@@ -1,0 +1,207 @@
+<div class="boxed_wrapper">
+
+
+
+    <!--page-title-two-->
+    <section class="page-title-two">
+        <div class="title-box centred bg-color-2">
+            <div class="pattern-layer">
+                <div class="pattern-1" style="background-image: url(assets/images/shape/shape-70.png);"></div>
+                <div class="pattern-2" style="background-image: url(assets/images/shape/shape-71.png);"></div>
+            </div>
+            <div class="auto-container">
+                <div class="title">
+                    <h1>Especialistas</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--page-title-two end-->
+
+
+    <div class="select-field bg-color-3">
+        <div class="auto-container">
+            <div class="content-box">
+                <div class="form-inner clearfix">
+                    <form  method="post">
+                        <div class="form-group clearfix">
+                            <select class="wide">
+                               <option data-display="Select Location">Ubicación</option>
+<!--                                <option value="1">California</option>
+                               <option value="2">New York</option>
+                               <option value="3">Sun Francis</option>
+                               <option value="4">Shicago</option> -->
+                            </select>
+                            <input type="text" name="name" placeholder="nombre" required="">
+                            <button type="submit"><i class="icon-Arrow-Right"></i></button>
+                        </div>
+                    </form>
+                    <ul class="select-box clearfix">
+                        <li>
+                            <div class="single-checkbox">
+                                <input type="radio" name="check-box" id="check1">
+                                <label for="check1"><span></span>.</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="single-checkbox">
+                                <input type="radio" name="check-box" id="check2" checked="">
+                                <label for="check2"><span></span>.</label>    
+                            </div>
+                        </li>
+                        <li>
+                            <div class="single-checkbox">
+                                <input type="radio" name="check-box" id="check3">
+                                <label for="check3"><span></span>.</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- doctors-page-section -->
+    <section class="clinic-section doctors-page-section">
+        <div class="auto-container">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 content-side">
+                    <div class="item-shorting clearfix">
+                        <div class="left-column pull-left">
+                            <h3>Resultados 1-6 of 20 </h3>
+                        </div>
+                        <div class="right-column pull-right clearfix">
+                            <div class="short-box clearfix">
+                                <div class="select-box">
+                                    <!-- <select class="wide">
+                                       <option data-display="Sort by">Sort by</option>
+                                       <option value="1">Cardiology</option>
+                                       <option value="2">Nurology</option>
+                                       <option value="4">Pragnency</option>
+                                    </select> -->
+                                </div>
+                            </div>
+                            <div class="menu-box">
+                                <button class="list-view on" [class.on]="view === 'list'" (click)="view = 'list'" ><i class="icon-List"></i></button>
+                                <button class="grid-view" [class.on]="view === 'grid'" (click)="view = 'grid'" ><i class="icon-Grid"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper" *ngIf="view === 'list'">
+                        <!-- BLOQUE DE LISTA -->
+                        <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="clinic-list-content list-item" *ngFor="let profesional of realtimeProfesionales.profesionales$ | async ">
+                        
+                            <div class="clinic-block-one">
+                                <div class="inner-box">
+                                    <div class="pattern">
+                                        <div class="pattern-1" style="background-image: url(assets/images/shape/shape-24.png);"></div>
+                                        <div class="pattern-2" style="background-image: url(assets/images/shape/shape-25.png);"></div>
+                                    </div>
+                                    <figure class="image-box">
+                                        <img 
+                                          [src]="profesional.images[0] || 'assets/images/user.png'" 
+                                          [alt]="profesional.name || 'Professional'"
+                                        >
+                                      </figure>
+                                    <div class="content-box">
+                                        <div class="like-box"><a (click)="global.goToDetail(profesional)"><i class="far fa-shield"></i></a></div>
+                                        <ul class="name-box clearfix">
+                                            <li class="name"><h3><a (click)="global.goToDetail(profesional)">{{profesional.name}}</a></h3></li>
+                                            <li><i class="icon-Trust-1"></i></li>
+                                            <li><i class="icon-Trust-2"></i></li>
+                                        </ul>
+                                        <div class="text">
+                                            <p>{{profesional.biography}}</p>
+                                        </div>
+                                        <span class="designation" style="color: #0f405f;">
+                                            Especialista en: 
+                                            <span style="color: #808080;"> {{ profesional.typeEspeciality && profesional.typeEspeciality.length ? profesional.typeEspeciality[0].name : 'No especificado' }}
+                                            </span>
+                                        </span>
+                                        <span style="color:  #0f405f;">Dirigido a: <span style="color: #808080;"> {{ getFormattedTargets(profesional.targets) }}</span></span>
+                                        <div class="rating-box clearfix">
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <!-- <li><a >(17)</a></li> -->
+                                            </ul>
+                                        </div>
+                                        <div class="location-box">
+                                            <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
+                                        </div>
+                                        <div class="lower-box clearfix">
+                                            <p><i class="fas fa-heart" style="color: #0f405f;"></i> Sesion: <span style="color: #808080;">{{profesional.priceSession}}</span></p>
+                                        </div>
+                                        <div class="btn-box"><a (click)="global.goToDetail(profesional)" style="cursor: pointer;">Agendar</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                         
+                        </div>
+                        <!-- FIN BLOQUE DE LISTA -->
+                    </div>
+                    <div class="wrapper" *ngIf="view === 'grid'">
+                        <!-- BLOQUE DE GRILLA -->
+                        <div class="clinic-grid-content">
+                            <div class="row clearfix" >
+                                <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="col-lg-4 col-md-4 col-sm-6 col-xs-6 team-block" *ngFor="let profesional of realtimeProfesionales.profesionales$ | async ">
+                                    <div class="team-block-three">
+                                        <div class="inner-box">
+                                          
+                                            <figure class="image-box">
+                                                <img 
+                                                  [src]="profesional.images[0] || 'assets/images/user.png'" 
+                                                  [alt]="profesional.name || 'Professional'"
+                                                >
+                                                <a (click)="global.goToDetail(profesional)"> <i class="far fa-shield"></i></a>
+                                              </figure>
+                                            <div class="lower-content">
+                                                <ul class="name-box clearfix">
+                                                    <li class="name"><h3><a (click)="global.goToDetail(profesional)">{{profesional.name}}</a></h3></li>
+                                                    <li><i class="icon-Trust-1"></i></li>
+                                                    <li><i class="icon-Trust-2"></i></li>
+                                                </ul>
+                                                <span class="designation" style="color: #0f405f;">Especialista en: <span style="color: #808080;"> {{ profesional.typeEspeciality && profesional.typeEspeciality.length ? profesional.typeEspeciality[0].name : 'No especificado' }}</span></span>
+                                                <span style="color: #0f405f;">Dirigido a: <span style="color: #808080;"> {{ getFormattedTargets(profesional.targets) }}</span></span>
+                                                <div class="rating-box clearfix">
+                                                    <ul class="rating clearfix">
+                                                        <li><i class="icon-Star"></i></li>
+                                                        <li><i class="icon-Star"></i></li>
+                                                        <li><i class="icon-Star"></i></li>
+                                                        <li><i class="icon-Star"></i></li>
+                                                        <li><i class="icon-Star"></i></li>
+                                                        <!-- <li><a >(32)</a></li> -->
+                                                    </ul>
+                                                </div>
+                                                <div class="location-box">
+                                                    <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
+                                                </div>
+                                                <div class="lower-box clearfix">
+                                                    <span class="text" style="color: #0f405f;"><i class="fas fa-heart" > Sesion:</i> <span style="color: #808080;"> {{profesional.priceSession}}</span></span>
+                                                    <a (click)="global.goToDetail(profesional)" style="cursor: pointer;">Agendar</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pagination-wrapper">
+                        <ul class="pagination">
+                            <li><a  class="current">1</a></li>
+                            <li><a >2</a></li>
+                            <li><a >3</a></li>
+                            <li><a ><i class="icon-Arrow-Right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+  
+</div>

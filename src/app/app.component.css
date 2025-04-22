@@ -1,0 +1,65 @@
+.theme-btn-two{
+    cursor: pointer;
+    color   : #0f405f;
+    border-color: #0f405f;
+}
+
+.theme-btn-two:hover{
+    background: #0f405f;
+    color: #ffffff;
+}
+.theme-btn-two i{
+    padding-left: 4px;
+}
+.swal2-container
+/* Add this to your global styles or relevant CSS file */
+.swal2-confirm, .swal2-cancel {
+    border-radius: 25px; /* Adjust the value for more or less rounding */
+}
+.swal2-popup .swal2-confirm, .swal2-popup .swal2-cancel {
+    border-radius: 25px !important; /* Adjust the value for more or less rounding */
+}
+nav.main-menu {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+nav.main-menu .navigation li {
+    display: inline-block;
+    margin: 0 15px;
+}
+
+nav.main-menu .navigation li a {
+    color: #5d8dda;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+nav.main-menu .navigation li a:hover {
+    color: #0056b3;
+}
+
+nav.main-menu .navigation li.active a {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.btn-box {
+    display: inline-block; /* Asegura que los botones se alineen horizontalmente */
+    margin: 5px; /* Espaciado entre los botones */
+}
+
+.theme-btn-one, .theme-btn-two {
+    padding: 10px 15px; /* Espaciado interno para los botones */
+    font-size: 16px; /* Tamaño de fuente */
+    text-align: center; /* Centrar texto */
+}
+
+@media (max-width: 768px) {
+    .btn-box {
+        width: 30%; /* Hacer que los botones ocupen el ancho completo en pantallas pequeñas */
+        text-align: center; /* Centrar texto en pantallas pequeñas */
+    }
+}
+
+

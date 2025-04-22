@@ -1,0 +1,209 @@
+ 
+<section class="doctor-details bg-color-3">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-8 col-md-12 col-sm-12 content-side">
+                <div class="clinic-details-content doctor-details-content">
+                    <div class="clinic-block-one">
+                        <div class="inner-box">
+                            <figure class="image-box" *ngFor="let image of global.previewProfesionals?.images">
+                                <img [src]="image" alt="">
+                            </figure>
+                            <div class="content-box">
+                       
+                                <ul class="name-box clearfix">
+                                    <li class="name">
+                                        <h2 >{{ global.previewProfesionals.name }}</h2>
+                                    </li>
+                                    <li><i class="icon-Trust-1"></i></li>
+                                    <li><i class="icon-Trust-2"></i></li>
+                                </ul>
+                                <span class="designation" >{{ global.previewProfesionals.typeEspeciality }}</span>
+                                <div class="rating-box clearfix">
+                                    <ul class="rating clearfix">
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><a >(32)</a></li>
+                                    </ul>
+                                </div>
+                                <span class="designation" >{{ global.previewProfesionals.typeEspeciality }}</span>
+                                <div class="lower-box clearfix">
+                                    <ul class="info clearfix">
+                                        <li ><i class="fas fa-map-marker-alt" ></i>{{global.previewProfesionals.consultationAddress}}</li>
+                                        <li ><i class="fas fa-map"></i>{{global.previewProfesionals.region}}</li>
+                                        <li ><i class="fas fa-phone"></i><a href="tel:2265458856">{{global.previewProfesionals.phone}}</a></li>
+                                    </ul>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tabs-box">
+                        <div class="tab-btn-box centred">
+                            <ul class="tab-btns tab-buttons clearfix">
+                                <li class="tab-btn active-btn" data-tab="#tab-1">Información</li>
+                                <!-- <li class="tab-btn" data-tab="#tab-2">Experiencia</li>
+                                  <li class="tab-btn" data-tab="#tab-3">Ubicación</li>
+                                 -->
+                                
+                                <li class="tab-btn" data-tab="#tab-4">Reseñas</li>
+                            </ul>
+                        </div>
+                        <div class="tabs-content">
+                            <div class="tab active-tab" id="tab-1">
+                                <div class="inner-box">
+                                    <div class="text">
+                                        <h3>Sobre mi</h3>
+                                        <p *ngIf="global.previewProfesionals">{{global.previewProfesionals.biography}}</p>
+                                        <div class="text">
+                                            <p><strong>Idiomas:</strong> </p>
+                                            <ul class="treatments-list clearfix">
+                                                <li><a >Español</a></li>
+                                                <li><a >Inglés</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="text">
+                                            <p><strong>Dirigido a:</strong> </p>
+                                        </div>
+                                        <div class="text">
+                                            <p><strong>Tipo de terapia:</strong> </p>
+                                        </div>
+                                        
+                                        <h3>Especialidades</h3>
+<!--                                         <p>Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Nullam mollis. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapi.</p>
+ -->                                        <ul class="treatments-list clearfix">
+                                            <li><a >Cardiology</a></li>
+                                            <li><a >Dermatology</a></li>
+                                            <li><a >Family Medicine</a></li>
+                                            <li><a >Obstetrics & Gynecology</a></li>
+                                            <li><a >Oncology</a></li>
+                                            <li><a >Orthopedic Surgery</a></li>
+                                        </ul>
+                                        <h3>Formación</h3>
+<!--                                         <p>Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Nullam mollis. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapi.</p>
+ -->                                        <ul class="list clearfix">
+                                            <li>New York Medical College <span>- Doctor of Medicine</span></li>
+                                            <li>Montefiore Medical Center <span>- Residency in Internal Medicine</span></li>
+                                            <li>New York Medical College <span>- Master Internal Medicine</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="accordion-box">
+                                        <h3>Tratamientos</h3>
+                                        
+                                        <ul class="list clearfix" style="color: black;">
+                                            <li><a >Cardiology</a></li>
+                                            <li><a >Dermatology</a></li>
+                                            <li><a >Family Medicine</a></li>
+                                            <li><a >Obstetrics & Gynecology</a></li>
+                                            <li><a >Oncology</a></li>
+                                            <li><a >Orthopedic Surgery</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab" id="tab-4">
+                                <div class="review-box">
+                                    <h3>Dr. Agnes Ayres Reviews</h3>
+                                    <div class="rating-inner">
+                                        <div class="rating-box">
+                                            <h2>4.5</h2>
+                                            <ul class="clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <span>Based on 5 review</span>
+                                        </div>
+                                        <div class="rating-pregress">
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text"><p><i class="icon-Star"></i>5 Stars</p></div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text"><p><i class="icon-Star"></i>4 Stars</p></div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text"><p><i class="icon-Star"></i>3 Stars</p></div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text"><p><i class="icon-Star"></i>2 Stars</p></div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text"><p><i class="icon-Star"></i>1 Stars</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="review-inner">
+                                        <div class="single-review-box">
+                                            <figure class="image-box"><img src="assets/images/resource/review-1.jpg" alt=""></figure>
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li class="light"><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <h6>Agnes Ayres <span>- April 10, 2020</span></h6>
+                                            <p>Lorem ipsum dolor sit amet consectetur adipisicing sed eiusmod tempor incididunt labore dolore magna aliqua enim.</p>
+                                        </div>
+                                    </div>
+                                    <div class="btn-box">
+                                        <a  class="theme-btn-one">Enviar<i class="icon-Arrow-Right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 col-sm-12 sidebar-side">
+                <div class="doctors-sidebar">
+                    <div class="form-widget">
+                        <div class="form-title">
+                            <h3>Quieres agendar una cita</h3>
+                            <p>Horario: 09:00Am-05:00PM</p>
+                            <p>Dia: Lunes a Viernes</p>
+                        </div>
+                        <div class="form-inner">
+                    
+                            <div class="choose-service">
+                                <h4>Dejame tus datos</h4>
+                                <form>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 form-group" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
+                                        <input type="text" name="name" placeholder="Escribe tu nombre" required="">
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 form-group" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
+                                        <input type="number" name="phone" placeholder="Escribe tu telefono" required="">
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 form-group" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
+                                        <input type="email" name="email" placeholder="Escribe tu correo" required="">
+                                    </div>
+                                <div class="row">
+                                    <div class="col-12 btn-box">
+                                        <a  class="theme-btn-one" (click)="sendToWhatsApp()"> Enviar al WhatsApp<i class="fab fa-whatsapp"></i></a>
+                                    </div>
+                                    <div class="col-12 btn-box">
+                                        <a  class="theme-btn-one" (click)="sendToWhatsApp()">Enviar al Correo<i class="fa fa-envelope"></i></a>
+                                    </div>
+
+                                </div>
+                                
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,445 @@
+<!-- banner-section -->
+<section class="banner-section style-two bg-color-1">
+    <div class="bg-layer" style="background-image: url(assets/images/banner/banner-bg-1.jpg); top:-40px !important;"></div>
+    <div class="pattern">
+        <div class="pattern-1" style="background-image: url(assets/images/shape/shape-32.png);"></div>
+        <div class="pattern-2" style="background-image: url(assets/images/shape/shape-33.png);"></div>
+        <div class="pattern-3" style="background-image: url(assets/images/shape/shape-34.png);"></div>
+        <div class="pattern-4" style="background-image: url(assets/images/shape/shape-35.png);"></div>
+    </div>
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                <div class="content-box">
+                    <h1>Red Psicólogos Chile</h1>
+                    <p>El directorio de especialistas en psicología de Chile</p>
+                    <span class="text-dark " style="font-size:16px;" >Encuentra el especialista que mas se adapte a tus necesidades, contamos con busqueda por especialidad y region</span>
+                    <div class="form-inner" style="margin-top:40px;">
+                        <form  method="post">
+                            <div class="form-group">
+                                <input type="text" name="name" placeholder="Terapia Psicológica..." required="">
+                                <button type="submit"><i class="icon-Arrow-Right"></i></button>
+                            </div>
+                        </form>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- banner-section end -->
+
+
+<!-- search-doctors -->
+<section class="search-doctors-two">
+    <div class="auto-container">
+        <div class="inner-container">
+            <div class="row clearfix">
+                <div class="col-lg-4 col-md-6 col-sm-12 doctors-block">
+                    <div class="doctors-block-one wow fadeInUp animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                        <div class="inner-box">
+                            <div class="pattern" style="background-image: url(assets/images/shape/shape-26.png);"></div>
+                            <div class="pattern-2" style="background-image: url(assets/images/shape/shape-36.png);"></div>
+                            <h3>Navega <br />por Tipo de Terapia</h3>
+                            <ul class="doctors-list clearfix">
+                                <li><a >Individual, grupal o de pareja</a></li>
+                            </ul>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 doctors-block">
+                    <div class="doctors-block-one wow fadeInUp animated animated" data-wow-delay="300ms" data-wow-duration="1500ms">
+                        <div class="inner-box">
+                            <div class="pattern" style="background-image: url(assets/images/shape/shape-26.png);"></div>
+                            <div class="pattern-2" style="background-image: url(assets/images/shape/shape-36.png);"></div>
+                            <h3>Navega <br />por Corriente</h3>
+                            <ul class="doctors-list clearfix">
+                                <li><a >Gestalt, Psicodinámico, Psicoanálisis ... </a></li>
+                            </ul>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='corrientes'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 doctors-block">
+                    <div class="doctors-block-one wow fadeInUp animated animated" data-wow-delay="600ms" data-wow-duration="1500ms">
+                        <div class="inner-box">
+                            <div class="pattern" style="background-image: url(assets/images/shape/shape-26.png);"></div>
+                            <div class="pattern-2" style="background-image: url(assets/images/shape/shape-36.png);"></div>
+                            <h3>Ubícalos <br />por tu región y comuna</h3>
+                            <ul class="doctors-list clearfix">
+                                <li><a>Ubica a un especialista según la región</a></li>
+                            </ul>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- search-doctors end -->
+
+<!-- team-style-two -->
+<section class="team-style-two" *ngIf="isMobile()">
+    <div class="auto-container">
+        <div class="sec-title centred">
+            <p>Especialistas</p>
+            <h2>TOP de especialistas destacados (Móvil)</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="col-12 team-block" *ngFor="let profesional of realtimeProfesionales.profesionales$ | async">
+                <div class="team-block-two " data-wow-delay="00ms" data-wow-duration="1500ms">
+                    <div class="inner-box">
+                        <div class="pattern" style="background-image: url(assets/images/shape/shape-43.png);"></div>
+                        <figure class="image-box">
+                           
+                            <img [src]="profesional.images[0] || 'assets/images/user.png'" alt="">
+    
+                            <a><i class="far fa-heart"></i></a>
+                        </figure>
+                        <div class="lower-content">
+                            <h3><a>{{profesional.name}}</a></h3>
+                            <span class="designation">Ph.D, DPT, MS OMPT</span>
+                            <ul class="rating clearfix">
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><a>2 reviews</a></li>
+                            </ul>
+                            <div class="location-box">
+                                <p><i class="fas fa-map-marker-alt"></i>G87P+PG Shustoke, Birmingham, UK</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección para escritorio -->
+<section class="team-style-two" *ngIf="!isMobile()">
+    <div class="auto-container">
+        <div class="sec-title centred">
+            <p>Especialistas</p>
+            <h2>TOP de especialistas destacados</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 team-block" *ngFor="let profesional of realtimeProfesionales.profesionales$ | async">
+                <div class="team-block-two wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                    <div class="inner-box">
+                        <div class="pattern" style="background-image: url(assets/images/shape/shape-43.png);"></div>
+                        <figure class="image-box">
+                            <img [src]="profesional.images[0] || 'assets/images/user.png'" alt="" (click)="global.goToDetail(profesional)">
+    
+                            <a><i class="far fa-shield"></i></a>
+                        </figure>
+                        <div class="lower-content">
+                            <h3><a>{{profesional.name}}</a></h3>
+<!--                             <span class="designation" style="color: #0f405f;">Especialista en: <span style="color: #808080;">{{ (profesional.typeEspeciality?.length ? profesional.typeEspeciality[0].name : 'No especificado') }}</span></span>
+ -->                            <span class="designation" style="color: #0f405f;">Dirigido a: 
+                                <span style="color: #808080;">{{ getFormattedTargets(profesional.targets) }}</span></span>
+                            <span class="designation" style="color: #0f405f;">Sesión: 
+                                <span style="color: #808080;">{{ profesional.priceSession }} CLP</span></span>
+                            <ul class="rating clearfix">
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <li><i class="icon-Star"></i></li>
+                                <!-- <li><a>2 comentarios</a></li> -->
+                            </ul>
+                            <div class="location-box">
+                                <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
+                                <a (click)="global.goToDetail(profesional)" style="cursor: pointer; color: #0f405f;">Ver perfil</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="more-btn centred">
+            <a class="theme-btn-one" (click)="global.activeRoute='professionals'">Todos los Especialistas <i class="icon-Arrow-Right"></i></a>
+        </div>
+    </div>
+</section>
+<!-- team-style-two end -->
+
+
+
+<!-- process-style-two -->
+<section class="process-style-two bg-color-3 centred">
+    <div class="pattern-layer">
+        <div class="pattern-1" style="background-image: url(assets/images/shape/shape-39.png);"></div>
+        <div class="pattern-2" style="background-image: url(assets/images/shape/shape-40.png);"></div>
+        <div class="pattern-3" style="background-image: url(assets/images/shape/shape-41.png);"></div>
+        <div class="pattern-4" style="background-image: url(assets/images/shape/shape-42.png);"></div>
+    </div>
+    <div class="auto-container">
+        <div class="sec-title centred">
+            <p>Como funciona</p>
+            <h2>Proceso de registro</h2>
+        </div>
+        <div class="inner-content">
+            <div class="arrow" style="background-image: url(assets/images/icons/arrow-1.png);"></div>
+            <div class="row clearfix">
+                <div class="col-lg-4 col-md-6 col-sm-12 processing-block">
+                    <div class="processing-block-two">
+                        <div class="inner-box">
+                            <figure class="icon-box"><img src="assets/images/icons/icon-9.png" alt=""></figure>
+                            <h3>Buscar Psicologo</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 processing-block">
+                    <div class="processing-block-two">
+                        <div class="inner-box">
+                            <figure class="icon-box"><img src="assets/images/icons/icon-10.png" alt=""></figure>
+                            <h3>Ver Perfil Profesional</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 processing-block">
+                    <div class="processing-block-two">
+                        <div class="inner-box">
+                            <figure class="icon-box"><img src="assets/images/icons/icon-11.png" alt=""></figure>
+                            <h3>Reserva tu cita</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- process-style-two end -->
+
+  <!-- faq-section -->
+  <section class="faq-section">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-6 col-md-12 col-sm-12 image-column">
+                <div class="image_block_4">
+                    <div class="image-box">
+                        <div class="pattern" style="background-image: url(assets/images/shape/shape-54.png);"></div>
+                        <figure class="image"><img src="assets/images/resource/faq-1.png" alt=""></figure>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                <div class="content_block_5">
+                    <div class="content-box">
+                        <div class="sec-title">
+                            <p>Preguntas frecuentes</p>
+                            <h2>Encuentra la respuesta a tus inquietudes</h2>
+                        </div>
+                        <ul class="accordion-box">
+                            <li class="accordion block">
+                                <div class="acc-btn">
+                                    <div class="icon-outer"></div>
+                                    <h4>¿Cómo puedo registrarme como psicólogo/a en el directorio?</h4>
+                                </div>
+                                <div class="acc-content">
+                                    <div class="text">
+                                        <p>Para registrarte como psicólogo/a en nuestro directorio, accede a la página principal de registro de la plataforma, completa el formulario con tus datos y el administrador validará tu registro. Una vez aprobado, recibirás un correo de confirmación y tu perfil estará activo.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="accordion block">
+                                <div class="acc-btn">
+                                    <div class="icon-outer"></div>
+                                    <h4>¿Qué información necesito para registrarme?</h4>
+                                </div>
+                                <div class="acc-content">
+                                    <div class="text">
+                                        <p>Necesitarás proporcionar tu nombre completo, especialidad, título universitario,rut, datos de contacto (correo, teléfono) y foto profesional. Toda la información será verificada durante el proceso de validación.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="accordion block">
+                                <div class="acc-btn">
+                                    <div class="icon-outer"></div>
+                                    <h4>¿Es gratuito registrarse en el directorio?</h4>
+                                </div>
+                                <div class="acc-content">
+                                    <div class="text">
+                                        <p>Sí, el registro es gratuito. Sin embargo, hay planes de suscripción pagados que ofrecen beneficios adicionales como mayor visibilidad y servicios premium.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="accordion block">
+                                <div class="acc-btn">
+                                    <div class="icon-outer"></div>
+                                    <h4>¿Cómo puedo editar o actualizar mi perfil como psicólogo/a?</h4>
+                                </div>
+                                <div class="acc-content">
+                                    <div class="text">
+                                        <p>Puedes editar tu perfil en cualquier momento iniciando sesión y accediendo a la sección "Mis datos". Allí podrás actualizar tus horarios, especialidades, datos de contacto y foto.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="accordion block">
+                                <div class="acc-btn">
+                                    <div class="icon-outer"></div>
+                                    <h4>¿Qué tipo de psicólogos pueden registrarse?</h4>
+                                </div>
+                                <div class="acc-content">
+                                    <div class="text">
+                                        <p>Cualquier psicólogo/a con una licenciatura en Psicología y, si es necesario, con las credenciales correspondientes (licencia, especialización). El registro está abierto para profesionales con formación y habilitación válida para ejercer.</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row col-lg-12 col-md-12 col-sm-12" style="margin-bottom: 20px;">
+                <ul class="col-md-6 accordion-box">
+                    
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Cómo puedo aumentar la visibilidad de mi perfil?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>La visibilidad se puede aumentar a través de los planes de suscripción premium, los cuales te ofrecen mayor exposición en los resultados de búsqueda y opciones de promoción destacada.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Cómo se contactan los pacientes conmigo a través de la plataforma?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>Los pacientes pueden contactarte mediante el formulario de contacto en tu perfil o utilizando los datos de contacto que hayas proporcionado (correo, teléfono). También puedes habilitar la opción para agendar citas online.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Qué sucede si no puedo responder a los pacientes por alguna razón?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>Si no puedes responder a los pacientes, puedes marcar tu perfil como "No disponible temporalmente". Esto notificará a los pacientes que no estás disponible para consultas.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Cómo puedo asegurarme de que mi consulta sea confidencial?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>La plataforma utiliza cifrado de datos y cumple con normativas de privacidad para garantizar la confidencialidad de las consultas. Además, las videollamadas y otras interacciones se realizan de forma segura.</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="col-md-6 accordion-box">
+                    
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Los pacientes pueden dejar valoraciones o comentarios sobre mi trabajo?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>Sí, los pacientes pueden dejar valoraciones y comentarios en tu perfil, lo que les ayuda a otros usuarios a conocer más sobre tu trabajo y experiencia.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿La plataforma verifica las credenciales de los psicólogos?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>Sí, la plataforma verifica las credenciales de los psicólogos al momento de registrarse, garantizando que los profesionales sean auténticos y cualificados para ofrecer sus servicios.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Cuánto tiempo toma que mi perfil esté activo después de registrarme?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>El proceso de validación de tu perfil puede tomar de 1 a 3 días hábiles. Una vez aprobado, recibirás un correo de confirmación y tu perfil será visible para los pacientes.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="accordion block">
+                        <div class="acc-btn">
+                            <div class="icon-outer"></div>
+                            <h4>¿Puedo cancelar mi registro en cualquier momento?</h4>
+                        </div>
+                        <div class="acc-content">
+                            <div class="text">
+                                <p>Sí, puedes cancelar tu registro en cualquier momento. Para hacerlo, simplemente inicia sesión y solicita la baja. Tu perfil será eliminado y ya no aparecerás en el directorio.</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- faq-section end -->
+
+  <!-- cta-section -->
+  <section class="cta-section bg-color-2">
+    <div class="pattern-layer">
+        <div class="pattern-1" style="background-image: url(assets/images/shape/shape-17.png);"></div>
+        <div class="pattern-2" style="background-image: url(assets/images/shape/shape-18.png);"></div>
+        <div class="pattern-3" style="background-image: url(assets/images/shape/shape-19.png);"></div>
+    </div>
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-6 col-md-12 col-sm-12 image-column">
+                <div class="image-box wow fadeInUp animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                    <figure class="image"><img src="assets/images/resource/phone-1.png" alt=""></figure>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                <div class="content_block_2">
+                    <div class="content-box">
+                        <div class="sec-title light">
+                            <p>Quieres formar parte de nuestra comunidad?</p>
+                            <h2>Registrate GRATUITAMENTE</h2>
+                        </div>
+                        <div class="text">
+                            <p>¡Registrate y accede a todos los servicios de nuestra plataforma!</p>
+                        </div>
+                        <div class="btn-box clearfix">
+                            <a (click)="global.activeRoute='register'" class="download-btn app-store">
+                                <i class="fa fa-user"></i>
+                                <span>REGISTRATE</span>
+                                <h3>Gana tu primer cliente y un descuento por invitación</h3>
+                            </a>
+                            <!-- <a (click)="global.setRoute('login')" class="download-btn play-store">
+                                <i class="fab fa-google-play"></i>
+                                <span>INGRESA</span>
+                                <h3>El mundo de la psicologia</h3>
+                            </a> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- cta-section end -->
