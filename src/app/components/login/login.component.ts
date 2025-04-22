@@ -34,31 +34,6 @@ export class LoginComponent {
 togglePasswordVisibility() {
   this.passwordVisible = !this.passwordVisible;
 }
-// Método para manejar el envío del formulario de inicio de sesión
-/* onLogin() {
-  if (this.loginForm.valid) {
-    const { email, password } = this.loginForm.value;
-    this.auth.loginUser(email, password).subscribe({
-      next: (response) => {
-        console.log('Inicio de sesión exitoso', response);
-
-        // Guardar el estado de login y el usuario actual en localStorage
-        localStorage.setItem('isLoggedin', 'true');
-        this.auth.setUser(response.user); // Suponiendo que `response.user` es el usuario
-
-        // Redirigir según el tipo de usuario con `permision()`
-        this.auth.permision();
-      },
-      error: (error) => {
-        console.error('Error en el inicio de sesión:', error);
-        this.errorMessage = 'Credenciales incorrectas, intenta de nuevo.';
-      }
-    });
-  } else {
-    this.errorMessage = 'Por favor, completa los campos correctamente.';
-  }
-} */
-
   onLogin() {
 
     this.global.loading = true; // Start loading
@@ -71,7 +46,7 @@ togglePasswordVisibility() {
           console.log('Inicio de sesión exitoso', response);
           localStorage.setItem('isLoggedin', 'true');
           this.auth.setUser(response.user);
-          this.global.setMenuOption('profile');
+          this.global.activeRoute = 'homeprofessional';
           this.auth.permision();
         },
         error: (error) => {

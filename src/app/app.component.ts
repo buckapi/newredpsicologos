@@ -12,6 +12,9 @@ import { LoginComponent } from './components/login/login.component';
 import { AuthPocketbaseService } from './service/auth-pocketbase.service';
 import Swal from 'sweetalert2';
 import { RealtimeProfessionalsService } from './service/realtime-professionals';
+import { ProfileComponent } from './components/dahsboard/profile/profile.component';
+import { HomeadminComponent } from './components/dahsboard/homeadmin/homeadmin.component';
+import { HomeprofessionalComponent } from './components/dahsboard/homeprofessional/homeprofessional.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -23,7 +26,10 @@ import { RealtimeProfessionalsService } from './service/realtime-professionals';
     ProfessionalsComponent,
     ProfessionalDetailComponent,
     RegisterComponent,
-    LoginComponent  
+    LoginComponent,
+    ProfileComponent,
+    HomeadminComponent,
+    HomeprofessionalComponent
   ],  
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

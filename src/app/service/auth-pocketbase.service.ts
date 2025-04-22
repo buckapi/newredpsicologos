@@ -274,8 +274,8 @@ export class AuthPocketbaseService {
         this.global.setMenuOption('profile');
         this.global.profileComplete = false;
     } else {
-        this.global.setMenuOption('dashboard');
-        this.global.profileComplete = true;
+      this.global.activeRoute = 'homeadmin';
+      this.global.profileComplete = true;
     }
 }
 
@@ -291,8 +291,7 @@ export class AuthPocketbaseService {
 
     // Handle admin user
     if (userType === 'admin') {
-      this.global.setMenuOption('dashboard');
-      this.global.activeRoute = 'dashboard';
+      this.global.activeRoute = 'homeadmin';
       return;
     }
 
@@ -305,7 +304,7 @@ export class AuthPocketbaseService {
           const profesional = profesionales[0];
           localStorage.setItem('professionalInfo', JSON.stringify(profesional));
           this.completeVal(profesional);
-          this.global.activeRoute = 'profile-specialist';
+          this.global.activeRoute = 'homeprofessional';
 
         } else {
           console.warn('No professional found with the provided userId');

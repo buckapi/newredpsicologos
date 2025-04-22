@@ -69,7 +69,7 @@ loginAfterRegistration(email: string, password: string) {
       console.log('Inicio de sesión exitoso', response);
       localStorage.setItem('isLoggedin', 'true');
       this.auth.setUser(response.user);
-      this.global.setMenuOption('dashboard');
+      this.global.activeRoute = 'homeprofessional';
       this.auth.permision();
     },
     error: (error) => {
@@ -77,63 +77,6 @@ loginAfterRegistration(email: string, password: string) {
       this.errorMessage = 'Credenciales incorrectas, intenta de nuevo.';
     }
   });
+}
 
-
-  // this.auth.loginUser(email, password).subscribe(
-  //   (response) => {
-  //     console.log('Login successful', response);
-  //     this.global.setRoute('profile-specialist'); // O la ruta que desees después del inicio de sesión
-  //   },
-  //   (error) => {
-  //     console.error('Error logging in after registration', error);
-  //     this.global.setRoute('login'); // Redirigir al login en caso de error
-  //   }
-  // );
-}
-/* registerUser() {
-  this.auth.registerUser(this.email, this.password, 'especialista', this.name, this.username).subscribe(
-    (response) => {
-      console.log('Usuario registrado correctamente', response);
-      this.loginAfterRegistration(this.email, this.password);
-    },
-    (error) => {
-      console.error('Error registering user', error);
-    }
-  );
-}
-specialistRegister() {
-  if (this.name && this.email && this.password && this.name  ) {
-    this.auth.registerUser(this.email, this.password, 'especialista', this.name, this.username).subscribe(
-      (response) => {
-        console.log('Especialista registrado correctamente', response);
-        Swal.fire({
-          title: 'Éxito',
-          text: 'El especialista ha sido registrado correctamente.',
-          icon: 'success',
-          confirmButtonText: 'Aceptar'
-        }).then(() => {
-          this.global.setRoute('home'); // Redirigir al home después de cerrar el alert
-        });
-      },
-      (error) => {
-        console.error('Error registering user', error);
-      }
-    );
-  } else {
-    console.error('Please complete all required fields');
-  }
-}
- // Método para iniciar sesión después del registro
- loginAfterRegistration(email: string, password: string) {
-  this.auth.loginUser(email, password).subscribe(
-    (response) => {
-      console.log('Login successful', response);
-      this.global.setRoute('profile-specialist'); // O la ruta que desees después del inicio de sesión
-    },
-    (error) => {
-      console.error('Error logging in after registration', error);
-      this.global.setRoute('login'); // Redirigir al login en caso de error
-    }
-  );
-} */
 }
