@@ -15,6 +15,7 @@ import { RealtimeProfessionalsService } from './service/realtime-professionals';
 import { ProfileComponent } from './components/dahsboard/profile/profile.component';
 import { HomeadminComponent } from './components/dahsboard/homeadmin/homeadmin.component';
 import { HomeprofessionalComponent } from './components/dahsboard/homeprofessional/homeprofessional.component';
+import { SettingsComponent } from './components/dahsboard/settings/settings.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -29,7 +30,8 @@ import { HomeprofessionalComponent } from './components/dahsboard/homeprofession
     LoginComponent,
     ProfileComponent,
     HomeadminComponent,
-    HomeprofessionalComponent
+    HomeprofessionalComponent,
+    SettingsComponent
   ],  
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

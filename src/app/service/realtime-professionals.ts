@@ -160,11 +160,6 @@ export class RealtimeProfessionalsService implements OnDestroy {
     }
   }
 
-/*   getCantidadProfesionales(): Observable<number> {
-    return this.firestore.collection('psychologistsProfessionals').snapshotChanges().pipe(
-      map(actions => actions.length) // Contamos la cantidad de documentos en la colección
-    );
-  } */
 
   ngOnDestroy() {
     // Unsubscribe when the service is destroyed

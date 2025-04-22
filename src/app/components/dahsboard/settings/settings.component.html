@@ -1,0 +1,70 @@
+<div class="right-panel" id="especialidades">
+    <div class="card content-container">
+        <div class="container">
+            <div class="clinic-details-content doctor-details-content">
+                <div class="location-box">
+                    <div class="location-box" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Especialidades</h4>
+                        <div class="btn-box" style="display: inline;">
+                            <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;" (click)="openSpecialtyPopup()"> <i class="icon-image"></i></a>
+                            <!-- <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointerbtn btn-sm btn-primary hover-invert; border-radius: 50px; color: white;">Agregar Especialidad <i class="icon-image"></i></a> -->
+                        </div>
+                    </div>
+                    <span *ngFor="let especialidad of realtimeEspecialidades.especialidades$ | async ">
+                        <span class="badge">{{especialidad.name}}
+
+                        <i class="fa fa-times" style="cursor: pointer;"></i>
+
+                        </span>
+                    </span>
+                </div>
+                <div class="location-box">
+                    <div class="location-box" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Tratamientos</h4>
+                        <div class="btn-box" style="display: inline;">
+                            <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;" (click)="openTreatmentPopup()"> <i class="icon-image"></i></a>
+
+                            <!-- <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;">Agregar Tratamiento <i class="icon-image"></i></a> -->
+                        </div>
+                    </div>
+                    <span *ngFor="let tratamiento of realtimeTratamientos.tratamientos$ | async ">  
+                        <span class="badge">{{tratamiento.name}}
+                            <i class="fa fa-times" style="cursor: pointer;"></i>
+                        </span>
+                    </span>
+                </div>
+                <div class="location-box">
+                    <div class="location-box" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Corriente</h4>
+                        <div class="btn-box" style="display: inline;">
+                            <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;" (click)="openCorrientesPopup()"> <i class="icon-image"></i></a>
+
+                            <!-- <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;">Agregar Tratamiento <i class="icon-image"></i></a> -->
+                        </div>
+                    </div>
+                    <span *ngFor="let corriente of realtimeCorrientes.corrientes$ | async ">  
+                        <span class="badge">{{corriente.name}}
+                            <i class="fa fa-times" style="cursor: pointer;"></i>
+                        </span>
+                    </span>
+                </div>
+                <div class="location-box">
+                    <div class="location-box" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Terapias</h4>
+                        <div class="btn-box" style="display: inline;">
+                            <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;" (click)="openTherapyPopup()"> <i class="icon-image"></i></a>
+
+                            <!-- <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;">Agregar Terapia <i class="icon-image"></i></a> -->
+                        </div>
+                    </div>
+                    <span *ngFor="let terapia of realtimeTerapia.terapia$ | async ">  
+                        <span class="badge">{{terapia.name}}
+                            <i class="fa fa-times" style="cursor: pointer;"></i>
+                        </span>
+                    </span>
+                </div>
+       
+            </div>
+        </div>
+    </div>
+</div>
