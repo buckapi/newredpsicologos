@@ -49,10 +49,14 @@ constructor(
     this.setImage();
   } else {
     // Si no hay datos en cache, cargarlos del servidor
-    this.getProfessionlINfo();
+    this.global.loadProfessionalInfo();
   }
 }
- 
+/* ngOnInit() {
+  if (!this.global.professionalInfo) {
+    this.global.loadProfessionalInfo(); // Asegúrate de que este método exista
+  }
+} */ 
   setImage() {
     const professionalInfo = JSON.parse(localStorage.getItem('professionalInfo') || '{}');  
     this.imageUrl = professionalInfo.images?.[0] || 'assets/images/user.png'; 

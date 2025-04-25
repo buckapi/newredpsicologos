@@ -212,30 +212,15 @@ export class GlobalService {
     this.previewProfesionals = profesional;
   }
 
-  /* setPreviewProfesional(data: any) {
-    this.previewProfesionals = data;
-    
-    // Verificar si data y su propiedad images existen
-    if (data && data['images']) {
-        this.imageUrl = data['images'][0] || 'assets/images/user.png'; // Asignar la imagen
-    } else {
-        this.imageUrl = 'assets/images/user.png'; // Valor por defecto si no hay imagen
-    }
-
-    // alert("imagen: " + this.imageUrl);
-} */
+ 
 getPreviewProfesional(): Profesionals {
   return this.previewProfesionals;
 }
   loadProfessionalInfo(): any {
     const info = localStorage.getItem('professionalInfo');
-    if (info) {
-      this.professionalInfo = JSON.parse(info);
-    }
-    return this.professionalInfo; // Assuming professionalInfo contains the data you need
-
+    this.professionalInfo = info ? JSON.parse(info) : {}; // Default a objeto vacío
+    return this.professionalInfo;
   }
-  
   getProfesionals() {
     this.realtimeProfesionales.profesionales$.subscribe(profesionales => {
       this.profesionals = profesionales;
