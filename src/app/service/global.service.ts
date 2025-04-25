@@ -93,7 +93,9 @@ interface corriente {
   providedIn: 'root'
 })
 export class GlobalService {
-  storedRegiones: any[] = [];
+  private professionalInfoSubject = new BehaviorSubject<any>(null);
+  professionalInfo$ = this.professionalInfoSubject.asObservable();
+    storedRegiones: any[] = [];
   imageUrl: string = '';
   isLoading = false;
   professionalToEdit: any={};
@@ -176,9 +178,21 @@ export class GlobalService {
     this.loadProfessionalInfo();
     this.pb = new PocketBase('https://db.redpsicologos.cl:8090');
   }
- /*  setRoute(route: string) {
-    this.activeRoute = route;
-  } */
+  getFormattedTargets(targets: any): string {
+    const activeTargets = [];
+    
+    if (targets?.['niños y niñas']) activeTargets.push('Niños y niñas');
+    if (targets?.adultos) activeTargets.push('Adultos');
+    if (targets?.['jóvenes y adolecentes']) activeTargets.push('Jóvenes y adolescentes');
+    if (targets?.['adultos mayores']) activeTargets.push('Adultos mayores');
+    if (targets?.todos) activeTargets.push('Todos los públicos');
+    
+    return activeTargets.join(', ') || 'No especificado';
+  }
+ 
+  setPreviewProfesional(data: any) {
+    this.professionalInfoSubject.next(data);
+  }
   setMenuOption(option: string) {
     let regions = this.getRegiones();
     regions.subscribe((regions: any) => {
@@ -198,7 +212,7 @@ export class GlobalService {
     this.previewProfesionals = profesional;
   }
 
-  setPreviewProfesional(data: any) {
+  /* setPreviewProfesional(data: any) {
     this.previewProfesionals = data;
     
     // Verificar si data y su propiedad images existen
@@ -209,7 +223,7 @@ export class GlobalService {
     }
 
     // alert("imagen: " + this.imageUrl);
-}
+} */
 getPreviewProfesional(): Profesionals {
   return this.previewProfesionals;
 }
@@ -225,6 +239,7 @@ getPreviewProfesional(): Profesionals {
   getProfesionals() {
     this.realtimeProfesionales.profesionales$.subscribe(profesionales => {
       this.profesionals = profesionales;
+      this.professionalInfoSubject.next(profesionales);
     });
     return this.profesionals;
   }

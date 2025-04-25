@@ -28,15 +28,14 @@
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                 <label>Contraseña</label>
                                 <div class="input-group">
-                                    <input name="password" placeholder="Ingrese su contraseña" 
-                                           class="form-control py-11 ps-40" id="password"
-                                           formControlName="password" 
-                                           [type]="passwordVisible ? 'text' : 'password'">
+                                    <input name="password" placeholder="Ingrese su contraseña"
+                                           class="form-control"
+                                           [type]="passwordVisible ? 'text' : 'password'"
+                                           formControlName="password">
                                     <span class="input-group-text password-toggle">
-                                        <button type="button" (click)="togglePasswordVisibility()" class="btn btn-link p-0">
-                                            <i class="bi bi-eye" *ngIf="passwordVisible"></i>
-                                            <i class="bi bi-eye-slash" *ngIf="!passwordVisible"></i>
-                                        </button>
+                                      <button type="button" (click)="togglePasswordVisibility()" class="">
+                                        <i class="fa fa-eye" [ngClass]="passwordVisible ? 'fa-eye' : 'fa-eye-slash'"></i>
+                                      </button>
                                     </span>
                                 </div>
                                 <div *ngIf="password?.invalid && (password?.touched || password?.dirty)" class="text-danger">
@@ -88,5 +87,3 @@
         </div>
     </div>
 </section>
-
-

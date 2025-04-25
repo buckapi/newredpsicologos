@@ -1,1 +1,262 @@
-<p>homeprofessional works!</p>
+<section class="doctors-dashboard bg-color-3">
+    <div class="left-panel">
+        <div class="profile-box">
+            <div class="upper-box">
+                <figure class="profile-image">
+                    <img [src]="authService.getImage()" alt="Profile Image" />
+                </figure>
+                <div class="title-box centred">
+                    <div class="inner">
+                        <h3> {{ global.professionalInfo.name }} {{ global.professionalInfo.lastname }}</h3>
+                        <p>Bienvenido(a) a tu panel de control</p>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-info">
+                <ul class="list clearfix">
+                   
+                    <li><a href="dashboard" style="cursor: pointer;"><i
+                                class="fas fa-home"></i>Cuenta</a></li>
+                    <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i
+                                class="fas fa-user"></i>Actualizar datos</a></li>
+                    <li><a style="cursor: pointer;"><i class="fas fa-unlock-alt"></i>Cambiar contraseña</a></li>
+                    <li>
+                        <div class="btn-box" *ngIf="authService.isLogin()">
+                            <a (click)="confirmLogout()" style="cursor: pointer;">
+                                <i class="fa fa-sign-out"></i>Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="right-panel">
+        <div class="content-container" id="dashboard" >
+            <div class="outer-container">
+                <div class="clinic-details-content doctor-details-content">
+                    <div class="clinic-block-one">
+                        <div class="inner-box">
+                            <figure class="image-box">
+                                <img [src]="authService.getImage()" alt="">
+                            </figure>
+                            <div class="content-box" style="margin: 40px;">
+
+                                <ul class="name-box clearfix">
+                                    <li class="name">
+                                        <h2> {{ global.professionalInfo.name }} {{ global.professionalInfo.lastname }}
+                                        </h2>
+                                    </li>
+                                    <li><i class="icon-Trust-1"></i></li>
+                                    <li><i class="icon-Trust-2"></i></li>
+                                </ul>
+                                <span class="designation" style="color: #0f405f;">Especialista en: <span style="color: #808080;">
+                                    {{ global.professionalInfo.typeEspeciality && global.professionalInfo.typeEspeciality.length ? global.professionalInfo.typeEspeciality[0].name : 'No especificado' }}</span></span>
+                                <!-- <div class="rating-box clearfix">
+                                    <ul class="rating clearfix">
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><i class="icon-Star"></i></li>
+                                        <li><a >(32)</a></li>
+                                    </ul>
+                                </div> -->
+                                <div class="text">
+                                    <span style="color: #0f405f;">Dirigido a: <span style="color: #808080;"> {{ global.getFormattedTargets(global.professionalInfo.targets) }}</span></span>
+                                </div>
+                                
+                                <div class="lower-box clearfix">
+                                    <ul class="info clearfix">
+                                        <li><i class="fas fa-map-marker-alt"></i><a>Dirección de consultorio: {{ global.professionalInfo.consultationAddress}}</a></li>
+                                        <li><i class="fas fa-map"></i><a>Region: {{global.professionalInfo.region.name || 'No especificado' }}</a></li>
+                                        <li><i class="fas fa-phone"></i><a href="tel:2265458856">Teléfono: {{global.professionalInfo.phone }}</a></li>
+                                        <li><i class="fas fa-id-card"></i><a>Rut: {{ global.professionalInfo.rut }}</a></li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tabs-box">
+                        <div class="tabs-content">
+                            <div class="tab active-tab" id="tab-1">
+                                <div class="inner-box">
+                                    <div class="text">
+                                        <h3>Sobre {{ global.professionalInfo.name }} {{ global.professionalInfo.lastname
+                                            }}:</h3>
+                                        <p>
+                                            {{ global.professionalInfo.biography }}
+                                        </p>
+                                        <h3>Especialista en: </h3>
+                                        <ul class="treatments-list clearfix">
+                                            <li><a>{{global.professionalInfo.typeEspeciality?.name || 'No especificado'}}</a></li>
+                                        </ul>
+                                        <h3>Dificultades en (Tratamientos):</h3>
+                                        <ul class="treatments-list clearfix">
+                                            <li><a>{{global.professionalInfo.typeTreatment?.name || 'No especificado'}}</a></li>
+                                        </ul>
+                                        <h3>Corrientes</h3>
+                                        <ul class="list clearfix">
+                                            <li>{{global.professionalInfo.typeAttention?.name || 'No especificado'}}</li>
+                                        </ul>
+                                        <h3>Tipo de atención</h3>
+                                        <ul class="list clearfix">
+                                            <li>{{global.professionalInfo.typeAttention?.name || 'No especificado'}}</li>
+                                        </ul>
+                                        <h3>Horario de atención</h3>
+                                        <ul class="list clearfix">
+                                            <li>{{global.professionalInfo.openingHours || 'No especificado'}}</li>
+                                            <li>{{global.professionalInfo.day || 'No especificado'}}</li>
+                                        </ul>
+                                        <h3>Costo de atención</h3>
+                                        <ul class="list clearfix">
+                                            <li>{{global.professionalInfo.priceSession || 'No especificado'}}</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="location-box">
+                                        <h3>Formación Académica</h3>
+                                        <ul class="location-info clearfix">
+                                            <li><i class="fas fa-graduation-cap"></i>{{global.professionalInfo.certificates || 'No especificado'}}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab" id="tab-4">
+                                <div class="review-box">
+                                    <h3>Dr. Agnes Ayres Reviews</h3>
+                                    <div class="rating-inner">
+                                        <div class="rating-box">
+                                            <h2>4.5</h2>
+                                            <ul class="clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <span>Based on 5 review</span>
+                                        </div>
+                                        <div class="rating-pregress">
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text">
+                                                    <p><i class="icon-Star"></i>5 Stars</p>
+                                                </div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text">
+                                                    <p><i class="icon-Star"></i>4 Stars</p>
+                                                </div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text">
+                                                    <p><i class="icon-Star"></i>3 Stars</p>
+                                                </div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text">
+                                                    <p><i class="icon-Star"></i>2 Stars</p>
+                                                </div>
+                                            </div>
+                                            <div class="single-progress">
+                                                <span class="porgress-bar"></span>
+                                                <div class="text">
+                                                    <p><i class="icon-Star"></i>1 Stars</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="review-inner">
+                                        <div class="single-review-box">
+                                            <figure class="image-box"><img src="assets/images/resource/review-1.jpg"
+                                                    alt=""></figure>
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li class="light"><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <h6>Agnes Ayres <span>- April 10, 2020</span></h6>
+                                            <p>Lorem ipsum dolor sit amet consectetur adipisicing sed eiusmod tempor
+                                                incididunt labore dolore magna aliqua enim.</p>
+                                        </div>
+                                        <div class="single-review-box">
+                                            <figure class="image-box"><img src="assets/images/resource/review-2.jpg"
+                                                    alt=""></figure>
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <h6>Mary Astor <span>- April 09, 2020</span></h6>
+                                            <p>Lorem ipsum dolor sit amet consectetur adipisicing sed eiusmod tempor
+                                                incididunt labore dolore magna aliqua enim.</p>
+                                        </div>
+                                        <div class="single-review-box">
+                                            <figure class="image-box"><img src="assets/images/resource/review-3.jpg"
+                                                    alt=""></figure>
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li class="light"><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <h6>Anderson <span>- April 08, 2020</span></h6>
+                                            <p>Lorem ipsum dolor sit amet consectetur adipisicing sed eiusmod tempor
+                                                incididunt labore dolore magna aliqua enim.</p>
+                                        </div>
+                                        <div class="single-review-box">
+                                            <figure class="image-box"><img src="assets/images/resource/review-4.jpg"
+                                                    alt=""></figure>
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li class="light"><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <h6>Bradshaw <span>- April 07, 2020</span></h6>
+                                            <p>Lorem ipsum dolor sit amet consectetur adipisicing sed eiusmod tempor
+                                                incididunt labore dolore magna aliqua enim.</p>
+                                        </div>
+                                        <div class="single-review-box">
+                                            <figure class="image-box"><img src="assets/images/resource/review-5.jpg"
+                                                    alt=""></figure>
+                                            <ul class="rating clearfix">
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li><i class="icon-Star"></i></li>
+                                                <li class="light"><i class="icon-Star"></i></li>
+                                            </ul>
+                                            <h6>Bradshaw <span>- April 26, 2020</span></h6>
+                                            <p>Lorem ipsum dolor sit amet consectetur adipisicing sed eiusmod tempor
+                                                incididunt labore dolore magna aliqua enim.</p>
+                                        </div>
+                                    </div>
+                                    <div class="btn-box">
+                                        <a class="theme-btn-one">Submit Review<i class="icon-Arrow-Right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+   
+
+</section>

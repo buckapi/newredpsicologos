@@ -279,50 +279,49 @@ export class AuthPocketbaseService {
     }
 }
 
-  permision() {
-    const userId = this.getUserId(); // Get userId from localStorage
-    const userType = this.getType();
+permision() {
+  const userId = this.getUserId();
+  const userType = this.getType();
 
-    // If no userId, always redirect to home
-    if (!userId) {
-      this.global.activeRoute = 'home';
-      return;
-    }
-
-    // Handle admin user
-    if (userType === 'admin') {
-      this.global.activeRoute = 'homeadmin';
-      return;
-    }
-
-    // Only fetch professional info for specialists
-    if (userType === 'especialista') {
-      this.pb.collection('psychologistsProfessionals').getFullList(200, {
-        filter: `userId = "${userId}"`
-      }).then(profesionales => {
-        if (profesionales.length > 0) {
-          const profesional = profesionales[0];
-          localStorage.setItem('professionalInfo', JSON.stringify(profesional));
-          this.completeVal(profesional);
-          this.global.activeRoute = 'homeprofessional';
-
-        } else {
-          console.warn('No professional found with the provided userId');
-          this.global.activeRoute = 'error';
-        }
-      }).catch((error) => {
-        console.error('Error fetching professional information:', error);
-        this.global.activeRoute = 'home';
-      });
-    } else if (userType === 'cliente') {
-      // Redirect client to home
-      this.global.activeRoute = 'home';
-    } else {
-      // Unknown user type
-      console.warn('Unrecognized user type');
-      this.global.activeRoute = 'error';
-    }
+  if (!userId) {
+    this.global.activeRoute = 'home';
+    return;
   }
+
+  if (userType === 'admin') {
+    this.global.activeRoute = 'homeadmin';
+    return;
+  }
+
+  if (userType === 'especialista') {
+    this.pb.collection('psychologistsProfessionals').getFullList(200, {
+      filter: `userId = "${userId}"`
+    }).then(profesionales => {
+      if (profesionales.length > 0) {
+        const profesional = profesionales[0];
+        localStorage.setItem('professionalInfo', JSON.stringify(profesional));
+        
+        // Asegurarse de actualizar el estado global
+        this.global.setPreviewProfesional(profesional);
+        this.global.professionalInfo = profesional;
+        
+        this.completeVal(profesional);
+        this.global.activeRoute = 'homeprofessional';
+      } else {
+        console.warn('No professional found with the provided userId');
+        this.global.activeRoute = 'error';
+      }
+    }).catch((error) => {
+      console.error('Error fetching professional information:', error);
+      this.global.activeRoute = 'home';
+    });
+  } else if (userType === 'cliente') {
+    this.global.activeRoute = 'home';
+  } else {
+    console.warn('Unrecognized user type');
+    this.global.activeRoute = 'error';
+  }
+}
 
   getCollection(collection: string) {
     return this.pb.collection(collection);
