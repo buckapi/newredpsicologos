@@ -18,39 +18,24 @@
         <div class="auto-container">
             <div class="content-box">
                 <div class="form-inner clearfix">
-                    <form  method="post">
+                    <form method="post">
                         <div class="form-group clearfix">
-                            <select class="wide">
-                               <option data-display="Select Location">Ubicación</option>
-<!--                                <option value="1">California</option>
-                               <option value="2">New York</option>
-                               <option value="3">Sun Francis</option>
-                               <option value="4">Shicago</option> -->
-                            </select>
-                            <input type="text" name="name" placeholder="nombre" required="">
-                            <button type="submit"><i class="icon-Arrow-Right"></i></button>
+                          <select class="wide"
+                            [(ngModel)]="selectedRegionId"
+                            (change)="onRegionChange($event)"
+                            name="region">
+                            <option data-display="Seleccione" value="">Región</option>
+                            <option *ngFor="let region of realtimeRegiones.regiones$ | async" 
+                              [value]="region.id">{{region.name}}</option>
+                          </select>
+                          <input type="text" 
+                            name="name" 
+                            placeholder="nombre" 
+                            [(ngModel)]="searchName"
+                            (input)="onNameChange($event)">
+                          <button type="button" (click)="applyFilters()"><i class="icon-Arrow-Right"></i></button>
                         </div>
                     </form>
-                    <ul class="select-box clearfix">
-                        <li>
-                            <div class="single-checkbox">
-                                <input type="radio" name="check-box" id="check1">
-                                <label for="check1"><span></span>.</label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="single-checkbox">
-                                <input type="radio" name="check-box" id="check2" checked="">
-                                <label for="check2"><span></span>.</label>    
-                            </div>
-                        </li>
-                        <li>
-                            <div class="single-checkbox">
-                                <input type="radio" name="check-box" id="check3">
-                                <label for="check3"><span></span>.</label>
-                            </div>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -84,9 +69,10 @@
                         </div>
                     </div>
                     <div class="wrapper" *ngIf="view === 'list'">
-                        <!-- BLOQUE DE LISTA -->
-                        <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="clinic-list-content list-item" *ngFor="let profesional of realtimeProfesionales.profesionales$ | async ">
                         
+                        <!-- BLOQUE DE LISTA -->
+                        <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="clinic-list-content list-item" 
+                        *ngFor="let profesional of filteredProfesionales | async">                        
                             <div class="clinic-block-one">
                                 <div class="inner-box">
                                     <div class="pattern">

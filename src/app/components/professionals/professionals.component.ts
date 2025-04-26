@@ -1,91 +1,98 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { GlobalService } from '../../service/global.service';
-import { RealtimeProfessionalsService } from '../../service/realtime-professionals';
-import { RealtimeRegionesService } from '../../service/realtime-regiones';
-interface profesional {
-  id: string;
-  name: string;
-  rut: string;
-  biography: string;
-  biography2: string;
-  phone: string;
-  email: string;
-  website: string;
-  birthday: string;
-  consultationAddress: string;
-  region: string;
-  comuna: string;
-  gender: string;
-  languages: {
-    es: boolean;
-    en: boolean;
-    fr: boolean;
-    de: boolean;
-  };
-  targets: Targets;
-
-  payments: {
-    efectivo: boolean;
-    transferencia: boolean;
-    tarjetas: boolean;
-    webpay: boolean;
-  };
-  days: {
-    Lunes: boolean;
-    Martes: boolean;
-    Miercoles: boolean;
-    Jueves: boolean;
-    Viernes: boolean;
-    Sabado: boolean;
-    Domingo: boolean;
-  };
-  typeAttention: {
-    Online: boolean;
-    Presencial: boolean;
-    'A domicilio': boolean;
-  };
-  priceSession: string;
-  titleUniversity: string;
-  typeTherapy: any[] | string;
-  typeTreatment: any[] | string;
-  typeEspeciality: any[] | string; // Actualizado para reflejar la realidad
-  corriente: any[] | string;
-  openingHours: string;
-  registrationNumber: string;
-  sessions: number;
-  certificates: string;
-  images: string[]
-}
-interface Targets {
-  niñosYNinas: boolean;
-  adultos: boolean;
-  jovenesYAdolescentes: boolean;
-  adultosMayores: boolean;
-  todos: boolean;
-}
+import { RealtimeProfessionalsService, Profesionals } from '../../service/realtime-professionals';
+import { RealtimeRegionesService, Regiones } from '../../service/realtime-regiones';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-professionals',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './professionals.component.html',
   styleUrl: './professionals.component.css'
 })
 export class ProfessionalsComponent {
   view: 'list' | 'grid' = 'list';
-  specialists: any[] = [];
+  selectedRegionId: string = '';
+  searchName: string = '';
+  filteredProfesionales: Observable<Profesionals[]>;
+  regiones: Regiones[] = [];
+  professionals: Profesionals[] = [];
+
   constructor(
     public global: GlobalService,
     public realtimeProfesionales: RealtimeProfessionalsService,
-    public regi: RealtimeRegionesService,
-  ){
-    this.realtimeProfesionales.profesionales$.subscribe((profesionales) => {
-      this.specialists = profesionales;
+    public realtimeRegiones: RealtimeRegionesService
+  ) {
+    // Suscripción para obtener las regiones
+    this.realtimeRegiones.regiones$.subscribe(regiones => {
+      this.regiones = regiones;
+    });
+
+    // Suscripción para obtener los profesionales
+    this.realtimeProfesionales.profesionales$.subscribe(profesionales => {
+      this.professionals = profesionales;
+    });
+
+    // Configuración del filtrado combinado
+    this.filteredProfesionales = combineLatest([
+      this.realtimeProfesionales.profesionales$,
+      this.realtimeRegiones.regiones$
+    ]).pipe(
+      map(([profesionales, regiones]) => {
+        return this.applyFiltersToProfesionales(profesionales, regiones);
+      })
+    );
+  }
+
+  private applyFiltersToProfesionales(professionals: Profesionals[], regiones: Regiones[]): Profesionals[] {
+    return professionals.filter(professional => {
+      // Filtro por nombre
+      const nameMatch = !this.searchName || 
+        professional.name.toLowerCase().includes(this.searchName.toLowerCase());
+      
+      // Filtro por región
+      let regionMatch = true;
+      if (this.selectedRegionId && regiones) {
+        const region = regiones.find(r => r.id === this.selectedRegionId);
+        regionMatch = !!region && !!professional.regions && 
+          professional.regions.some((r: any) => r.id === region?.id);
+      }
+      
+      return nameMatch && regionMatch;
     });
   }
-  getFormattedTargets(targets: any): string {
+
+  onRegionChange(event: any): void {
+    this.selectedRegionId = event.target.value;
+    this.applyFilters();
+  }
+
+  onNameChange(event: any): void {
+    this.searchName = event.target.value;
+    this.applyFilters();
+  }
+
+  applyFilters(): void {
+    this.filteredProfesionales = combineLatest([
+      this.realtimeProfesionales.profesionales$,
+      this.realtimeRegiones.regiones$
+    ]).pipe(
+      map(([professionals, regiones]) => {
+        return this.applyFiltersToProfesionales(professionals, regiones);
+      })
+    );
+  }
+
+  getFormattedTargets(targets: {
+    'niños y niñas'?: boolean;
+    adultos?: boolean;
+    'jóvenes y adolecentes'?: boolean;
+    'adultos mayores'?: boolean;
+    todos?: boolean;
+  }): string {
     const activeTargets = [];
     
     if (targets?.['niños y niñas']) activeTargets.push('Niños y niñas');
