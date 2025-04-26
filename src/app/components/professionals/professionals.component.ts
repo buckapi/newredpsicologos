@@ -20,6 +20,7 @@ export class ProfessionalsComponent {
   filteredProfesionales: Observable<Profesionals[]>;
   regiones: Regiones[] = [];
   professionals: Profesionals[] = [];
+  showFilters: boolean = false;
 
   constructor(
     public global: GlobalService,
@@ -45,6 +46,9 @@ export class ProfessionalsComponent {
         return this.applyFiltersToProfesionales(profesionales, regiones);
       })
     );
+  }
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
   }
 
   private applyFiltersToProfesionales(professionals: Profesionals[], regiones: Regiones[]): Profesionals[] {

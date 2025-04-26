@@ -18,24 +18,33 @@
         <div class="auto-container">
             <div class="content-box">
                 <div class="form-inner clearfix">
-                    <form method="post">
+                    <form method="post" class="filter-form">
                         <div class="form-group clearfix">
-                          <select class="wide"
-                            [(ngModel)]="selectedRegionId"
-                            (change)="onRegionChange($event)"
-                            name="region">
-                            <option data-display="Seleccione" value="">Región</option>
-                            <option *ngFor="let region of realtimeRegiones.regiones$ | async" 
-                              [value]="region.id">{{region.name}}</option>
-                          </select>
+                          <div class="custom-select-wrapper">
+                            <select class="custom-select"
+                              [(ngModel)]="selectedRegionId"
+                              (change)="onRegionChange($event)"
+                              name="region"
+                              #regionSelect>
+                              <option value="" disabled selected hidden>Seleccione una región</option>
+                              <option value="">Todas las regiones</option>
+                              <option *ngFor="let region of regiones" 
+                                [value]="region.id">{{region.name}}</option>
+                            </select>
+                          </div>
+                          
                           <input type="text" 
+                            class="search-input"
                             name="name" 
-                            placeholder="nombre" 
+                            placeholder="Buscar por nombre..." 
                             [(ngModel)]="searchName"
                             (input)="onNameChange($event)">
-                          <button type="button" (click)="applyFilters()"><i class="icon-Arrow-Right"></i></button>
+                            
+                          <button type="button" class="search-button" (click)="applyFilters()">
+                            <i class="icon-Arrow-Right"></i>
+                          </button>
                         </div>
-                    </form>
+                      </form>
                 </div>
             </div>
         </div>
@@ -54,12 +63,12 @@
                         <div class="right-column pull-right clearfix">
                             <div class="short-box clearfix">
                                 <div class="select-box">
-                                    <!-- <select class="wide">
-                                       <option data-display="Sort by">Sort by</option>
+                                    <select class="wide">
+                                       <option data-display="Sort by">Tipo de sesión</option>
                                        <option value="1">Cardiology</option>
                                        <option value="2">Nurology</option>
                                        <option value="4">Pragnency</option>
-                                    </select> -->
+                                    </select>
                                 </div>
                             </div>
                             <div class="menu-box">
@@ -72,7 +81,7 @@
                         
                         <!-- BLOQUE DE LISTA -->
                         <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="clinic-list-content list-item" 
-                        *ngFor="let profesional of filteredProfesionales | async">                        
+                            *ngFor="let profesional of filteredProfesionales | async">                        
                             <div class="clinic-block-one">
                                 <div class="inner-box">
                                     <div class="pattern">
@@ -129,8 +138,8 @@
                         <!-- BLOQUE DE GRILLA -->
                         <div class="clinic-grid-content">
                             <div class="row clearfix" >
-                                <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="col-lg-4 col-md-4 col-sm-6 col-xs-6 team-block" *ngFor="let profesional of realtimeProfesionales.profesionales$ | async ">
-                                    <div class="team-block-three">
+                                <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="col-lg-4 col-md-4 col-sm-6 col-xs-6 team-block" 
+                                *ngFor="let profesional of filteredProfesionales | async">                                    <div class="team-block-three">
                                         <div class="inner-box">
                                           
                                             <figure class="image-box">
@@ -184,5 +193,54 @@
             </div>
         </div>
     </section>
+
+    <!-- Botón flotante y panel de filtros -->
+<div class="floating-filter-container">
+    <!-- Botón flotante -->
+    <button class="floating-filter-button" (click)="toggleFilters()">
+      <i class="fas fa-filter"></i>
+    </button>
+    
+    <!-- Panel de filtros (inicialmente oculto) -->
+    <div class="filter-panel" [class.visible]="showFilters">
+      <div class="filter-panel-header">
+        <h3>Filtrar Especialistas</h3>
+        <button class="close-panel" (click)="toggleFilters()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="filter-panel-content">
+        <form method="post" class="filter-form">
+          <div class="form-group">
+            <label>Región</label>
+            <select class="custom-select"
+              [(ngModel)]="selectedRegionId"
+              (change)="onRegionChange($event)"
+              name="region">
+              <option value="" disabled selected hidden>Seleccione una región</option>
+              <option value="">Todas las regiones</option>
+              <option *ngFor="let region of regiones" 
+                [value]="region.id">{{region.name}}</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" 
+              class="search-input"
+              name="name" 
+              placeholder="Buscar por nombre..." 
+              [(ngModel)]="searchName"
+              (input)="onNameChange($event)">
+          </div>
+          
+          <button type="button" class="apply-filters-button" (click)="applyFilters(); toggleFilters()">
+            Aplicar Filtros
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
   
 </div>
