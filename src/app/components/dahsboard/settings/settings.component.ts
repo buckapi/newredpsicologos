@@ -31,6 +31,12 @@ export class SettingsComponent {
     public realtimePlanes: RealtimePlanesService
 
   ) { }
+  ngOnInit() {
+    this.getAllPlanes();
+  }
+  getAllPlanes() {
+    this.realtimePlanes.getAllPlanes();
+  }
   openSpecialtyPopup() {
     Swal.fire({
         title: 'Agregar Especialidad',
@@ -163,8 +169,7 @@ openCorrientesPopup() {
         }
     });
   }
-  ngOnInit() {
-  }
+  
   async deleteTreatment(id: string) {
     const result = await Swal.fire({
       title: '¿Estás seguro?',
@@ -243,35 +248,41 @@ openCorrientesPopup() {
   }
   openPlanPopup() {
     Swal.fire({
-        title: 'Agregar Plan',
-        input: 'text',
-        inputLabel: 'Nombre del plan',
-        inputPlaceholder: 'Escribe el nombre aquí',
-        showCancelButton: true,
-        confirmButtonText: 'Agregar',
-        cancelButtonText: 'Cancelar',
-        preConfirm: (name) => {
-            if (!name) {
-                Swal.showValidationMessage('Por favor ingresa un nombre');
-            }
-            return { name: name };
-        }
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const data = {
-                name: result.value.name,
-                image: '', // Optional: Add image if needed
-                description: '', // Optional: Add description if needed
-                status: '' // Optional: Add status if needed
-            };
+      title: 'Agregar Plan',
+      html:
+        '<input id="swal-input-name" class="swal2-input" placeholder="Nombre del plan">' +
+        '<input id="swal-input-price" type="number" min="0" class="swal2-input" placeholder="Precio">' +
+        '<textarea id="swal-input-description" class="swal2-textarea" placeholder="Descripción"></textarea>',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Agregar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const name = (document.getElementById('swal-input-name') as HTMLInputElement).value;
+        const price = (document.getElementById('swal-input-price') as HTMLInputElement).value;
+        const description = (document.getElementById('swal-input-description') as HTMLTextAreaElement).value;
   
-            try {
-                const record = await pb.collection('psychologistsPlanes').create(data);
-                Swal.fire('Éxito!', 'El plan ha sido agregado.', 'success');
-            } catch (error) {
-                Swal.fire('Error!', 'No se pudo agregar el plan.', 'error');
-            }
+        if (!name || !price) {
+          Swal.showValidationMessage('Por favor ingresa nombre y precio');
+          return;
         }
+        return { name, price, description };
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const data = {
+          name: result.value.name,
+          price: result.value.price,
+          description: result.value.description
+        };
+  
+        try {
+          await pb.collection('psychologistsPlanes').create(data);
+          Swal.fire('Éxito!', 'El plan ha sido agregado.', 'success');
+        } catch (error) {
+          Swal.fire('Error!', 'No se pudo agregar el plan.', 'error');
+        }
+      }
     });
   }
   async deletePlan(id: string) {
