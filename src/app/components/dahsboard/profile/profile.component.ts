@@ -702,8 +702,8 @@ onFileSelected(event: any) {
             id: this.global.professionalInfo.id,
             // Formación académica (convertir FormArray a array de objetos)
             academicTitles: this.academicTitles.value,
-            certificates: this.global.professionalInfo.certificates || [],
-            // Convertir los grupos de checkboxes
+/*             certificates: this.global.professionalInfo.certificates || [],
+ */            // Convertir los grupos de checkboxes
             languages: this.prepareLanguagesData(formValue.languages),
             targets: this.prepareTargetData(formValue.targets),
             payments: this.preparePaymentsData(formValue.payments),

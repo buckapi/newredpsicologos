@@ -156,5 +156,22 @@ async deleteEspecialidad(especialidad: any) {
   });
 }
 
+async deleteProfesional(profesional: any) {
+  const confirm = await Swal.fire({
+    title: '¿Eliminar especialidad?',
+    text: 'Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar'
+  });
+  if (confirm.isConfirmed) {
+    const pb = new PocketBase('https://db.redpsicologos.cl:8090');
+    await pb.collection('psychologistsProfessionals').delete(profesional.id);
+    Swal.fire('Éxito', 'El especialista ha sido eliminado.', 'success');
+  }
+}
+
 
 }

@@ -17,7 +17,7 @@
                 <ul class="list clearfix">
                     <li><a (click)="global.setMenuOption('settings')" style="cursor: pointer;"><i class="fas fa-cog"></i>Ajustes</a></li>
                     <li><a (click)="global.setMenuOption('dashboard')" class="current" style="cursor: pointer;"><i class="fas fa-users"></i>Especialistas</a></li>
-                    <li><a (click)="global.setMenuOption('planes-suscripcion')" style="cursor: pointer;"><i class="fas fa-calendar-alt"></i>Planes de suscripción</a></li>
+                    <li><a (click)="global.setMenuOption('settings')" style="cursor: pointer;"><i class="fas fa-calendar-alt"></i>Planes de suscripción</a></li>
 
                 </ul>
             </div>
@@ -133,18 +133,33 @@
                     </div>
                 </div>
                 
-                
                 <div class="doctors-appointment">
                     <div class="title-box">
                         <h3>Solicitudes</h3>
                     </div>
                     <div class="tab-container">
-                        <ul class="tabs">
-                            <li (click)="setActiveTab('pending')" [class.active]="activeTab === 'pending'">Pendientes</li>
-                            <li (click)="setActiveTab('approved')" [class.active]="activeTab === 'approved'">Aprobadas</li>
-                            <li (click)="setActiveTab('denied')" [class.active]="activeTab === 'denied'">Denegadas</li>
-                        </ul>
-                    </div>
+                        <nav class="custom-tabs">
+                          <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'pending'" 
+                            (click)="setActiveTab('pending')">
+                            Pendientes
+                          </button>
+                          <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'approved'" 
+                            (click)="setActiveTab('approved')">
+                            Aprobadas
+                          </button>
+                          <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'denied'" 
+                            (click)="setActiveTab('denied')">
+                            Denegadas
+                          </button>
+                        </nav>
+                      </div>
+
                     <div class="doctors-list">
                         <div class="table-outer">
                             <table class="doctors-table">
@@ -153,8 +168,7 @@
 
                                         <th>Nombre</th>
                                         <th>Fecha de solicitud</th>
-                                        <th>&nbsp;</th>
-                                        <th>&nbsp;</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -162,15 +176,24 @@
                                         (click)="showDetails(profesional)">
                                         <td style="cursor: pointer;">
                                             <div class="name-box">
-                                                <figure class="image"><img src="assets/images/resource/dashboard-doc-1.png" alt=""></figure>
+                                                <figure class="image" *ngIf="global.professionalInfo.images">
+                                                    <img [src]="global.professionalInfo.images[0]" alt="Foto de perfil" />
+                                                </figure>
                                                 <h5>{{profesional.name}}</h5>
-                                                <h5>{{profesional.id}}</h5>
-                                                <span class="designation">..</span>
+                                                <span class="designation">{{profesional.email}}</span>
                                             </div>
                                         </td>
                                         <td>
                                             <p>{{formatDate(profesional.created) || profesional.created}}</p>
                                             <span class="time">{{hoursDate(profesional.created) || profesional.created}}</span>
+                                        </td>
+                                        
+                                        <td>
+                                            <div class="btn-box" *ngIf="profesional.status === 'denegado'">
+                                                <a (click)="deleteProfesional(profesional)" style="cursor: pointer;">
+                                                    <i class="fa fa-trash"></i>Eliminar
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr *ngIf="filteredProfesionals().length === 0">

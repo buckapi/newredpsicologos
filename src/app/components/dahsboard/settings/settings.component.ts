@@ -7,6 +7,7 @@ import { RealtimeEspecialidadesService } from '../../../service/realtime-especia
 import { RealtimeTerapiaService } from '../../../service/realtime-terapia.service';
 import { RealtimeTratamientosService } from '../../../service/realtime-tratamientos.service';
 import { RealtimeCorrientesService } from '../../../service/realtime-corrientes.service';
+import { RealtimePlanesService } from '../../../service/realtime-planes.service';
 
 const pb = new PocketBase('https://db.redpsicologos.cl:8090');
 
@@ -26,7 +27,8 @@ export class SettingsComponent {
     public realtimeEspecialidades: RealtimeEspecialidadesService,
     public realtimeTerapia: RealtimeTerapiaService,
     public realtimeTratamientos: RealtimeTratamientosService,
-    public realtimeCorrientes: RealtimeCorrientesService
+    public realtimeCorrientes: RealtimeCorrientesService,
+    public realtimePlanes: RealtimePlanesService
 
   ) { }
   openSpecialtyPopup() {
@@ -236,6 +238,58 @@ openCorrientesPopup() {
         Swal.fire('Éxito!', 'La corriente ha sido eliminada.', 'success');
       } catch (error) {
         Swal.fire('Error!', 'No se pudo eliminar la corriente.', 'error');
+      }
+    }
+  }
+  openPlanPopup() {
+    Swal.fire({
+        title: 'Agregar Plan',
+        input: 'text',
+        inputLabel: 'Nombre del plan',
+        inputPlaceholder: 'Escribe el nombre aquí',
+        showCancelButton: true,
+        confirmButtonText: 'Agregar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (name) => {
+            if (!name) {
+                Swal.showValidationMessage('Por favor ingresa un nombre');
+            }
+            return { name: name };
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const data = {
+                name: result.value.name,
+                image: '', // Optional: Add image if needed
+                description: '', // Optional: Add description if needed
+                status: '' // Optional: Add status if needed
+            };
+  
+            try {
+                const record = await pb.collection('psychologistsPlanes').create(data);
+                Swal.fire('Éxito!', 'El plan ha sido agregado.', 'success');
+            } catch (error) {
+                Swal.fire('Error!', 'No se pudo agregar el plan.', 'error');
+            }
+        }
+    });
+  }
+  async deletePlan(id: string) {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Deseas eliminar este plan?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await pb.collection('psychologistsPlanes').delete(id);
+        Swal.fire('Éxito!', 'El plan ha sido eliminado.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'No se pudo eliminar el plan.', 'error');
       }
     }
   }
