@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef,EventEmitter, NO_ERRORS_SCHEMA, AfterViewInit} from '@angular/core';
 import PocketBase from 'pocketbase';
 import { BehaviorSubject } from 'rxjs';
-import { FormGroup,FormBuilder, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { FormGroup,FormBuilder, ReactiveFormsModule, FormsModule, Validators, FormArray } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import Cleave from 'cleave.js';
@@ -41,6 +41,9 @@ type PaymentsArray = string[];
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements AfterViewInit {
+  @ViewChild('certificateInput', { static: false }) certificateInput!: ElementRef<HTMLInputElement>;
+  selectedCertificateFile: File | null = null;
+
   rutError: boolean = false;
   selectedRegion: Region | null = null;
   regionesList: Region[] = [];
@@ -191,8 +194,9 @@ this.typeAttentionSelected = [];
     typeEspeciality: ['', [Validators.required]],
     corriente: ['', [Validators.required]],
     openingHours: ['', ],
-    /* certificates: ['', ], */
     registrationNumber: ['', ],
+    academicTitles: this.fb.array([]),
+    certificates: this.fb.array([]),
    
   });
  
@@ -239,6 +243,7 @@ ngAfterViewInit() {
       corriente: this.global.professionalInfo.corriente,
       openingHours: this.global.professionalInfo.openingHours,
       registrationNumber: this.global.professionalInfo.registrationNumber,
+      certificates: this.global.professionalInfo.certificates,
       
       // Grupos de checkboxes
       languages: {
@@ -276,6 +281,27 @@ ngAfterViewInit() {
         'A domicilio': !!typeAttention['A domicilio']
       }
     });
+    if (this.global.professionalInfo) {
+    // Cargar formación académica si existe
+    if (this.global.professionalInfo.academicTitles && this.global.professionalInfo.academicTitles.length > 0) {
+      // Limpiar el FormArray antes de agregar nuevos grupos
+      while (this.academicTitles.length !== 0) {
+        this.academicTitles.removeAt(0);
+      }
+
+      // Agregar cada título académico al FormArray
+      this.global.professionalInfo.academicTitles.forEach((title: { institution: string; specialization: string; year: string }) => {
+        this.academicTitles.push(this.fb.group({
+          institution: [title.institution, Validators.required],
+          specialization: [title.specialization, Validators.required],
+          year: [title.year, Validators.required]
+        }));
+      });
+    } else {
+      // Si no hay datos, agregar un grupo vacío
+      this.addTitle();
+    }
+  }
 
     if (this.global.professionalInfo.gender) {
       this.profileForm.get('gender')?.setValidators(null);
@@ -296,6 +322,104 @@ ngAfterViewInit() {
   }
 }
 
+
+// Método para subir el certificado (actualizado)
+uploadCertificate() {
+  // Simular click en el input file
+  this.certificateInput.nativeElement.click();
+}
+
+async onCertificateSelected(event: any) {
+  const file = event.target.files[0];
+  if (!file) return;
+ 
+
+  try {
+    Swal.fire({
+      title: 'Subiendo certificado...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'certificate');
+    formData.append('user', this.authService.getUserId());
+
+    const record = await this.pb.collection('images').create(formData);
+    const fileUrl = `${this.pb.baseUrl}/api/files/${record.collectionId}/${record.id}/${record['file']}`;
+
+    // Actualizar lista de certificados
+    const currentCertificates = this.global.professionalInfo.certificates || [];
+    const updatedCertificates = [...currentCertificates, fileUrl];
+
+    await this.pb.collection('psychologistsProfessionals').update(
+      this.authService.getUserId(),
+      { certificates: updatedCertificates }
+    );
+
+    // Actualizar estado local
+    this.global.professionalInfo.certificates = updatedCertificates;
+    localStorage.setItem('professionalInfo', JSON.stringify(this.global.professionalInfo));
+
+    Swal.fire({
+      title: '¡Éxito!',
+      text: 'Certificado cargado correctamente',
+      icon: 'success',
+      timer: 2000
+    });
+
+  } catch (error) {
+    console.error('Error al cargar certificado:', error);
+    Swal.fire('Error', 'No se pudo cargar el certificado', 'error');
+  } finally {
+    // Resetear input
+    event.target.value = '';
+  }
+}
+
+// Método para eliminar un certificado (actualizado)
+async removeCertificate(certificateUrl: string) {
+  const confirm = await Swal.fire({
+    title: '¿Eliminar certificado?',
+    text: "Esta acción no se puede deshacer",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar'
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    // Extraer el ID del certificado de la URL
+    const parts = certificateUrl.split('/');
+    const fileId = parts[parts.length - 2];
+    
+    // 1. Eliminar el archivo de la colección certificates
+    await this.pb.collection('psychologistsProfessionals').delete(fileId);
+
+    // 2. Actualizar la lista de certificados del profesional
+    const updatedCertificates = this.global.professionalInfo.certificates
+      .filter((cert: string) => cert !== certificateUrl);
+
+    await this.pb.collection('psychologistsProfessionals').update(
+      this.authService.getUserId(),
+      { certificates: updatedCertificates }
+    );
+
+    // 3. Actualizar estado local
+    this.global.professionalInfo.certificates = updatedCertificates;
+    localStorage.setItem('professionalInfo', JSON.stringify(this.global.professionalInfo));
+
+    Swal.fire('Eliminado!', 'El certificado ha sido eliminado.', 'success');
+
+  } catch (error) {
+    console.error('Error al eliminar certificado:', error);
+    Swal.fire('Error', 'No se pudo eliminar el certificado', 'error');
+  }
+}
 regionSelect(region: Region) {
     this.regionSelected = region;
     console.log('Región seleccionada:', region);
@@ -566,157 +690,93 @@ onFileSelected(event: any) {
     this.uploadImage(); // Llama a la función para cargar la imagen inmediatamente después de seleccionar
   }
 }
-/* async sendToUpdate() {
-    if (this.profileForm.valid) {
-      try {
-        const formValue = this.profileForm.value;
+ async sendToUpdate() {
+      // 1. Validación general del formulario (sin validar género)
+      if (this.profileForm.valid) {
+        try {
+          const formValue = this.profileForm.value;
+          
+          // Preparar datos para enviar
+          const updatedData = {
+            ...formValue,
+            id: this.global.professionalInfo.id,
+            // Formación académica (convertir FormArray a array de objetos)
+            academicTitles: this.academicTitles.value,
+            certificates: this.global.professionalInfo.certificates || [],
+            // Convertir los grupos de checkboxes
+            languages: this.prepareLanguagesData(formValue.languages),
+            targets: this.prepareTargetData(formValue.targets),
+            payments: this.preparePaymentsData(formValue.payments),
+            days: this.prepareDaysData(formValue.days),
+            typeAttention: this.prepareTypeAttentionData(formValue.typeAttention),
+            // Mantener datos existentes si no hay nuevos
+            region: this.regionSelected || this.global.professionalInfo.region,
+            comuna: this.comunaSelected || this.global.professionalInfo.comuna,
+            gender: formValue.gender || this.global.professionalInfo.gender || null, // Asegurar género (puede ser null)
+            typeTherapy: this.terapiaSelected || this.global.professionalInfo.typeTherapy,
+            typeTreatment: this.tratamientoSelected || this.global.professionalInfo.typeTreatment,
+            typeEspeciality: this.especialidadSelected || this.global.professionalInfo.typeEspeciality,
+            corriente: this.corrienteSelected || this.global.professionalInfo.corriente,
+            images: this.imageUrl ? [this.imageUrl] : this.global.professionalInfo.images,
+            // Otros campos importantes
+            biography: formValue.biography,
+            biography2: formValue.biography2,
+            priceSession: formValue.priceSession,
+            registrationNumber: formValue.registrationNumber
+          };
+    
+          // Limpiar datos nulos/undefined (excepto gender que puede ser null)
+          const cleanData = this.removeEmptyFields(updatedData);    
+          // Actualizar localStorage
+          localStorage.setItem('professionalInfo', JSON.stringify(cleanData));
+    
+          // Enviar datos al backend
+          const response = await this.authService.updateProfessionalInfo(cleanData);
+    
+          // Actualizar la vista con los nuevos datos
+          this.global.setPreviewProfesional(response);
+          
+          // Mostrar confirmación
+          await Swal.fire({
+            title: '¡Éxito!',
+            text: 'Datos actualizados correctamente',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+    
+          // Recargar datos del profesional
+          await this.getProfessionlINfo();
+    
+        } catch (error: unknown) {
+          console.error('Error al actualizar:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+          await Swal.fire({
+            title: 'Error',
+            text: 'No se pudo actualizar la información: ' + errorMessage,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      } else {
+        // Mostrar errores de validación detallados (excluyendo género)
+        const invalidFields = this.getInvalidFields().filter(field => field !== 'Género');
         
-        // Preparar datos para enviar
-        const updatedData = {
-          ...formValue,
-          id: this.global.professionalInfo.id,
-          languages: this.prepareLanguagesData(formValue.languages),
-          targets: this.prepareTargetData(formValue.targets),
-          payments: this.preparePaymentsData(formValue.payments),
-          days: this.prepareDaysData(formValue.days),
-          typeAttention: this.prepareTypeAttentionData(formValue.typeAttention),
-          region: this.regionSelected || this.global.professionalInfo.region,
-          comuna: this.comunaSelected || this.global.professionalInfo.comuna,
-          typeTherapy: this.terapiaSelected || this.global.professionalInfo.typeTherapy,
-          typeTreatment: this.tratamientoSelected || this.global.professionalInfo.typeTreatment,
-          typeEspeciality: this.especialidadSelected || this.global.professionalInfo.typeEspeciality,
-          corriente: this.corrienteSelected || this.global.professionalInfo.corriente,
-          images: this.imageUrl ? [this.imageUrl] : this.global.professionalInfo.images
-        };
-  
-        const cleanData = this.removeEmptyFields(updatedData);
-        localStorage.setItem('professionalInfo', JSON.stringify(cleanData));
-  
-        // Asumiendo que ahora el método acepta un parámetro
-        const response = await this.authService.updateProfessionalInfo(cleanData);
-  
-        this.global.setPreviewProfesional(response);
-        
-        await Swal.fire({
-          title: '¡Éxito!',
-          text: 'Datos actualizados correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-  
-        await this.getProfessionlINfo();
-  
-      } catch (error: unknown) {
-        console.error('Error al actualizar:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-        await Swal.fire({
-          title: 'Error',
-          text: 'No se pudo actualizar la información: ' + errorMessage,
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
+        if (invalidFields.length > 0) {
+          await Swal.fire({
+            title: 'Formulario incompleto',
+            html: `Por favor completa correctamente los siguientes campos:<br><br>${invalidFields.join('<br>')}`,
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+          });
+        } else {
+          // Si el único campo inválido es el género, permitir guardar igual
+          await this.sendToUpdate();
+        }
       }
-    } else {
-      const invalidFields = this.getInvalidFields();
-      await Swal.fire({
-        title: 'Formulario incompleto',
-        html: `Por favor completa correctamente los siguientes campos:<br><br>${invalidFields.join('<br>')}`,
-        icon: 'warning',
-        confirmButtonText: 'Entendido'
-      });
     }
-  } */
-  async sendToUpdate() {
-    // 1. Verificación especial para el campo gender
-   /*  if (!this.global.professionalInfo?.gender && !this.profileForm.get('gender')?.value) {
-      this.profileForm.get('gender')?.setValidators(Validators.required);
-      this.profileForm.get('gender')?.updateValueAndValidity();
-      this.profileForm.get('gender')?.markAsTouched(); */
-      
-      // Mostrar error inmediatamente si el campo es requerido
-      /* if (!this.profileForm.get('gender')?.value) {
-        await Swal.fire({
-          title: 'Campo requerido',
-          text: 'Por favor selecciona un género',
-          icon: 'warning',
-          confirmButtonText: 'Entendido'
-        });
-        return; // Detener la ejecución si falta el género
-      }
-    } */
-  
-    // 2. Validación general del formulario
-    if (this.profileForm.valid) {
-      try {
-        const formValue = this.profileForm.value;
-        
-        // Preparar datos para enviar
-        const updatedData = {
-          ...formValue,
-          id: this.global.professionalInfo.id,
-          // Convertir los grupos de checkboxes
-          languages: this.prepareLanguagesData(formValue.languages),
-          target: this.prepareTargetData(formValue.target), // Cambiado de targets a target
-          payments: this.preparePaymentsData(formValue.payments),
-          days: this.prepareDaysData(formValue.days),
-          typeAttention: this.prepareTypeAttentionData(formValue.typeAttention),
-          // Mantener datos existentes si no hay nuevos
-          region: this.regionSelected || this.global.professionalInfo.region,
-          comuna: this.comunaSelected || this.global.professionalInfo.comuna,
-          gender: formValue.gender || this.global.professionalInfo.gender, // Asegurar gender
-          typeTherapy: this.terapiaSelected || this.global.professionalInfo.typeTherapy,
-          typeTreatment: this.tratamientoSelected || this.global.professionalInfo.typeTreatment,
-          typeEspeciality: this.especialidadSelected || this.global.professionalInfo.typeEspeciality,
-          corriente: this.corrienteSelected || this.global.professionalInfo.corriente,
-          images: this.imageUrl ? [this.imageUrl] : this.global.professionalInfo.images
-        };
-  
-        // Limpiar datos nulos/undefined
-        const cleanData = this.removeEmptyFields(updatedData);
-  
-        // Actualizar localStorage
-        localStorage.setItem('professionalInfo', JSON.stringify(cleanData));
-  
-        // Enviar datos al backend
-        const response = await this.authService.updateProfessionalInfo(cleanData);
-  
-        // Actualizar la vista con los nuevos datos
-        this.global.setPreviewProfesional(response);
-        
-        // Mostrar confirmación
-        await Swal.fire({
-          title: '¡Éxito!',
-          text: 'Datos actualizados correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-  
-        // Recargar datos del profesional
-        await this.getProfessionlINfo();
-  
-      } catch (error: unknown) {
-        console.error('Error al actualizar:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-        await Swal.fire({
-          title: 'Error',
-          text: 'No se pudo actualizar la información: ' + errorMessage,
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
-      }
-    } else {
-      // Mostrar errores de validación detallados
-      const invalidFields = this.getInvalidFields();
-      await Swal.fire({
-        title: 'Formulario incompleto',
-        html: `Por favor completa correctamente los siguientes campos:<br><br>${invalidFields.join('<br>')}`,
-        icon: 'warning',
-        confirmButtonText: 'Entendido'
-      });
-    }
-  }
+    
+    
   
   // Métodos auxiliares
   private prepareLanguagesData(languages: any): any {
@@ -812,8 +872,8 @@ onFileSelected(event: any) {
       typeAttention: 'Tipo de atención',
       biography: 'Descripción breve',
       biography2: 'Descripción extendida',
+      academicTitles: 'Formación académica',
 
-      // ... otros campos
     };
     
     return Object.keys(this.profileForm.controls)
@@ -841,6 +901,7 @@ onFileSelected(event: any) {
       corriente: 'Corriente',
       registrationNumber: 'Número de registro',
       website: 'Sitio web',
+      academicTitles: 'Formación académica'
     };
   
     return fieldNames[key] || key;
@@ -850,9 +911,7 @@ onFileSelected(event: any) {
 openFileSelector() {
   this.fileInput.nativeElement.click(); 
 }
-openCertificateSelector() {
-  this.fileInput.nativeElement.click(); 
-}
+
 async updateProfessionalRecord(imageUrl: string,) {
   const professionalId = this.global.professionalInfo.id; 
 
@@ -942,6 +1001,43 @@ async updateCertificate(certificateUrl: string) {
     this.loadTratamientos();
     this.loadEspecialidades();
     this.loadCorrientes();
+    // Inicializar academicTitles con al menos un grupo vacío si no hay datos
+  if (this.academicTitles.length === 0) {
+    this.addTitle(); // Agrega un grupo vacío inicial
+  }
+  if (!this.global.professionalInfo.certificates) {
+    this.global.professionalInfo.certificates = [];
+  }
+  }
+  createTitleGroup(): FormGroup {
+    return this.fb.group({
+      institution: ['', Validators.required],
+      specialization: ['', Validators.required],
+      year: ['', Validators.required]
+    });
+  }
+
+  get academicTitles(): FormArray {
+    return this.profileForm.get('academicTitles') as FormArray;
+  }
+
+  addTitle() {
+    this.academicTitles.push(this.createTitleGroup());
+  }
+  
+  removeTitle(index: number) {
+    if (this.academicTitles.length > 1) {
+      this.academicTitles.removeAt(index);
+    } else {
+      // Opcional: Mostrar un mensaje si intentan eliminar el último título
+      Swal.fire({
+        title: 'Atención',
+        text: 'Debe haber al menos una formación académica',
+        icon: 'warning',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
   }
   loadRegiones() {
     this.regionesService.regiones$.subscribe(data => {
@@ -976,34 +1072,7 @@ async updateCertificate(certificateUrl: string) {
   setImage() {
     const professionalInfo = JSON.parse(localStorage.getItem('professionalInfo') || '{}');  
     this.imageUrl = professionalInfo.images?.[0] || 'assets/images/user.png'; 
-  }
-    /* async getProfessionlINfo() {
-      try {
-        const profesional = await this.realtimeProfesionales.getProfesionalById(this.authService.getUserId()).toPromise();
-        this.global.setPreviewProfesional(profesional);
-        
-        if (profesional) {
-          // Inicializa todos los objetos necesarios
-          profesional.languages = profesional.languages || {};
-          profesional.target = profesional.target || {};
-          profesional.payments = profesional.payments || {};
-          profesional.days = profesional.days || {};
-          profesional.typeAttention = profesional.typeAttention || {};
-          
-          localStorage.setItem('professionalInfo', JSON.stringify(profesional));
-          this.setImage();
-          
-          // Forzar la actualización del formulario si ya está creado
-          if (this.profileForm) {
-            this.ngAfterViewInit();
-          }
-        }
-      } catch (error) {
-        console.error('Error al cargar info profesional:', error);
-      }
-    } */
- 
-      async getProfessionlINfo() {
+  } async getProfessionlINfo() {
         try {
           // Limpiar datos existentes primero
           this.clearUserData();
@@ -1017,6 +1086,8 @@ async updateCertificate(certificateUrl: string) {
             profesional.payments = profesional.payments || {};
             profesional.days = profesional.days || {};
             profesional.typeAttention = profesional.typeAttention || {};
+            profesional.certificates = profesional.certificates || [];
+
             
             // Guardar en el servicio global
             this.global.setPreviewProfesional(profesional);
@@ -1048,29 +1119,7 @@ async updateCertificate(certificateUrl: string) {
       console.error('Error fetching record:', error);
     }
   }
-
-   /*  confirmLogout() {
-      Swal.fire({
-          title: '¿Quieres cerrar sesión?',
-          text: "",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Sí, cerrar sesión',
-          cancelButtonText: 'Mantenerme aquí'
-      }).then((result) => {
-          if (result.isConfirmed) {
-              this.authService.logoutUser(); 
-              Swal.fire(
-                  '¡Cerrado!',
-                  'Has cerrado sesión con éxito.',
-                  'success'
-              );
-          }
-      });
-  } */
-      confirmLogout() {
+confirmLogout() {
         Swal.fire({
           title: '¿Quieres cerrar sesión?',
           text: "",
@@ -1094,7 +1143,15 @@ async updateCertificate(certificateUrl: string) {
           }
         });
       }
+      hasSelectedItems(obj: any): boolean {
+        if (!obj) return false;
+        return Object.values(obj).some(val => val === true);
+      }
       
+      getSelectedItems(obj: any): string[] {
+        if (!obj) return [];
+        return Object.keys(obj).filter(key => obj[key]);
+      }
       private clearUserData() {
         // Limpiar todos los datos relacionados con el usuario
         localStorage.removeItem('professionalInfo');
@@ -1107,33 +1164,6 @@ async updateCertificate(certificateUrl: string) {
         // Resetea el formulario
         this.profileForm.reset();
       }
-      onCertificateSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-    if (this.selectedFile) {
-      this.uploadImage(); // Llama a la función para cargar la imagen inmediatamente después de seleccionar
-    }
-  }
-  /* onCertificateSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-            // Asegúrate de que certificates sea un array en global.professionalInfo
-            if (!this.global.professionalInfo.certificates) {
-                this.global.professionalInfo.certificates = [];
-            }
-            this.global.professionalInfo.certificates.push(e.target.result); // Agrega la imagen cargada
-            
-            // Actualiza el valor en el formulario
-            this.profileForm.patchValue({
-                certificates: this.global.professionalInfo.certificates // Actualiza el formulario
-            });
-
-            localStorage.setItem('professionalInfo', JSON.stringify(this.global.professionalInfo)); // Guarda en localStorage
-        };
-        reader.readAsDataURL(file); // Lee el archivo como URL de datos
-    }
-} */
-
+     
 
 }

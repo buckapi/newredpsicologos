@@ -61,8 +61,14 @@ interface Profesionals {
   openingHours: string;
   registrationNumber: string;
   sessions: number;
-  certificates: string;
-  images: string[]
+  certificates: string[];
+  images: string[],
+  academicTitles: {
+    institution: string;
+    specialization: string;
+    year: string;
+  }[],
+  
 }
 interface Comunas {
   id: string;
@@ -167,17 +173,19 @@ export class GlobalService {
     openingHours: '',
     registrationNumber: '',
     sessions: 0,
-    certificates: '',
-    images: []
+    certificates:[],
+    images: [],
+    academicTitles: []
   };
   constructor(
     private realtimeRegiones: RealtimeRegionesService,
-    public realtimeProfesionales: RealtimeProfessionalsService
+    public realtimeProfesionales: RealtimeProfessionalsService,
   ) 
   { 
     this.loadProfessionalInfo();
     this.pb = new PocketBase('https://db.redpsicologos.cl:8090');
   }
+
   getFormattedTargets(targets: any): string {
     const activeTargets = [];
     

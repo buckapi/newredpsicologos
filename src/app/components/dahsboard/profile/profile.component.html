@@ -8,6 +8,8 @@
                 <div class="title-box centred">
                     <div class="inner">
                         <h3> {{ global.professionalInfo.name }} {{ global.professionalInfo.lastname }}</h3>
+                        <span>Genero: {{ global.professionalInfo.gender  }}</span>
+                        <p>{{ global.professionalInfo.languages && hasSelectedItems(global.professionalInfo.languages) ? 'Idiomas: ' + getSelectedItems(global.professionalInfo.languages).join(', ') : 'No especificado' }}</p>
                         <p>Bienvenido(a) a tu panel de control</p>
                     </div>
                 </div>
@@ -15,11 +17,12 @@
             <div class="profile-info">
                 <ul class="list clearfix">
                    
-                    <li><a (click)="global.activeRoute = 'homeprofessional'" style="cursor: pointer;"><i
+                    <li><a href="dashboard" style="cursor: pointer;"><i
                                 class="fas fa-home"></i>Cuenta</a></li>
                     <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i
                                 class="fas fa-user"></i>Actualizar datos</a></li>
                     <li><a style="cursor: pointer;"><i class="fas fa-unlock-alt"></i>Cambiar contraseña</a></li>
+                    <li><a (click)="global.activeRoute = 'reviews'" style="cursor: pointer;"><i class="fas fa-comment"></i>Comentarios y Calificaciones</a></li>
                     <li>
                         <div class="btn-box" *ngIf="authService.isLogin()">
                             <a (click)="confirmLogout()" style="cursor: pointer;">
@@ -107,6 +110,7 @@
                                         Este campo es requerido
                                         </div>
                                     </div>
+                                  
                                     <div class="col-lg-4 col-md-4 col-sm-12 form-group">
                                         <label>Fecha de nacimiento
                                             <span *ngIf="!global.professionalInfo.birthday" style="color: red;">*</span>
@@ -230,31 +234,55 @@
                                     <div class="title-box">
                                         <h3>Formación académica </h3>
                                     </div>
-                                    <!--  <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                        <label>Formación académica 
-                                            <span *ngIf="!global.professionalInfo.titleUniversity" style="color: red;">*</span>
-                                        </label>
-                                        <input type="text" formControlName="titleUniversity" placeholder="Formación académica " required  [ngModel]="global.professionalInfo.titleUniversity">
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Año de egreso 
-                                            <span *ngIf="!global.professionalInfo.titleUniversity" style="color: red;">*</span>
-                                        </label>
-                                        <input type="text" formControlName="titleUniversity" placeholder="Año de egreso" required  [ngModel]="global.professionalInfo.titleUniversity">
-                                    </div> -->
-
-                                    <!--  <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                        <div class="profile-title">
-                                            <figure class="image-box">
-                                                <img *ngFor="let cert of global.professionalInfo.certificates" [src]="cert" alt="Certificate Image" />
-                                            </figure>
-                                            <div class="upload-photo">
-                                                <input type="file" (change)="onCertificateSelected($event)" accept="image/*" #fileInput hidden />
-                                                <a (click)="openFileSelector()" style="cursor: pointer;"><i class="icon-Upload"></i>Cargar certificado</a>
-                                                <span>Formato JPG, GIF o PNG. Max 2MB</span>
-                                            </div>
+                                    <div formArrayName="academicTitles">
+                                        <div class="row" *ngFor="let title of academicTitles.controls; let i = index" [formGroupName]="i">
+                                          <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                                            <label>Nombre de la institución<span style="color: red;">*</span></label>
+                                            <input type="text" formControlName="institution" placeholder="Formación académica" required>
+                                          </div>
+                                          <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                                            <label>Título de especialización<span style="color: red;">*</span></label>
+                                            <input type="text" formControlName="specialization" placeholder="Título de especialización" required>
+                                          </div>
+                                          <div class="col-lg-3 col-md-3 col-sm-12 form-group">
+                                            <label>Año de egreso<span style="color: red;">*</span></label>
+                                            <input type="text" formControlName="year" placeholder="Año de egreso" required>
+                                          </div>
+                                          <div class="col-lg-1 col-md-1 col-sm-12 form-group d-flex align-items-end">
+                                            <!-- Botón "+" siempre visible -->
+                                            <button type="button" (click)="addTitle()" class="btn btn-success" title="Agregar título">+</button>
+                                            <!-- Botón "-" solo visible si hay más de un título -->
+                                            <button type="button" (click)="removeTitle(i)" class="btn btn-danger ml-2" *ngIf="academicTitles.length > 1" title="Eliminar título">-</button>
+                                          </div>
                                         </div>
-                                    </div> -->
+                                      </div>
+                                      <!-- <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                        <label>Certificados</label>
+                                        <div class="profile-title row">
+                                          <div class="certificates-container  col-6">
+                                            <div *ngFor="let cert of global.professionalInfo.certificates || []" class="certificate-item">
+                                              <figure class="image-box">
+                                                <img [src]="cert" alt="Certificate Image" class="certificate-image" />
+                                                <button type="button" (click)="removeCertificate(cert)" class="btn btn-danger btn-sm remove-certificate">
+                                                  <i class="fas fa-times"></i>
+                                                </button>
+                                              </figure>
+                                            </div>
+                                          </div>
+                                          <div class="upload-photo col-6">
+                                            <input type="file" 
+                                                   (change)="onCertificateSelected($event)" 
+                                                   accept="image/*,.pdf" 
+                                                   #certificateInput 
+                                                   hidden />
+                                            <a (click)="uploadCertificate()" style="cursor: pointer;">
+                                              <i class="icon-Upload"></i>Cargar certificado
+                                            </a>
+                                            <span>Formato JPG, PNG, GIF o PDF. Máx. 5MB</span>
+                                          </div>
+                                        </div>
+                                      </div> -->
+                                    
                                     <div class="col-12 title-box">
                                         <h3>Tipo de Atención</h3>
                                     </div>

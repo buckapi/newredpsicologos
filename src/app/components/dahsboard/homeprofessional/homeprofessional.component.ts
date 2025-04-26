@@ -52,11 +52,38 @@ constructor(
     this.global.loadProfessionalInfo();
   }
 }
-/* ngOnInit() {
-  if (!this.global.professionalInfo) {
-    this.global.loadProfessionalInfo(); // Asegúrate de que este método exista
+confirmLogout() {
+  Swal.fire({
+    title: '¿Quieres cerrar sesión?',
+    text: "",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, cerrar sesión',
+    cancelButtonText: 'Mantenerme aquí'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Limpiar los datos específicos del usuario antes de cerrar sesión
+      
+      this.authService.logoutUser(); 
+      Swal.fire(
+        '¡Cerrado!',
+        'Has cerrado sesión con éxito.',
+        'success'
+      );
+    }
+  });
+}
+  hasSelectedItems(obj: any): boolean {
+    if (!obj) return false;
+    return Object.values(obj).some(val => val === true);
   }
-} */ 
+  
+  getSelectedItems(obj: any): string[] {
+    if (!obj) return [];
+    return Object.keys(obj).filter(key => obj[key]);
+  }
   setImage() {
     const professionalInfo = JSON.parse(localStorage.getItem('professionalInfo') || '{}');  
     this.imageUrl = professionalInfo.images?.[0] || 'assets/images/user.png'; 
@@ -102,29 +129,7 @@ constructor(
     }
   }
 
- confirmLogout() {
-        Swal.fire({
-          title: '¿Quieres cerrar sesión?',
-          text: "",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Sí, cerrar sesión',
-          cancelButtonText: 'Mantenerme aquí'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Limpiar los datos específicos del usuario antes de cerrar sesión
-            
-            this.authService.logoutUser(); 
-            Swal.fire(
-              '¡Cerrado!',
-              'Has cerrado sesión con éxito.',
-              'success'
-            );
-          }
-        });
-      }
+
       
     
 }

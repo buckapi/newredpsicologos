@@ -2,6 +2,7 @@
     <div class="card content-container">
         <div class="container">
             <div class="clinic-details-content doctor-details-content">
+                
                 <div class="location-box">
                     <div class="location-box" style="display: flex; justify-content: space-between; align-items: center;">
                         <h4>Especialidades</h4>
@@ -13,7 +14,7 @@
                     <span *ngFor="let especialidad of realtimeEspecialidades.especialidades$ | async ">
                         <span class="badge">{{especialidad.name}}
 
-                        <i class="fa fa-times" style="cursor: pointer;"></i>
+                        <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteSpecialty(especialidad.id)"></i>
 
                         </span>
                     </span>
@@ -29,7 +30,7 @@
                     </div>
                     <span *ngFor="let tratamiento of realtimeTratamientos.tratamientos$ | async ">  
                         <span class="badge">{{tratamiento.name}}
-                            <i class="fa fa-times" style="cursor: pointer;"></i>
+                            <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteTreatment(tratamiento.id)"></i>
                         </span>
                     </span>
                 </div>
@@ -44,7 +45,7 @@
                     </div>
                     <span *ngFor="let corriente of realtimeCorrientes.corrientes$ | async ">  
                         <span class="badge">{{corriente.name}}
-                            <i class="fa fa-times" style="cursor: pointer;"></i>
+                            <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteCorriente(corriente.id)"></i>
                         </span>
                     </span>
                 </div>
@@ -59,7 +60,7 @@
                     </div>
                     <span *ngFor="let terapia of realtimeTerapia.terapia$ | async ">  
                         <span class="badge">{{terapia.name}}
-                            <i class="fa fa-times" style="cursor: pointer;"></i>
+                            <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteTherapy(terapia.id)"></i>
                         </span>
                     </span>
                 </div>

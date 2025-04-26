@@ -163,4 +163,80 @@ openCorrientesPopup() {
   }
   ngOnInit() {
   }
+  async deleteTreatment(id: string) {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Deseas eliminar este tratamiento?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await pb.collection('psychologistsTreatments').delete(id);
+        Swal.fire('Éxito!', 'El tratamiento ha sido eliminado.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'No se pudo eliminar el tratamiento.', 'error');
+      }
+    }
+  } 
+  async deleteSpecialty(id: string) {
+    const result = await Swal.fire({    
+      title: '¿Estás seguro?',
+      text: '¿Deseas eliminar esta especialidad?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await pb.collection('psychologistsSpecialties').delete(id);
+        Swal.fire('Éxito!', 'La especialidad ha sido eliminada.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'No se pudo eliminar la especialidad.', 'error');
+      }
+    }
+  } 
+  async deleteTherapy(id: string) {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Deseas eliminar esta terapia?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await pb.collection('psychologistsTerapy').delete(id);
+        Swal.fire('Éxito!', 'La terapia ha sido eliminada.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'No se pudo eliminar la terapia.', 'error');
+      }
+    }
+  }
+  async deleteCorriente(id: string) {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Deseas eliminar esta corriente?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await pb.collection('psychologistsCorrientes').delete(id);
+        Swal.fire('Éxito!', 'La corriente ha sido eliminada.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'No se pudo eliminar la corriente.', 'error');
+      }
+    }
+  }
 }

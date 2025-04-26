@@ -15,8 +15,7 @@
             </div>
             <div class="profile-info">
                 <ul class="list clearfix">
-                    <li><a (click)="global.setMenuOption('settings')" style="cursor: pointer;"><i class="fas fa-gear"></i>Ajustes</a></li>
-
+                    <li><a (click)="global.setMenuOption('settings')" style="cursor: pointer;"><i class="fas fa-cog"></i>Ajustes</a></li>
                     <li><a (click)="global.setMenuOption('dashboard')" class="current" style="cursor: pointer;"><i class="fas fa-users"></i>Especialistas</a></li>
                     <li><a (click)="global.setMenuOption('planes-suscripcion')" style="cursor: pointer;"><i class="fas fa-calendar-alt"></i>Planes de suscripción</a></li>
 
@@ -68,7 +67,7 @@
                                         <div class="pattern-2" style="background-image: url(assets/images/shape/shape-84.png);"></div>
                                     </div>
                                     <div class="icon-box"><i class="icon-Dashboard-3"></i></div>
-                                    <h3>275</h3>
+                                    <h3>{{profesionals.length}}</h3>
                                     <h5>Total especialistas activos</h5>
 <!--                                     <p>Lorem ipsum dolor  amet eiusmod tempor.</p>
  -->                                </div>
@@ -76,47 +75,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="doctors-appointment">
-                    <div class="title-box">
-                        <h3>Solicitudes de registro</h3>
-                    </div>
-                    <div class="doctors-list">
-                        <div class="table-outer">
-                            <table class="doctors-table">
-                                <thead class="table-header">
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Fecha de solicitud</th>
-                                        <th>&nbsp;</th>
-                                        <th>&nbsp;</th>
-                                    </tr>    
-                                </thead>
-                               <tbody>
-    <tr *ngFor="let profesional of realtimeProfesionales.profesionales$ | async" 
-        (click)="showDetails(profesional)">
-        <td>
-            <div class="name-box">
-                <figure class="image"><img src="assets/images/resource/dashboard-doc-1.png" alt=""></figure>
-                <h5>{{profesional.name}}</h5>
-                <span class="designation">..</span>
-            </div>
-        </td>
-        <td>
-            <p>13 febrero 2025</p>
-            <span class="time">10:30AM</span>
-        </td>
-        <td>
-            <span class="accept"><i class="fas fa-check"></i>Aceptar</span>
-        </td>
-        <td>
-            <span class="cancel"><i class="fas fa-times"></i>Cancelar</span>
-        </td>
-    </tr>
-</tbody>   
-                            </table>
-                        </div>
-                    </div>
-                </div> -->
+                
             </div>
         </div>
     </div>
@@ -165,7 +124,7 @@
                                         <div class="pattern-2" style="background-image: url(assets/images/shape/shape-84.png);"></div>
                                     </div>
                                     <div class="icon-box"><i class="icon-Dashboard-3"></i></div>
-                                    <h3>275</h3>
+                                    <h3>{{profesionals.length}}</h3>
                                     <h5>Total especialistas activos</h5>
 <!--                                     <p>Lorem ipsum dolor  amet eiusmod tempor.</p>
  -->                                </div>
@@ -228,158 +187,8 @@
             </div>
         </div>
     </div>
-    <div class="right-panel" id="especialidades" [hidden]="global.menuSelected !== 'especialidades'">
-        <div class="content-container">
-            <div class="outer-container">
-                <div class="doctors-appointment my-patients">
-                    <div class="title-box clearfix">
-                        <div class="text pull-left">
-                            <h3>Lista de Especialidades</h3>
-                        </div>
-                        <div class="btn-box pull-right">
-                            <a class="theme-btn-one" style="cursor: pointer;">Agregar Especialidad<i class="icon-image"></i></a>
-                        </div>
-                    </div>
-                    <div class="doctors-list" >
-                        <div class="table-outer">
-                            <table class="doctors-table">
-                                <thead class="table-header">
-                                    <tr>
-                                        <th>Especialidad</th>
-                                    </tr>    
-                                </thead>
-                                <tbody *ngFor="let especialidad of realtimeEspecialidades.especialidades$ | async ">
-                                    <tr>
-                                        
-                                        <td>
-                                            <p>{{especialidad.name}}</p>
-                                        </td>
-                                        
-                                        <td>
-                                            <span class="accept"><i class="fas fa-pencil-alt"></i>Editar</span>
-                                        </td>
-                                        <td>
-                                            <span class="cancel"><i class="fas fa-times"></i>Eliminar</span>
-                                        </td>
-                                    </tr>
-                                   
-                                </tbody>    
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="pagination-wrapper">
-                    <ul class="pagination">
-                        <li><a  class="current">1</a></li>
-                        <li><a >2</a></li>
-                        <li><a >3</a></li>
-                        <li><a ><i class="icon-Arrow-Right"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="right-panel" id="tratamientos" [hidden]="global.menuSelected !== 'tratamientos'">
-        <div class="content-container">
-            <div class="outer-container">
-                <div class="doctors-appointment my-patients">
-                    <div class="title-box clearfix">
-                        <div class="text pull-left">
-                            <h3>Lista de Tratamientos</h3>
-                        </div>
-                        <div class="btn-box pull-right">
-                            <a class="theme-btn-one" style="cursor: pointer;"><i class="icon-image"></i> Agregar Tratamiento</a>
-                        </div>
-                    </div>
-                    <div class="doctors-list" >
-                        <div class="table-outer">
-                            <table class="doctors-table">
-                                <thead class="table-header">
-                                    <tr>
-                                        <th>Tratamiento</th>
-                                    </tr>    
-                                </thead>
-                                <tbody *ngFor="let tratamiento of realtimeTratamientos.tratamientos$ | async ">
-                                    <tr>
-                                        
-                                        <td>
-                                            <p>{{tratamiento.name}}</p>
-                                        </td>
-                                        
-                                        <td>
-                                            <span class="accept"><i class="fas fa-pencil-alt"></i>Editar</span>
-                                        </td>
-                                        <td>
-                                            <span class="cancel"><i class="fas fa-times"></i>Eliminar</span>
-                                        </td>
-                                    </tr>
-                                   
-                                </tbody>    
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="pagination-wrapper">
-                    <ul class="pagination">
-                        <li><a  class="current">1</a></li>
-                        <li><a >2</a></li>
-                        <li><a >3</a></li>
-                        <li><a ><i class="icon-Arrow-Right"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="right-panel" id="terapias" [hidden]="global.menuSelected !== 'terapias'">
-        <div class="content-container">
-            <div class="outer-container">
-                <div class="doctors-appointment my-patients">
-                    <div class="title-box clearfix">
-                        <div class="text pull-left">
-                            <h3>Lista de Terapias</h3>
-                        </div>
-                        <div class="btn-box pull-right">
-                            <a class="theme-btn-one" style="cursor: pointer;">Agregar Terapia<i class="icon-image"></i></a>
-                        </div>
-                    </div>
-                    <div class="doctors-list" >
-                        <div class="table-outer">
-                            <table class="doctors-table">
-                                <thead class="table-header">
-                                    <tr>
-                                        <th>Terapia</th>
-                                    </tr>    
-                                </thead>
-                                <tbody *ngFor="let terapia of realtimeTerapias.terapia$ | async ">
-                                    <tr>
-                                        
-                                        <td>
-                                            <p>{{terapia.name}}</p>
-                                        </td>
-                                        
-                                        <td>
-                                            <span class="accept"><i class="fas fa-pencil-alt"></i>Editar</span>
-                                        </td>
-                                        <td>
-                                            <span class="cancel"><i class="fas fa-times"></i>Eliminar</span>
-                                        </td>
-                                    </tr>
-                                   
-                                </tbody>    
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="pagination-wrapper">
-                    <ul class="pagination">
-                        <li><a  class="current">1</a></li>
-                        <li><a >2</a></li>
-                        <li><a >3</a></li>
-                        <li><a ><i class="icon-Arrow-Right"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+   
+    
     <app-settings [hidden]="global.menuSelected !== 'settings' || auth.getType() !== 'admin'"></app-settings>
+    
 </section>

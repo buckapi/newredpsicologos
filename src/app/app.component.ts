@@ -16,6 +16,7 @@ import { ProfileComponent } from './components/dahsboard/profile/profile.compone
 import { HomeadminComponent } from './components/dahsboard/homeadmin/homeadmin.component';
 import { HomeprofessionalComponent } from './components/dahsboard/homeprofessional/homeprofessional.component';
 import { SettingsComponent } from './components/dahsboard/settings/settings.component';
+import { ReviewsComponent } from './components/dahsboard/reviews/reviews.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -31,7 +32,8 @@ import { SettingsComponent } from './components/dahsboard/settings/settings.comp
     ProfileComponent,
     HomeadminComponent,
     HomeprofessionalComponent,
-    SettingsComponent
+    SettingsComponent,
+    ReviewsComponent
   ],  
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

@@ -65,7 +65,7 @@ export interface Service {
     openingHours: string;
     registrationNumber: string;
     sessions: number;
-    certificates: string;
+    certificates: string[];
     images: string[]
   }
 
