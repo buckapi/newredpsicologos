@@ -26,7 +26,7 @@
                               (change)="onRegionChange($event)"
                               name="region"
                               #regionSelect>
-                              <option value="" disabled selected hidden>Seleccione una región</option>
+                              <option value="" disabled hidden>Seleccione una región</option>
                               <option value="">Todas las regiones</option>
                               <option *ngFor="let region of regiones" 
                                 [value]="region.id">{{region.name}}</option>
@@ -218,7 +218,7 @@
               [(ngModel)]="selectedRegionId"
               (change)="onRegionChange($event)"
               name="region">
-              <option value="" disabled selected hidden>Seleccione una región</option>
+              <option value="" disabled hidden>Seleccione una región</option>
               <option value="">Todas las regiones</option>
               <option *ngFor="let region of regiones" 
                 [value]="region.id">{{region.name}}</option>
