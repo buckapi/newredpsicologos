@@ -104,7 +104,8 @@
                         </figure>
                         <div class="lower-content">
                             <h3><a>{{profesional.name}}</a></h3>
-                            <span class="designation">Ph.D, DPT, MS OMPT</span>
+                            <span class="designation">Dirigido a: {{profesional.targets}}</span>
+                            <span class="designation">Sesión: {{profesional.priceSession}} CLP</span>
                             <ul class="rating clearfix">
                                 <li><i class="icon-Star"></i></li>
                                 <li><i class="icon-Star"></i></li>
@@ -114,7 +115,8 @@
                                 <li><a>2 reviews</a></li>
                             </ul>
                             <div class="location-box">
-                                <p><i class="fas fa-map-marker-alt"></i>G87P+PG Shustoke, Birmingham, UK</p>
+                                <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
+                                <a (click)="global.goToDetail(profesional)" style="cursor: pointer; color: #0f405f;">Ver perfil</a>
                             </div>
                         </div>
                     </div>

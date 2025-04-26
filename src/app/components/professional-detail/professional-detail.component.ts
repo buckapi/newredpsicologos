@@ -1,15 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { GlobalService } from '../../service/global.service';
-interface profesional {
-  name: string;
-  specialty: string;
-  address: string;
-  phone: string;
-  biography: string;
-  region: string;
-  images: string[];
-}
+
 @Component({
   selector: 'app-professional-detail',
   standalone: true,
@@ -17,13 +9,25 @@ interface profesional {
   templateUrl: './professional-detail.component.html',
   styleUrl: './professional-detail.component.css'
 })
-export class ProfessionalDetailComponent {
+export class ProfessionalDetailComponent implements OnInit, AfterViewInit {
 name: string = '';
 phone: number = 0;
 email: string = '';
+profesional: any;
 constructor(
   public global: GlobalService
 ){}
+ngOnInit() {
+  this.profesional = this.global.previewProfesionals;
+  
+}
+ngAfterViewInit() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // Opcional: para un scroll suave
+  });
+}
+
 sendToWhatsApp() {
   const message = `Hola, mi nombre es ${this.name}.`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -36,24 +40,15 @@ hasSelectedItems(items: any[]) {
   return items.length > 0;
 }
 getLanguagesDisplay(): string {
-  const langs = this.global.previewProfesionals.languages;
-  if (!langs || typeof langs !== 'object') return 'No especificado';
-  const map: Record<string, string> = { es: 'Español', en: 'Inglés', fr: 'Francés', de: 'Alemán' };
-  const selected = Object.keys(langs)
-    .filter(key => langs[key as keyof typeof langs])
-    .map(key => map[key] || key);
-  return selected.length > 0 ? selected.join(', ') : 'No especificado';
+  const langs = this.global.previewProfesionals?.languages;
+  if (!langs || !Object.values(langs).length) return 'No especificado';
+  return Object.keys(langs).filter(lang => langs[lang as keyof typeof langs]).join(', ');
 }
 
 getRegionDisplay(): string {
-  const region = this.global.previewProfesionals.region;
-
-  // Si es un objeto, intenta obtener los valores
-  if (typeof region === 'object') {
-    const values = Object.values(region).filter(Boolean);
-    return values.length > 0 ? values.join(', ') : 'No especificado';
-  }
-  return 'No especificado';
+  const regionId = this.global.previewProfesionals?.region;
+  const region = this.global.storedRegiones?.find(r => r.id === regionId);
+  return region ? region.name : 'No especificado';
 }
 getSelectedDays(daysObj: {[key: string]: boolean}): string[] {
   if (!daysObj) return [];

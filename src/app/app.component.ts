@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { GlobalService } from './service/global.service';
 import { ScriptLoaderService } from './service/loader.service';
 import { HomeComponent } from './components/home/home.component';
@@ -17,6 +17,7 @@ import { HomeadminComponent } from './components/dahsboard/homeadmin/homeadmin.c
 import { HomeprofessionalComponent } from './components/dahsboard/homeprofessional/homeprofessional.component';
 import { SettingsComponent } from './components/dahsboard/settings/settings.component';
 import { ReviewsComponent } from './components/dahsboard/reviews/reviews.component';
+import { filter } from 'rxjs';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -38,7 +39,7 @@ import { ReviewsComponent } from './components/dahsboard/reviews/reviews.compone
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'psicologospwa';
   showUserMenu = false;
   isLogin: boolean = false;
@@ -49,7 +50,8 @@ export class AppComponent {
     public globalService: GlobalService,
     private scriptLoader: ScriptLoaderService,
     public auth: AuthPocketbaseService,
-    public realtimeProfesionales: RealtimeProfessionalsService
+    public realtimeProfesionales: RealtimeProfessionalsService,
+    private router: Router
   
   )
     {
@@ -96,7 +98,21 @@ export class AppComponent {
     ngOnInit(): void {
       this.loadScripts();
       this.checkLoginStatus();
-      window.scrollTo(0, 0);
+      this.getProfessionlINfo();
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+    ngAfterViewInit() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // Opcional: para un scroll suave
+      });
     }
     loadScripts() {
       const scripts = [  

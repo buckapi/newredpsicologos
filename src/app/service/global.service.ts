@@ -253,7 +253,7 @@ getPreviewProfesional(): Profesionals {
       this.storedRegiones = simplifiedRegions;
       localStorage.setItem('regions', JSON.stringify(simplifiedRegions));
     });
-    this.previewProfesionals = profesional; // Asigna el profesional seleccionado
+    this.previewProfesionals = JSON.parse(JSON.stringify(profesional));
     this.activeRoute='professional-detail'; // Navega al componente detail-doctor
   }
   clearProfessionalData() {
