@@ -7,13 +7,9 @@ import { RealtimeEspecialidadesService } from '../../../service/realtime-especia
 import { RealtimeTerapiaService } from '../../../service/realtime-terapia.service';
 import { RealtimeTratamientosService } from '../../../service/realtime-tratamientos.service';
 import { RealtimeCorrientesService } from '../../../service/realtime-corrientes.service';
-import { RealtimePlanesService } from '../../../service/realtime-planes.service';
+import { Planes, RealtimePlanesService } from '../../../service/realtime-planes.service';
 
 const pb = new PocketBase('https://db.redpsicologos.cl:8090');
-
-
-
-
 
 @Component({
   selector: 'app-settings',
@@ -281,6 +277,45 @@ openCorrientesPopup() {
           Swal.fire('Éxito!', 'El plan ha sido agregado.', 'success');
         } catch (error) {
           Swal.fire('Error!', 'No se pudo agregar el plan.', 'error');
+        }
+      }
+    });
+  }
+  editPlan(plan: Planes) {
+    Swal.fire({
+      title: 'Editar Plan',
+      html:
+        `<input id="swal-input-name" class="swal2-input" placeholder="Nombre del plan" value="${plan.name || ''}">` +
+        `<input id="swal-input-price" type="number" min="0" class="swal2-input" placeholder="Precio" value="${plan.price || ''}">` +
+        `<textarea id="swal-input-description" class="swal2-textarea" placeholder="Descripción">${plan.description || ''}</textarea>`,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Guardar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const name = (document.getElementById('swal-input-name') as HTMLInputElement).value;
+        const price = (document.getElementById('swal-input-price') as HTMLInputElement).value;
+        const description = (document.getElementById('swal-input-description') as HTMLTextAreaElement).value;
+  
+        if (!name || !price) {
+          Swal.showValidationMessage('Por favor ingresa nombre y precio');
+          return;
+        }
+        return { name, price, description };
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const data = {
+          name: result.value.name,
+          price: result.value.price,
+          description: result.value.description
+        };
+  
+        try {
+          await pb.collection('psychologistsPlanes').update(plan.id, data);
+          Swal.fire('Éxito!', 'El plan ha sido editado.', 'success');
+        } catch (error) {
+          Swal.fire('Error!', 'No se pudo editar el plan.', 'error');
         }
       }
     });

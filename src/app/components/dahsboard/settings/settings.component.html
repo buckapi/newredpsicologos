@@ -73,11 +73,12 @@
                             <!-- <a class="btn btn-sm btn-primary hover-invert" style="cursor: pointer; border-radius: 50px; color: white;">Agregar Terapia <i class="icon-image"></i></a> -->
                         </div>
                     </div>
-                    <span *ngFor="let plan of realtimePlanes.planes$ | async ">  
-                        <span class="badge">{{plan.name}}, {{plan.price}}
+                    <ul *ngFor="let plan of realtimePlanes.planes$ | async ">  
+                        <li class="badge">{{plan.name}}, {{plan.price}}, {{plan.description}}
                             <i class="fa fa-trash" style="cursor: pointer;" (click)="deletePlan(plan.id)"></i>
-                        </span>
-                    </span>
+                            <i class="fa fa-edit" style="cursor: pointer;" (click)="editPlan(plan)"></i>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

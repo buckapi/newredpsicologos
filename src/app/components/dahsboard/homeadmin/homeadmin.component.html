@@ -189,8 +189,8 @@
                                         </td>
                                         
                                         <td>
-                                            <div class="btn-box" *ngIf="profesional.status === 'denegado'">
-                                                <a (click)="deleteProfesional(profesional)" style="cursor: pointer;">
+                                            <div class="btn-box">
+                                                <a (click)="deleteProfesional(profesional); $event.stopPropagation()" style="cursor: pointer;">
                                                     <i class="fa fa-trash"></i>Eliminar
                                                 </a>
                                             </div>
