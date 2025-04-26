@@ -29,4 +29,30 @@ sendToWhatsApp() {
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
 }
+getSelectedItems(items: any[]) {
+  return items.map(item => item.name);
+}
+hasSelectedItems(items: any[]) {
+  return items.length > 0;
+}
+getLanguagesDisplay(): string {
+  const langs = this.global.previewProfesionals.languages;
+  if (!langs || typeof langs !== 'object') return 'No especificado';
+  const map: Record<string, string> = { es: 'Español', en: 'Inglés', fr: 'Francés', de: 'Alemán' };
+  const selected = Object.keys(langs)
+    .filter(key => langs[key as keyof typeof langs])
+    .map(key => map[key] || key);
+  return selected.length > 0 ? selected.join(', ') : 'No especificado';
+}
+
+getRegionDisplay(): string {
+  const region = this.global.previewProfesionals.region;
+
+  // Si es un objeto, intenta obtener los valores
+  if (typeof region === 'object') {
+    const values = Object.values(region).filter(Boolean);
+    return values.length > 0 ? values.join(', ') : 'No especificado';
+  }
+  return 'No especificado';
+}
 }

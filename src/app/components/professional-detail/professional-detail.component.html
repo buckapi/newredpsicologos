@@ -18,7 +18,8 @@
                                     <li><i class="icon-Trust-1"></i></li>
                                     <li><i class="icon-Trust-2"></i></li>
                                 </ul>
-                                <span class="designation" >{{ global.previewProfesionals.typeEspeciality }}</span>
+                                <p>Numero de registro: <span>{{ global.previewProfesionals.registrationNumber }}</span></p>
+                                <p>Rut: <span>{{ global.previewProfesionals.rut }}</span></p>
                                 <div class="rating-box clearfix">
                                     <ul class="rating clearfix">
                                         <li><i class="icon-Star"></i></li>
@@ -26,15 +27,21 @@
                                         <li><i class="icon-Star"></i></li>
                                         <li><i class="icon-Star"></i></li>
                                         <li><i class="icon-Star"></i></li>
-                                        <li><a >(32)</a></li>
+                                        <li><a >()</a></li>
                                     </ul>
                                 </div>
-                                <span class="designation" >{{ global.previewProfesionals.typeEspeciality }}</span>
+                                <span class="designation" >Especialista en: <span style="color: #808080;">{{ global.previewProfesionals.typeEspeciality && global.previewProfesionals.typeEspeciality.length ? global.previewProfesionals.typeEspeciality[0].name : 'No especificado' }}</span></span>
                                 <div class="lower-box clearfix">
                                     <ul class="info clearfix">
-                                        <li ><i class="fas fa-map-marker-alt" ></i>{{global.previewProfesionals.consultationAddress}}</li>
-                                        <li ><i class="fas fa-map"></i>{{global.previewProfesionals.region}}</li>
-                                        <li ><i class="fas fa-phone"></i><a href="tel:2265458856">{{global.previewProfesionals.phone}}</a></li>
+                                        <li ><i class="fas fa-map-marker-alt" ></i>Dirección de consultorio: <span style="color: #808080;">{{global.previewProfesionals.consultationAddress}}</span></li>
+                                        <li>
+                                            <i class="fas fa-map"></i>
+                                            Región: 
+                                            <span style="color: #808080;">
+                                                {{ getRegionDisplay()}}
+                                            </span>
+                                        </li>                                        
+                                        <li ><i class="fas fa-phone"></i><a href="tel:{{global.previewProfesionals.phone}}">{{global.previewProfesionals.phone}}</a></li>
                                     </ul>
                                     
                                 </div>
@@ -57,51 +64,46 @@
                                 <div class="inner-box">
                                     <div class="text">
                                         <h3>Sobre mi</h3>
-                                        <p *ngIf="global.previewProfesionals">{{global.previewProfesionals.biography}}</p>
+                                        <p *ngIf="global.previewProfesionals">{{global.previewProfesionals.biography}} <br/>
+                                            {{global.previewProfesionals.biography2}}
+                                        </p>
                                         <div class="text">
-                                            <p><strong>Idiomas:</strong> </p>
-                                            <ul class="treatments-list clearfix">
-                                                <li><a >Español</a></li>
-                                                <li><a >Inglés</a></li>
+                                            <h3>Idiomas: </h3>
+                                            <span>
+                                              {{ getLanguagesDisplay() }}
+                                            </span>
+                                            <ng-template #noLang>No especificado</ng-template>
+                                        </div>
+                                        <div class="text">
+                                            <h3>Dirigido a: </h3>
+                                            <span style="color: #808080;"> {{ global.getFormattedTargets(global.previewProfesionals.targets) }}</span>
+                                        </div>
+                                        <h3>Dificultades en (Tratamientos):</h3>
+                                        <li>
+                                            <span *ngIf="!global.previewProfesionals.typeTreatment || !global.previewProfesionals.typeTreatment.length">No especificado</span>
+                                            <ul *ngIf="global.previewProfesionals.typeTreatment && global.previewProfesionals.typeTreatment.length">
+                                              <li *ngFor="let tratamiento of global.previewProfesionals.typeTreatment">
+                                                {{ tratamiento.name }}
+                                              </li>
                                             </ul>
-                                        </div>
-                                        <div class="text">
-                                            <p><strong>Dirigido a:</strong> </p>
-                                        </div>
-                                        <div class="text">
-                                            <p><strong>Tipo de terapia:</strong> </p>
-                                        </div>
-                                        
-                                        <h3>Especialidades</h3>
-<!--                                         <p>Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Nullam mollis. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapi.</p>
- -->                                        <ul class="treatments-list clearfix">
-                                            <li><a >Cardiology</a></li>
-                                            <li><a >Dermatology</a></li>
-                                            <li><a >Family Medicine</a></li>
-                                            <li><a >Obstetrics & Gynecology</a></li>
-                                            <li><a >Oncology</a></li>
-                                            <li><a >Orthopedic Surgery</a></li>
-                                        </ul>
+                                          </li>
+                                        <h3>Corrientes</h3>
+                                        <li>
+                                            <span *ngIf="!global.previewProfesionals.corriente || !global.previewProfesionals.corriente.length">No especificado</span>
+                                            <ul *ngIf="global.previewProfesionals.corriente && global.previewProfesionals.corriente.length">
+                                              <li *ngFor="let corriente of global.previewProfesionals.corriente">
+                                                {{ corriente.name }}
+                                              </li>
+                                            </ul>
+                                          </li>
                                         <h3>Formación</h3>
-<!--                                         <p>Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Nullam mollis. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapi.</p>
- -->                                        <ul class="list clearfix">
-                                            <li>New York Medical College <span>- Doctor of Medicine</span></li>
-                                            <li>Montefiore Medical Center <span>- Residency in Internal Medicine</span></li>
-                                            <li>New York Medical College <span>- Master Internal Medicine</span></li>
+                                        <ul class="list clearfix" *ngIf="global.previewProfesionals.academicTitles && global.previewProfesionals.academicTitles.length > 0">
+                                            <li *ngFor="let title of global.previewProfesionals.academicTitles">
+                                              {{ title.institution }} - {{ title.specialization }} ({{ title.year }})
+                                            </li>
                                         </ul>
                                     </div>
-                                    <div class="accordion-box">
-                                        <h3>Tratamientos</h3>
-                                        
-                                        <ul class="list clearfix" style="color: black;">
-                                            <li><a >Cardiology</a></li>
-                                            <li><a >Dermatology</a></li>
-                                            <li><a >Family Medicine</a></li>
-                                            <li><a >Obstetrics & Gynecology</a></li>
-                                            <li><a >Oncology</a></li>
-                                            <li><a >Orthopedic Surgery</a></li>
-                                        </ul>
-                                    </div>
+                                    
                                 </div>
                             </div>
                             

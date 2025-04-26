@@ -172,6 +172,9 @@ async deleteProfesional(profesional: any) {
     Swal.fire('Éxito', 'El especialista ha sido eliminado.', 'success');
   }
 }
+get totalActivos(): number {
+  return this.profesionals ? this.profesionals.filter(p => p.status === 'Aprobado').length : 0;
+}
 
 
 }
