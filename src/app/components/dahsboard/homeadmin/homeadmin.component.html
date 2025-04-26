@@ -176,8 +176,8 @@
                                         (click)="showDetails(profesional)">
                                         <td style="cursor: pointer;">
                                             <div class="name-box">
-                                                <figure class="image" *ngIf="global.professionalInfo.images">
-                                                    <img [src]="global.professionalInfo.images[0]" alt="Foto de perfil" />
+                                                <figure class="image" *ngIf="profesional.images && profesional.images.length > 0">
+                                                    <img [src]="profesional.images[0]" alt="Foto de perfil" />
                                                 </figure>
                                                 <h5>{{profesional.name}}</h5>
                                                 <span class="designation">{{profesional.email}}</span>
