@@ -55,4 +55,8 @@ getRegionDisplay(): string {
   }
   return 'No especificado';
 }
+getSelectedDays(daysObj: {[key: string]: boolean}): string[] {
+  if (!daysObj) return [];
+  return Object.keys(daysObj).filter(day => daysObj[day]);
+}
 }

@@ -173,8 +173,12 @@
                     <div class="form-widget">
                         <div class="form-title">
                             <h3>Quieres agendar una cita</h3>
-                            <p>Horario: 09:00Am-05:00PM</p>
-                            <p>Dia: Lunes a Viernes</p>
+                            <p>Horario: {{ global.previewProfesionals.openingHours }}</p>
+                            <p>Dia: </p>
+                            <ul>
+                                <li *ngFor="let day of getSelectedDays(global.previewProfesionals.days)">{{ day }}</li>
+                            </ul>
+                            <p>Costo de atención: CLP {{ global.previewProfesionals.priceSession }}</p>
                         </div>
                         <div class="form-inner">
                     

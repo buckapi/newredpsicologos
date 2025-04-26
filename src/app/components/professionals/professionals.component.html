@@ -20,18 +20,16 @@
                 <div class="form-inner clearfix">
                     <form method="post" class="filter-form">
                         <div class="form-group clearfix">
-                          <div class="custom-select-wrapper">
-                            <select class="custom-select"
-                              [(ngModel)]="selectedRegionId"
-                              (change)="onRegionChange($event)"
-                              name="region"
-                              #regionSelect>
-                              <option value="" disabled hidden>Seleccione una región</option>
-                              <option value="">Todas las regiones</option>
-                              <option *ngFor="let region of regiones" 
-                                [value]="region.id">{{region.name}}</option>
-                            </select>
-                          </div>
+                            <mat-form-field appearance="fill" style="width: 50%">
+                                <mat-label>Región</mat-label>
+                                <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)" style="background-color: white">
+                                  <mat-option [value]="''">Todas las regiones</mat-option>
+                                  <mat-option *ngFor="let region of regiones" [value]="region.id">
+                                    {{region.name}}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            
                           
                           <input type="text" 
                             class="search-input"
@@ -58,17 +56,35 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 content-side">
                     <div class="item-shorting clearfix">
                         <div class="left-column pull-left">
-                            <h3>Resultados 1-6 of 20 </h3>
+                            <h3>
+                                Resultados {{ startResult }}-{{ endResult }} de {{ totalResults }}
+                              </h3>
+                            <div class="pagination-wrapper" *ngIf="totalPages > 1">
+                                <ul class="pagination">
+                                  <li>
+                                    <a (click)="goToPage(currentPage - 1)" [class.disabled]="currentPage === 1"><i class="icon-Arrow-Left"></i></a>
+                                  </li>
+                                  <li *ngFor="let page of [].constructor(totalPages); let i = index">
+                                    <a (click)="goToPage(i + 1)" [class.current]="currentPage === (i + 1)">{{ i + 1 }}</a>
+                                  </li>
+                                  <li>
+                                    <a (click)="goToPage(currentPage + 1)" [class.disabled]="currentPage === totalPages"><i class="icon-Arrow-Right"></i></a>
+                                  </li>
+                                </ul>
+                              </div>
                         </div>
                         <div class="right-column pull-right clearfix">
                             <div class="short-box clearfix">
                                 <div class="select-box">
-                                    <select class="wide">
-                                       <option data-display="Sort by">Tipo de sesión</option>
-                                       <option value="1">Cardiology</option>
-                                       <option value="2">Nurology</option>
-                                       <option value="4">Pragnency</option>
-                                    </select>
+                                    <mat-form-field appearance="fill" style="width: 100%">
+                                        <mat-label>Corriente</mat-label>
+                                        <mat-select [(ngModel)]="selectedCorrienteId" (selectionChange)="onCorrienteChange($event)">
+                                          <mat-option [value]="''">Todas las regiones</mat-option>
+                                          <mat-option *ngFor="let corriente of corrientes" [value]="corriente.id">
+                                            {{corriente.name}}
+                                          </mat-option>
+                                        </mat-select>
+                                      </mat-form-field>
                                 </div>
                             </div>
                             <div class="menu-box">
@@ -81,7 +97,7 @@
                         
                         <!-- BLOQUE DE LISTA -->
                         <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="clinic-list-content list-item" 
-                            *ngFor="let profesional of filteredProfesionales | async">                        
+                        *ngFor="let profesional of paginatedProfesionales">                        
                             <div class="clinic-block-one">
                                 <div class="inner-box">
                                     <div class="pattern">
@@ -139,7 +155,8 @@
                         <div class="clinic-grid-content">
                             <div class="row clearfix" >
                                 <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="col-lg-4 col-md-4 col-sm-6 col-xs-6 team-block" 
-                                *ngFor="let profesional of filteredProfesionales | async">                                    <div class="team-block-three">
+                                *ngFor="let profesional of paginatedProfesionales">
+                                    <div class="team-block-three">
                                         <div class="inner-box">
                                           
                                             <figure class="image-box">
@@ -181,14 +198,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="pagination-wrapper">
+                    <div class="pagination-wrapper" *ngIf="totalPages > 1">
                         <ul class="pagination">
-                            <li><a  class="current">1</a></li>
-                            <li><a >2</a></li>
-                            <li><a >3</a></li>
-                            <li><a ><i class="icon-Arrow-Right"></i></a></li>
+                          <li>
+                            <a (click)="goToPage(currentPage - 1)" [class.disabled]="currentPage === 1"><i class="icon-Arrow-Left"></i></a>
+                          </li>
+                          <li *ngFor="let page of [].constructor(totalPages); let i = index">
+                            <a (click)="goToPage(i + 1)" [class.current]="currentPage === (i + 1)">{{ i + 1 }}</a>
+                          </li>
+                          <li>
+                            <a (click)="goToPage(currentPage + 1)" [class.disabled]="currentPage === totalPages"><i class="icon-Arrow-Right"></i></a>
+                          </li>
                         </ul>
-                    </div>
+                      </div>
                 </div>
             </div>
         </div>
@@ -211,19 +233,16 @@
       </div>
       
       <div class="filter-panel-content">
-        <form method="post" class="filter-form">
-          <div class="form-group">
-            <label>Región</label>
-            <select class="custom-select"
-              [(ngModel)]="selectedRegionId"
-              (change)="onRegionChange($event)"
-              name="region">
-              <option value="" disabled hidden>Seleccione una región</option>
-              <option value="">Todas las regiones</option>
-              <option *ngFor="let region of regiones" 
-                [value]="region.id">{{region.name}}</option>
-            </select>
-          </div>
+        <form method="post">
+            <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Región</mat-label>
+                <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)">
+                  <mat-option [value]="''">Todas las regiones</mat-option>
+                  <mat-option *ngFor="let region of regiones" [value]="region.id">
+                    {{region.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
           
           <div class="form-group">
             <label>Nombre</label>

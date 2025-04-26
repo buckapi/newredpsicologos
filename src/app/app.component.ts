@@ -96,6 +96,7 @@ export class AppComponent {
     ngOnInit(): void {
       this.loadScripts();
       this.checkLoginStatus();
+      window.scrollTo(0, 0);
     }
     loadScripts() {
       const scripts = [  
