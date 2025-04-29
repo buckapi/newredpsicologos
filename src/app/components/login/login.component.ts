@@ -48,6 +48,7 @@ togglePasswordVisibility() {
           this.auth.setUser(response.user);
           this.global.activeRoute = 'homeprofessional';
           this.auth.permision();
+          this.global.loadProfessionalInfo();
         },
         error: (error) => {
           this.global.loading = false; // Stop loading

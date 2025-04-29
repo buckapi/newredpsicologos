@@ -15,6 +15,10 @@ import { RealtimeTratamientosService } from '../../../service/realtime-tratamien
 import { RealtimeEspecialidadesService } from '../../../service/realtime-especialidades.service';
 import { Corrientes, RealtimeCorrientesService } from '../../../service/realtime-corrientes.service';
 import { CommonModule } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input'; // si usas matInput en otros campos
+
 
 interface Comunas {
   id: string;
@@ -36,7 +40,7 @@ type PaymentsArray = string[];
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule,NgMultiSelectDropDownModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule,NgMultiSelectDropDownModule, MatFormFieldModule, MatSelectModule, MatInputModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -199,9 +203,8 @@ this.typeAttentionSelected = [];
     certificates: this.fb.array([]),
    
   });
- 
-  
  }
+ 
  async initializeData() {
   this.regionesList = await this.regionesService.getAllRegiones();
   this.comunasList = await this.comunasService.getAllComunas();
@@ -212,6 +215,7 @@ this.typeAttentionSelected = [];
 }
 
 ngAfterViewInit() {
+  
   this.initForms();
   if (this.global.professionalInfo) {
     // Inicializar valores para checkboxes y grupos
@@ -994,6 +998,7 @@ async updateCertificate(certificateUrl: string) {
   }
 }
   ngOnInit() {
+    this.initializeData();
     this.getProfessionlINfo();
     this.loadComunas(); 
     this.loadRegiones(); 

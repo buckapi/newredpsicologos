@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import PocketBase from 'pocketbase';  
 import { tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
-import { RealtimeProfessionalsService } from './realtime-professionals';
 import { RealtimeRegionesService } from './realtime-regiones';
-
+import { RealtimeProfessionalsService } from './realtime-professionals';
 interface Profesionals {
   id: string;
   name: string;
@@ -19,7 +18,12 @@ interface Profesionals {
   region: string;
   comuna: string;
   gender: string;
-  languages: {
+  academicTitles: {
+    institution: string;
+    specialization: string;
+    year: string;
+  }[],
+    languages: {
     es: boolean;
     en: boolean;
     fr: boolean;
@@ -52,6 +56,7 @@ interface Profesionals {
     Presencial: boolean;
     'A domicilio': boolean;
   };
+  
   priceSession: string;
   titleUniversity: string;
   typeTherapy: typeTherapy[];
@@ -61,14 +66,8 @@ interface Profesionals {
   openingHours: string;
   registrationNumber: string;
   sessions: number;
-  certificates: string[];
-  images: string[],
-  academicTitles: {
-    institution: string;
-    specialization: string;
-    year: string;
-  }[],
-  
+  certificates: string;
+  images: string[]
 }
 interface Comunas {
   id: string;
@@ -99,9 +98,9 @@ interface corriente {
   providedIn: 'root'
 })
 export class GlobalService {
-  private professionalInfoSubject = new BehaviorSubject<any>(null);
-  professionalInfo$ = this.professionalInfoSubject.asObservable();
-    storedRegiones: any[] = [];
+   /* private professionalInfoSubject = new BehaviorSubject<any>({});
+  professionalInfo$ = this.professionalInfoSubject.asObservable(); */ 
+  storedRegiones: any[] = [];
   imageUrl: string = '';
   isLoading = false;
   professionalToEdit: any={};
@@ -173,19 +172,23 @@ export class GlobalService {
     openingHours: '',
     registrationNumber: '',
     sessions: 0,
-    certificates:[],
+    certificates: '',
     images: [],
     academicTitles: []
   };
   constructor(
     private realtimeRegiones: RealtimeRegionesService,
-    public realtimeProfesionales: RealtimeProfessionalsService,
+    public realtimeProfesionales: RealtimeProfessionalsService
+
   ) 
   { 
-    this.loadProfessionalInfo();
     this.pb = new PocketBase('https://db.redpsicologos.cl:8090');
+    this.loadProfessionalInfo();
   }
-
+  setRoute(route: string) {
+    this.activeRoute = route;
+  }
+  
   getFormattedTargets(targets: any): string {
     const activeTargets = [];
     
@@ -197,13 +200,9 @@ export class GlobalService {
     
     return activeTargets.join(', ') || 'No especificado';
   }
- 
-  setPreviewProfesional(data: any) {
-    this.professionalInfoSubject.next(data);
-  }
   setMenuOption(option: string) {
     let regions = this.getRegiones();
-    regions.subscribe((regions: any) => {
+    regions.subscribe((regions) => {
       // Map to retain only id and name
       const simplifiedRegions = regions.map((region: { id: string; name: string }) => ({
         id: region.id,
@@ -220,19 +219,30 @@ export class GlobalService {
     this.previewProfesionals = profesional;
   }
 
- 
+  setPreviewProfesional(data: any) {
+    // Verificar si data y su propiedad images existen
+    if (data && data['images']) {
+        this.imageUrl = data['images'][0] || 'assets/images/user.png'; // Asignar la imagen
+    } else {
+        this.imageUrl = 'assets/images/user.png'; // Valor por defecto si no hay imagen
+    }
+  }
 getPreviewProfesional(): Profesionals {
   return this.previewProfesionals;
 }
-  loadProfessionalInfo(): any {
+   loadProfessionalInfo(): any {
     const info = localStorage.getItem('professionalInfo');
-    this.professionalInfo = info ? JSON.parse(info) : {}; // Default a objeto vacío
-    return this.professionalInfo;
-  }
+    if (info) {
+      this.professionalInfo = JSON.parse(info)
+    }
+    return this.professionalInfo; // Assuming professionalInfo contains the data you need
+
+  } 
+ 
+  
   getProfesionals() {
     this.realtimeProfesionales.profesionales$.subscribe(profesionales => {
       this.profesionals = profesionales;
-      this.professionalInfoSubject.next(profesionales);
     });
     return this.profesionals;
   }
@@ -253,8 +263,9 @@ getPreviewProfesional(): Profesionals {
       this.storedRegiones = simplifiedRegions;
       localStorage.setItem('regions', JSON.stringify(simplifiedRegions));
     });
-    this.previewProfesionals = JSON.parse(JSON.stringify(profesional));
-    this.activeRoute='professional-detail'; // Navega al componente detail-doctor
+    
+    this.previewProfesionals = profesional; // Asigna el profesional seleccionado
+    this.setRoute('professional-detail'); // Navega al componente detail-doctor
   }
   clearProfessionalData() {
     this.professionalInfo = null;

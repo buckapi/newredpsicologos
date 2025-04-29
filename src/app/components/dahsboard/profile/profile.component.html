@@ -1,4 +1,4 @@
-<section class="doctors-dashboard bg-color-3">
+<section  class="doctors-dashboard bg-color-3">
     <div class="left-panel">
         <div class="profile-box">
             <div class="upper-box">
@@ -7,9 +7,9 @@
                 </figure>
                 <div class="title-box centred">
                     <div class="inner">
-                        <h3> {{ global.professionalInfo.name }} {{ global.professionalInfo.lastname }}</h3>
-                        <span>Genero: {{ global.professionalInfo.gender  }}</span>
-                        <p>{{ global.professionalInfo.languages && hasSelectedItems(global.professionalInfo.languages) ? 'Idiomas: ' + getSelectedItems(global.professionalInfo.languages).join(', ') : 'No especificado' }}</p>
+                        <h3> {{ global.professionalInfo?.name }}</h3>
+                        <span>Genero: {{ global.professionalInfo?.gender  }}</span>
+                        <p>{{ global.professionalInfo?.languages && hasSelectedItems(global.professionalInfo.languages) ? 'Idiomas: ' + getSelectedItems(global.professionalInfo.languages).join(', ') : 'No especificado' }}</p>
                         <p>Bienvenido(a) a tu panel de control</p>
                     </div>
                 </div>
@@ -97,26 +97,25 @@
                                     
                                     
                                     <div class="col-lg-3 col-md-3 col-sm-12 form-group">
-                                        <label>Género 
-                                        <span *ngIf="!profileForm.get('gender')?.value && profileForm.get('gender')?.touched" style="color: red;">*</span>
-                                        </label>
-                                        <select formControlName="gender" class="form-control" (change)="onGenderChange()">
-                                        <option value="">Seleccione</option>
-                                        <option value="M">Masculino</option>
-                                        <option value="F">Femenino</option>
-                                        <option value="NB">No Binarie</option>
-                                        </select>
-                                        <div *ngIf="profileForm.get('gender')?.invalid && profileForm.get('gender')?.touched" class="text-danger">
-                                        Este campo es requerido
-                                        </div>
-                                    </div>
+                                        <mat-form-field appearance="fill" style="width: 100%">
+                                          <mat-label>Género</mat-label>
+                                          <mat-select formControlName="gender" (selectionChange)="onGenderChange()">
+                                            <mat-option value="">Seleccione</mat-option>
+                                            <mat-option value="M">Masculino</mat-option>
+                                            <mat-option value="F">Femenino</mat-option>
+                                            <mat-option value="NB">No Binarie</mat-option>
+                                          </mat-select>
+                                          <mat-error *ngIf="profileForm.get('gender')?.invalid && profileForm.get('gender')?.touched">
+                                            Este campo es requerido
+                                          </mat-error>
+                                        </mat-form-field>
+                                      </div>
                                   
                                     <div class="col-lg-4 col-md-4 col-sm-12 form-group">
                                         <label>Fecha de nacimiento
                                             <span *ngIf="!global.professionalInfo.birthday" style="color: red;">*</span>
                                         </label>
-                                        <input type="date" formControlName="birthday" required
-                                            [ngModel]="global.professionalInfo.birthday">
+                                        <input type="date" formControlName="birthday" required>
                                     </div>
                                     <div class="title-box">
                                         <h3>Datos profesionales</h3>
@@ -376,7 +375,7 @@
                                     <button type="submit" class="theme-btn-one">
                                         Guardar<i class="icon-Arrow-Right"></i>
                                     </button>
-                                    <a class="cancel-btn" (click)="global.setMenuOption('dashboard')">Cancelar</a>
+                                    <a class="cancel-btn" (click)="global.activeRoute = 'homeprofessional'">Cancelar</a>
                                 </div>
                             </form>
                         </div>

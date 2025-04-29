@@ -31,7 +31,9 @@ constructor(
   public realtimeEspecialidades: RealtimeEspecialidadesService,
   public realtimeTerapias: RealtimeTerapiaService,
   public realtimeTratamientos: RealtimeTratamientosService
-){}
+){
+  
+}
 showDetails(profesional: any) {
   Swal.fire({
       title: 'Detalles de la Solicitud',
