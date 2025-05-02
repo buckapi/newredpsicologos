@@ -175,7 +175,9 @@ export class GlobalService {
     certificates: '',
     images: [],
     academicTitles: []
+    
   };
+  searchTerm: string = '';
   constructor(
     private realtimeRegiones: RealtimeRegionesService,
     public realtimeProfesionales: RealtimeProfessionalsService

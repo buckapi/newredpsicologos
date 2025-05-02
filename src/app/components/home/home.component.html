@@ -15,12 +15,22 @@
                     <p>El directorio de especialistas en psicología de Chile</p>
                     <span class="text-dark " style="font-size:16px;" >Encuentra el especialista que mas se adapte a tus necesidades, contamos con busqueda por especialidad y region</span>
                     <div class="form-inner" style="margin-top:40px;">
-                        <form  method="post">
-                            <div class="form-group">
-                                <input type="text" name="name" placeholder="Terapia Psicológica..." required="">
-                                <button type="submit"><i class="icon-Arrow-Right"></i></button>
-                            </div>
-                        </form>
+                        <div class="form-inner" style="margin-top:40px;">
+                            <form method="post" class="filter-form" (submit)="searchProfessionals(searchTerm); $event.preventDefault()">
+                                <div class="form-group clearfix">
+                                    <input type="text" 
+                                        class="search-input"
+                                        name="searchTerm" 
+                                        placeholder="Buscar por nombre, tratamiento, especialidad o corriente..." 
+                                        [(ngModel)]="searchTerm"
+                                        (keyup.enter)="searchProfessionals(searchTerm)">
+                                    
+                                    <button type="submit" class="search-button">
+                                        <i class="icon-Arrow-Right"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                        
                     </div>
                 </div>

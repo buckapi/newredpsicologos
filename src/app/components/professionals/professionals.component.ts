@@ -12,6 +12,7 @@ import { Corrientes, RealtimeCorrientesService } from '../../service/realtime-co
 import { MatIconModule } from '@angular/material/icon';
 import { RealtimeTratamientosService } from '../../service/realtime-tratamientos.service';
 import { RealtimeEspecialidadesService } from '../../service/realtime-especialidades.service';
+import { RealtimeTerapiaService } from '../../service/realtime-terapia.service';
 @Component({
   selector: 'app-professionals',
   standalone: true,
@@ -20,31 +21,19 @@ import { RealtimeEspecialidadesService } from '../../service/realtime-especialid
   styleUrl: './professionals.component.css'
 })
 export class ProfessionalsComponent {
-  /* view: 'list' | 'grid' = 'list';
-  selectedRegionId: string = '';
-  selectedCorrienteId: string = '';
-  searchName: string = '';
-  filteredProfesionales: Observable<Profesionals[]>;
-  selectedTargets: any[] = [];
-  selectedTratamientos: any[] = [];
-  selectedEspecialidades: any[] = [];
-  tratamientos: any[] = [];
-  especialidades: any[] = [];
-  regiones: Regiones[] = [];
-  professionals: Profesionals[] = [];
-  corrientes: Corrientes[] = [];
-  showFilters: boolean = false;
-  currentPage: number = 1;
-  pageSize: number = 50; */
   view: 'list' | 'grid' = 'list';
   selectedRegionId: string = '';
   selectedCorrienteId: string = '';
   searchName: string = '';
   selectedTratamientos: string = '';
   selectedEspecialidades: string = '';
+  selectedTarget: string = '';
+  selectedTerapy: string = '';
   searchTerm: string = '';
   tratamientos: any[] = [];
   especialidades: any[] = [];
+  targets: any[] = [];
+  therapias: any[] = [];
   regiones: Regiones[] = [];
   professionals: Profesionals[] = [];
   corrientes: Corrientes[] = [];
@@ -61,7 +50,8 @@ export class ProfessionalsComponent {
     public realtimeRegiones: RealtimeRegionesService,
     public realtimeCorrientes: RealtimeCorrientesService,
     public realtimeTratamientos: RealtimeTratamientosService,
-    public realtimeEspecialidades: RealtimeEspecialidadesService
+    public realtimeEspecialidades: RealtimeEspecialidadesService,
+    public realtimeTerapia: RealtimeTerapiaService
   ) {
    // Cargar datos iniciales
    this.realtimeRegiones.regiones$.subscribe(regiones => this.regiones = regiones);
@@ -69,16 +59,17 @@ export class ProfessionalsComponent {
    this.realtimeProfesionales.profesionales$.subscribe(profesionales => this.professionals = profesionales);
    this.realtimeCorrientes.corrientes$.subscribe(corrientes => this.corrientes = corrientes);
    this.realtimeEspecialidades.especialidades$.subscribe(especialidades => this.especialidades = especialidades);
-
+   this.realtimeTerapia.terapia$.subscribe(therapias => this.therapias = therapias);
    // Configurar filtrado combinado
    this.filteredProfesionales$ = combineLatest([
      this.realtimeProfesionales.profesionales$,
      this.realtimeRegiones.regiones$,
      this.realtimeTratamientos.tratamientos$,
      this.realtimeEspecialidades.especialidades$,
-     this.realtimeCorrientes.corrientes$
+     this.realtimeCorrientes.corrientes$,
+     this.realtimeTerapia.terapia$
    ]).pipe(
-    map(([professionals, regiones, tratamientos, especialidades, corrientes]) => {
+    map(([professionals, regiones, tratamientos, especialidades, corrientes, terapias]) => {
       return this.applyFilters(
         professionals, 
         this.selectedRegionId,
@@ -86,9 +77,11 @@ export class ProfessionalsComponent {
         this.searchTerm, // Usamos searchTerm en lugar de searchName
         this.selectedTratamientos,
         this.selectedEspecialidades,
+        this.selectedTerapy,
         tratamientos,
         especialidades,
-        corrientes
+        corrientes,
+        terapias
       );
     })
   );
@@ -100,9 +93,11 @@ export class ProfessionalsComponent {
   searchTerm: string,
   tratamientoId: string,
   especialidadId: string,
+  terapiaId: string,
   tratamientosList: any[],
   especialidadesList: any[],
-  corrientesList: any[]
+  corrientesList: any[],
+  terapiasList: any[]
 ): Profesionals[] {
   return professionals.filter(professional => {
     // Filtro por término de búsqueda (busca en nombre, tratamiento, especialidad y corriente)
@@ -112,7 +107,8 @@ export class ProfessionalsComponent {
         searchTerm, 
         tratamientosList, 
         especialidadesList, 
-        corrientesList
+        corrientesList,
+        terapiasList
       );
 
 
@@ -138,7 +134,8 @@ export class ProfessionalsComponent {
     searchTerm: string,
     tratamientosList: any[],
     especialidadesList: any[],
-    corrientesList: any[]
+    corrientesList: any[],
+    terapiasList: any[]
   ): boolean {
     const term = searchTerm.toLowerCase();
     
@@ -171,6 +168,18 @@ export class ProfessionalsComponent {
       if (especialidadNames.length > 0) return true;
     }
     
+    // Buscar en terapias
+    if (professional.typeTherapy) {
+      const terapiaNames = professional.typeTherapy
+        .map(t => {
+          const terapia = terapiasList.find(te => te.id === t.id);
+          return terapia?.name?.toLowerCase();
+        })
+        .filter(name => name?.includes(term));
+      
+      if (terapiaNames.length > 0) return true;
+    }
+    
     // Buscar en corrientes
     if (professional.corriente) {
       const corrienteNames = professional.corriente
@@ -185,6 +194,16 @@ export class ProfessionalsComponent {
     
     return false;
   }
+ngOnInit() {
+  // Usa el término de búsqueda del global service
+  if (this.global.searchTerm) {
+      this.searchTerm = this.global.searchTerm;
+      this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchTerm, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias  ); // Aplica los filtros automáticamente
+  }
+  
+  // Limpia el término después de usarlo si es necesario
+  // this.global.searchTerm = '';
+}
 
   // Modificamos onNameChange para usar searchTerm
   onSearchTermChange(event: any): void {
@@ -196,9 +215,11 @@ export class ProfessionalsComponent {
       this.searchTerm, 
       this.selectedTratamientos, 
       this.selectedEspecialidades,
+      this.selectedTerapy,
       this.tratamientos,
       this.especialidades,
-      this.corrientes
+      this.corrientes,
+      this.therapias
     );
   }
 
@@ -206,27 +227,27 @@ export class ProfessionalsComponent {
 // Métodos para manejar cambios en los filtros
 onRegionChange(event: any): void {
   this.selectedRegionId = event.value;
-  this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes   );
+  this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias   );
 }
 
 onNameChange(event: any): void {
   this.searchName = event.target.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
 }
 
 onCorrienteChange(event: any): void {
   this.selectedCorrienteId = event.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
 }
 
 onTratamientoChange(event: any): void {
   this.selectedTratamientos = event.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
 }
 
 onEspecialidadChange(event: any): void {
   this.selectedEspecialidades = event.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
 }
 
 
@@ -285,5 +306,9 @@ toggleFilters(): void {
   
   get totalResults(): number {
     return this.filteredProfesionalesValue.length;
+  }
+  getFormattedTerapias(terapias: { id: number; name: string; }[]): string {
+    const terapiaNames = terapias.map(t => t.name);
+    return terapiaNames.join(', ') || 'No especificado';
   }
 }
