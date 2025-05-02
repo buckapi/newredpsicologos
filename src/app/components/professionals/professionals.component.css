@@ -218,3 +218,8 @@
     -moz-appearance: none;
     padding-right: 40px;
   }
+  @media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+}

@@ -65,7 +65,7 @@
                         </div>
                         <div class="right-column pull-right clearfix">
 
-                          <div class="short-box clearfix">
+                          <div class="short-box clearfix desktop-only">
                             <div class="select-box">
                                 <mat-form-field appearance="fill" style="width: 100%">
                                     <mat-label>Region</mat-label>
@@ -78,7 +78,7 @@
                                   </mat-form-field>
                             </div>
                           </div>
-                          <div class="short-box clearfix">
+                          <div class="short-box clearfix desktop-only">
                             <div class="select-box">
                                 <mat-form-field appearance="fill" style="width: 100%">
                                     <mat-label>Tratamiento</mat-label>
@@ -90,21 +90,21 @@
                                     </mat-select>
                                   </mat-form-field>
                             </div>
-                        </div>
-                        <div class="short-box clearfix">
-                          <div class="select-box">
-                              <mat-form-field appearance="fill" style="width: 100%">
-                                  <mat-label>Especialidad</mat-label>
-                                  <mat-select [(ngModel)]="selectedEspecialidades" (selectionChange)="onEspecialidadChange($event)">
-                                    <mat-option [value]="''">Todos las especialidades</mat-option>
-                                    <mat-option *ngFor="let especialidad of realtimeEspecialidades.especialidades$ | async" [value]="especialidad.id">
-                                      {{especialidad.name}}
-                                    </mat-option>
-                                  </mat-select>
-                                </mat-form-field>
                           </div>
-                      </div>
-                            <div class="short-box clearfix">
+                            <div class="short-box clearfix desktop-only">
+                            <div class="select-box">
+                                <mat-form-field appearance="fill" style="width: 100%">
+                                    <mat-label>Especialidad</mat-label>
+                                    <mat-select [(ngModel)]="selectedEspecialidades" (selectionChange)="onEspecialidadChange($event)">
+                                          <mat-option [value]="''">Todos las especialidades</mat-option>
+                                          <mat-option *ngFor="let especialidad of realtimeEspecialidades.especialidades$ | async" [value]="especialidad.id">
+                                            {{especialidad.name}}
+                                          </mat-option>
+                                        </mat-select>
+                                      </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="short-box clearfix  desktop-only">
                                 <div class="select-box">
                                     <mat-form-field appearance="fill" style="width: 100%">
                                         <mat-label>Corriente</mat-label>

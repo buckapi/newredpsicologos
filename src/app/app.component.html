@@ -35,7 +35,7 @@
                         <i class="fa fa-sign-in"></i>Ingresar
                     </a>
                 </div>
-                <div class="btn-box" *ngIf="!auth.isLogin()">
+                <div class="btn-box desktop-only" *ngIf="!auth.isLogin()">
                     <a (click)="onAction('register')" class="theme-btn-two" [hidden]="globalService.activeRoute === 'register' " style="cursor: pointer;">
                         <i class="fa fa-user"></i> Registrate
                     </a>

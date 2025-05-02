@@ -116,13 +116,17 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <div class="btn-box">
-                                    <button class="btn theme-btn-one" (click)="global.activeRoute='professionals'">Todos los Especialistas <i class="icon-Arrow-Right"></i></button>
-                                </div>
+                                <a class="btn theme-btn-one" (click)="global.goToDetail(profesional); global.scrollToTop()">Ver perfil <i class="icon-Arrow-Right"></i></a>
+
+                                
                             </div>
+                            
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="btn-box">
+                <button class="btn theme-btn-one" (click)="global.activeRoute='professionals'; global.scrollToTop()">Ver todos <i class="icon-Arrow-Right"></i></button>
             </div>
         </div>
     </div>
@@ -163,7 +167,8 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <a (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer; color: #0f405f;">Ver perfil</a>
+                                <a class="btn theme-btn-one" (click)="global.goToDetail(profesional); global.scrollToTop()">Ver perfil <i class="icon-Arrow-Right"></i></a>
+
                             </div>
                         </div>
                     </div>
