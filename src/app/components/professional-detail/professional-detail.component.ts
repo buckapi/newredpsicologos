@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { GlobalService } from '../../service/global.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-professional-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './professional-detail.component.html',
   styleUrl: './professional-detail.component.css'
 })
@@ -19,7 +20,7 @@ constructor(
 ){}
 ngOnInit() {
   this.profesional = this.global.previewProfesionals;
-  
+  this.resetForm();  
 }
 ngAfterViewInit() {
   window.scrollTo({
@@ -28,10 +29,41 @@ ngAfterViewInit() {
   });
 }
 
+private cleanPhoneNumber(phone: string): string {
+  return phone.replace(/[^0-9]/g, '');
+}
+
 sendToWhatsApp() {
-  const message = `Hola, mi nombre es ${this.name}.`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  // Get the professional's phone number from the previewProfesionals object
+  const professionalPhone = this.global.previewProfesionals?.phone || '';
+  const cleanPhone = this.cleanPhoneNumber(professionalPhone);
+  
+  // Build the message with all form data
+  const message = `Hola, mi nombre es ${this.name}.\n` +
+                  `Mi teléfono es: ${this.phone}\n` +
+                  `Mi correo electrónico es: ${this.email}\n` +
+                  `Me gustaría contactarte para una consulta.`;
+  
+  // Create WhatsApp URL with the professional's phone number
+  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+  
+  // Log the phone number being used (for debugging)
+  console.log('Sending WhatsApp message to:', cleanPhone);
+  
   window.open(whatsappUrl, '_blank');
+  this.resetForm();
+}
+
+sendToEmail() {
+  const message = `Hola, mi nombre es ${this.name}.`;
+  const emailUrl = `mailto:${this.email}?subject=Consulta&body=${encodeURIComponent(message)}`;
+  window.open(emailUrl, '_blank');
+  this.resetForm();
+}
+resetForm() {
+  this.name = '';
+  this.phone = 0;
+  this.email = '';
 }
 getSelectedItems(items: any[]) {
   return items.map(item => item.name);

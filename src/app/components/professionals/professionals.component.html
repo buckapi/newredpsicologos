@@ -8,7 +8,7 @@
             </div>
             <div class="auto-container">
                 <div class="title">
-                    <h1>Profesionales en salud mental</h1>
+                    <h1 style="color: #0f405f;">Profesionales en salud mental</h1>
                 </div>
             </div>
         </div>
@@ -23,12 +23,12 @@
                       <input type="text" 
                         class="search-input"
                         name="searchTerm" 
-                        placeholder="Buscar por nombre, tratamiento, especialidad, terapia o corriente..." 
+                        placeholder="Buscar por nombre, región, tratamiento, especialidad, terapia, corriente, público objetivo o biografía..."                        
                         [(ngModel)]="searchTerm"
                         (input)="onSearchTermChange($event)">
                         
                       <button type="button" class="search-button" 
-                        (click)="applyFilters(professionals, selectedRegionId, selectedCorrienteId, searchTerm, selectedTratamientos, selectedEspecialidades, selectedTerapy, tratamientos, especialidades, corrientes, therapias); toggleFilters()">
+                        (click)="applyFilters(professionals, selectedRegionId, selectedCorrienteId, searchTerm, selectedTratamientos, selectedEspecialidades, selectedTerapy, tratamientos, especialidades, corrientes, therapias, regiones); toggleFilters()">
                         <i class="icon-Arrow-Right"></i>
                       </button>
                     </div>
@@ -324,7 +324,7 @@
               (input)="onNameChange($event)">
           </div>
           
-          <button type="button" class="apply-filters-button" (click)="applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias); toggleFilters()">
+          <button type="button" class="apply-filters-button" (click)="applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias, this.regiones); toggleFilters()">
             Aplicar Filtros
           </button>
         </form>

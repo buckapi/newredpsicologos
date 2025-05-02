@@ -183,24 +183,22 @@
                                 <h4>Dejame tus datos</h4>
                                 <form>
                                     <div class="col-lg-12 col-md-12 col-sm-12 form-group" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
-                                        <input type="text" name="name" placeholder="Escribe tu nombre" required="">
+                                        <input type="text" name="name" placeholder="Escribe tu nombre" [(ngModel)]="name" required="">
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 form-group" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
-                                        <input type="number" name="phone" placeholder="Escribe tu telefono" required="">
+                                        <input type="number" name="phone" placeholder="Escribe tu telefono" [(ngModel)]="phone" required="">
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 form-group" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
-                                        <input type="email" name="email" placeholder="Escribe tu correo" required="">
+                                        <input type="email" name="email" placeholder="Escribe tu correo" [(ngModel)]="email" required="">
                                     </div>
-                                <div class="row">
-                                    <div class="col-12 btn-box">
-                                        <a  class="theme-btn-one" (click)="sendToWhatsApp()"> Enviar al WhatsApp<i class="fab fa-whatsapp"></i></a>
+                                    <div class="row">
+                                        <div class="col-12 btn-box">
+                                            <a class="theme-btn-one" (click)="sendToWhatsApp()">Enviar al WhatsApp<i class="fab fa-whatsapp"></i></a>
+                                        </div>
+                                        <div class="col-12 btn-box">
+                                            <a class="theme-btn-one" (click)="sendToEmail()">Enviar al Correo<i class="fa fa-envelope"></i></a>
+                                        </div>
                                     </div>
-                                    <div class="col-12 btn-box">
-                                        <a  class="theme-btn-one" (click)="sendToWhatsApp()">Enviar al Correo<i class="fa fa-envelope"></i></a>
-                                    </div>
-
-                                </div>
-                                
                                 </form>
                             </div>
                         </div>

@@ -13,10 +13,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { RealtimeTratamientosService } from '../../service/realtime-tratamientos.service';
 import { RealtimeEspecialidadesService } from '../../service/realtime-especialidades.service';
 import { RealtimeTerapiaService } from '../../service/realtime-terapia.service';
+import { MatSelectChange } from '@angular/material/select';
+
 @Component({
   selector: 'app-professionals',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgSelectModule, MatSelectModule, MatFormFieldModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgSelectModule, MatSelectModule, MatFormFieldModule, MatIconModule],
   templateUrl: './professionals.component.html',
   styleUrl: './professionals.component.css'
 })
@@ -81,7 +83,8 @@ export class ProfessionalsComponent {
         tratamientos,
         especialidades,
         corrientes,
-        terapias
+        terapias,
+        regiones
       );
     })
   );
@@ -97,7 +100,8 @@ export class ProfessionalsComponent {
   tratamientosList: any[],
   especialidadesList: any[],
   corrientesList: any[],
-  terapiasList: any[]
+  terapiasList: any[],
+  regionesList: Regiones[]
 ): Profesionals[] {
   return professionals.filter(professional => {
     // Filtro por término de búsqueda (busca en nombre, tratamiento, especialidad y corriente)
@@ -108,13 +112,13 @@ export class ProfessionalsComponent {
         tratamientosList, 
         especialidadesList, 
         corrientesList,
-        terapiasList
+        terapiasList,
+        regionesList
       );
 
 
-    // Filtro por región
     const regionMatch = !regionId || 
-      (professional.regions && professional.regions.some((r: any) => r.id === regionId));
+  (professional.regions && professional.regions.some((r: any) => r.id === regionId)); 
       
       const corrienteMatch = !corrienteId || 
         (professional.corriente && professional.corriente.some((c: any) => c.id === corrienteId));
@@ -135,7 +139,8 @@ export class ProfessionalsComponent {
     tratamientosList: any[],
     especialidadesList: any[],
     corrientesList: any[],
-    terapiasList: any[]
+    terapiasList: any[],
+    regionesList: Regiones[]  
   ): boolean {
     const term = searchTerm.toLowerCase();
     
@@ -179,6 +184,30 @@ export class ProfessionalsComponent {
       
       if (terapiaNames.length > 0) return true;
     }
+     // Buscar en biografía
+  if (professional.biography?.toLowerCase().includes(term)) {
+    return true;
+  }
+  
+  // Buscar en targets (público objetivo)
+  if (professional.targets) {
+    const formattedTargets = this.getFormattedTargets(professional.targets).toLowerCase();
+    if (formattedTargets.includes(term)) {
+      return true;
+    }
+  }
+
+  // Buscar en regiones
+  if (professional.regions) {
+    const regionNames = professional.regions
+      .map(r => {
+        const region = regionesList.find(re => re.id === r.id);
+        return region?.name?.toLowerCase();
+      })
+      .filter(name => name?.includes(term));
+    
+    if (regionNames.length > 0) return true;
+  }
     
     // Buscar en corrientes
     if (professional.corriente) {
@@ -198,7 +227,7 @@ ngOnInit() {
   // Usa el término de búsqueda del global service
   if (this.global.searchTerm) {
       this.searchTerm = this.global.searchTerm;
-      this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchTerm, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias  ); // Aplica los filtros automáticamente
+      this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchTerm, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias, this.regiones  ); // Aplica los filtros automáticamente
   }
   
   // Limpia el término después de usarlo si es necesario
@@ -219,35 +248,53 @@ ngOnInit() {
       this.tratamientos,
       this.especialidades,
       this.corrientes,
-      this.therapias
+      this.therapias,
+      this.regiones
     );
   }
 
 
 // Métodos para manejar cambios en los filtros
-onRegionChange(event: any): void {
+/* onRegionChange(event: any): void {
   this.selectedRegionId = event.value;
   this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias   );
-}
+} */
+  onRegionChange(event: MatSelectChange): void {
+    this.selectedRegionId = event.value;
+    this.applyFilters(
+      this.professionals, 
+      this.selectedRegionId, 
+      this.selectedCorrienteId, 
+      this.searchTerm, 
+      this.selectedTratamientos, 
+      this.selectedEspecialidades,
+      this.selectedTerapy,
+      this.tratamientos,
+      this.especialidades,
+      this.corrientes,
+      this.therapias,
+      this.regiones
+    );
+  }
 
 onNameChange(event: any): void {
   this.searchName = event.target.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias, this.regiones);
 }
 
 onCorrienteChange(event: any): void {
   this.selectedCorrienteId = event.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias, this.regiones);
 }
 
 onTratamientoChange(event: any): void {
   this.selectedTratamientos = event.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias, this.regiones);
 }
 
 onEspecialidadChange(event: any): void {
   this.selectedEspecialidades = event.value;
-  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias);
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.selectedTerapy, this.tratamientos, this.especialidades, this.corrientes, this.therapias, this.regiones);
 }
 
 
