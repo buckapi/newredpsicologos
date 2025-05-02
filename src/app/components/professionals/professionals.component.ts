@@ -10,6 +10,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Corrientes, RealtimeCorrientesService } from '../../service/realtime-corrientes.service';
 import { MatIconModule } from '@angular/material/icon';
+import { RealtimeTratamientosService } from '../../service/realtime-tratamientos.service';
+import { RealtimeEspecialidadesService } from '../../service/realtime-especialidades.service';
 @Component({
   selector: 'app-professionals',
   standalone: true,
@@ -18,105 +20,219 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './professionals.component.css'
 })
 export class ProfessionalsComponent {
-  view: 'list' | 'grid' = 'list';
+  /* view: 'list' | 'grid' = 'list';
   selectedRegionId: string = '';
   selectedCorrienteId: string = '';
   searchName: string = '';
   filteredProfesionales: Observable<Profesionals[]>;
+  selectedTargets: any[] = [];
+  selectedTratamientos: any[] = [];
+  selectedEspecialidades: any[] = [];
+  tratamientos: any[] = [];
+  especialidades: any[] = [];
   regiones: Regiones[] = [];
   professionals: Profesionals[] = [];
   corrientes: Corrientes[] = [];
   showFilters: boolean = false;
   currentPage: number = 1;
+  pageSize: number = 50; */
+  view: 'list' | 'grid' = 'list';
+  selectedRegionId: string = '';
+  selectedCorrienteId: string = '';
+  searchName: string = '';
+  selectedTratamientos: string = '';
+  selectedEspecialidades: string = '';
+  searchTerm: string = '';
+  tratamientos: any[] = [];
+  especialidades: any[] = [];
+  regiones: Regiones[] = [];
+  professionals: Profesionals[] = [];
+  corrientes: Corrientes[] = [];
+  
+  showFilters: boolean = false;
+  currentPage: number = 1;
   pageSize: number = 50;
+  
+  filteredProfesionales$: Observable<Profesionals[]>;
   
   constructor(
     public global: GlobalService,
     public realtimeProfesionales: RealtimeProfessionalsService,
     public realtimeRegiones: RealtimeRegionesService,
-    public realtimeCorrientes: RealtimeCorrientesService
+    public realtimeCorrientes: RealtimeCorrientesService,
+    public realtimeTratamientos: RealtimeTratamientosService,
+    public realtimeEspecialidades: RealtimeEspecialidadesService
   ) {
-    // Suscripción para obtener las regiones
-    this.realtimeRegiones.regiones$.subscribe(regiones => {
-      this.regiones = regiones;
-    });
+   // Cargar datos iniciales
+   this.realtimeRegiones.regiones$.subscribe(regiones => this.regiones = regiones);
+   this.realtimeTratamientos.tratamientos$.subscribe(tratamientos => this.tratamientos = tratamientos);
+   this.realtimeProfesionales.profesionales$.subscribe(profesionales => this.professionals = profesionales);
+   this.realtimeCorrientes.corrientes$.subscribe(corrientes => this.corrientes = corrientes);
+   this.realtimeEspecialidades.especialidades$.subscribe(especialidades => this.especialidades = especialidades);
 
-    // Suscripción para obtener los profesionales
-    this.realtimeProfesionales.profesionales$.subscribe(profesionales => {
-      this.professionals = profesionales;
-    });
+   // Configurar filtrado combinado
+   this.filteredProfesionales$ = combineLatest([
+     this.realtimeProfesionales.profesionales$,
+     this.realtimeRegiones.regiones$,
+     this.realtimeTratamientos.tratamientos$,
+     this.realtimeEspecialidades.especialidades$,
+     this.realtimeCorrientes.corrientes$
+   ]).pipe(
+    map(([professionals, regiones, tratamientos, especialidades, corrientes]) => {
+      return this.applyFilters(
+        professionals, 
+        this.selectedRegionId,
+        this.selectedCorrienteId,
+        this.searchTerm, // Usamos searchTerm en lugar de searchName
+        this.selectedTratamientos,
+        this.selectedEspecialidades,
+        tratamientos,
+        especialidades,
+        corrientes
+      );
+    })
+  );
+ }
+ public applyFilters(
+  professionals: Profesionals[],
+  regionId: string,
+  corrienteId: string,
+  searchTerm: string,
+  tratamientoId: string,
+  especialidadId: string,
+  tratamientosList: any[],
+  especialidadesList: any[],
+  corrientesList: any[]
+): Profesionals[] {
+  return professionals.filter(professional => {
+    // Filtro por término de búsqueda (busca en nombre, tratamiento, especialidad y corriente)
+    const searchTermMatch = !searchTerm || 
+      this.checkProfessionalMatchesSearchTerm(
+        professional, 
+        searchTerm, 
+        tratamientosList, 
+        especialidadesList, 
+        corrientesList
+      );
 
-    // Suscripción para obtener las corrientes
-    this.realtimeCorrientes.corrientes$.subscribe(corrientes => {
-      this.corrientes = corrientes;
-    });
 
-    // Configuración del filtrado combinado
-    this.filteredProfesionales = combineLatest([
-      this.realtimeProfesionales.profesionales$,
-      this.realtimeRegiones.regiones$
-    ]).pipe(
-      map(([profesionales, regiones]) => {
-        return this.applyFiltersToProfesionales(profesionales, regiones);
-      })
+    // Filtro por región
+    const regionMatch = !regionId || 
+      (professional.regions && professional.regions.some((r: any) => r.id === regionId));
+      
+      const corrienteMatch = !corrienteId || 
+        (professional.corriente && professional.corriente.some((c: any) => c.id === corrienteId));
+      
+      const tratamientoMatch = !tratamientoId || 
+        (professional.typeTreatment && professional.typeTreatment.some((t: any) => t.id === tratamientoId));
+      
+      const especialidadMatch = !especialidadId || 
+        (professional.typeEspeciality && professional.typeEspeciality.some((e: any) => e.id === especialidadId));
+      
+      return searchTermMatch && regionMatch && corrienteMatch && tratamientoMatch && especialidadMatch;
+    });
+  }
+    // Método para verificar si el profesional coincide con el término de búsqueda
+  private checkProfessionalMatchesSearchTerm(
+    professional: Profesionals,
+    searchTerm: string,
+    tratamientosList: any[],
+    especialidadesList: any[],
+    corrientesList: any[]
+  ): boolean {
+    const term = searchTerm.toLowerCase();
+    
+    // Buscar en nombre
+    if (professional.name?.toLowerCase().includes(term)) {
+      return true;
+    }
+    
+    // Buscar en tratamientos
+    if (professional.typeTreatment) {
+      const tratamientoNames = professional.typeTreatment
+        .map(t => {
+          const tratamiento = tratamientosList.find(tr => tr.id === t.id);
+          return tratamiento?.name?.toLowerCase();
+        })
+        .filter(name => name?.includes(term));
+      
+      if (tratamientoNames.length > 0) return true;
+    }
+    
+    // Buscar en especialidades
+    if (professional.typeEspeciality) {
+      const especialidadNames = professional.typeEspeciality
+        .map(e => {
+          const especialidad = especialidadesList.find(es => es.id === e.id);
+          return especialidad?.name?.toLowerCase();
+        })
+        .filter(name => name?.includes(term));
+      
+      if (especialidadNames.length > 0) return true;
+    }
+    
+    // Buscar en corrientes
+    if (professional.corriente) {
+      const corrienteNames = professional.corriente
+        .map(c => {
+          const corriente = corrientesList.find(co => co.id === c.id);
+          return corriente?.name?.toLowerCase();
+        })
+        .filter(name => name?.includes(term));
+      
+      if (corrienteNames.length > 0) return true;
+    }
+    
+    return false;
+  }
+
+  // Modificamos onNameChange para usar searchTerm
+  onSearchTermChange(event: any): void {
+    this.searchTerm = event.target.value;
+    this.applyFilters(  
+      this.professionals, 
+      this.selectedRegionId, 
+      this.selectedCorrienteId, 
+      this.searchTerm, 
+      this.selectedTratamientos, 
+      this.selectedEspecialidades,
+      this.tratamientos,
+      this.especialidades,
+      this.corrientes
     );
   }
-  toggleFilters(): void {
-    this.showFilters = !this.showFilters;
-  }
 
-  private applyFiltersToProfesionales(professionals: Profesionals[], regiones: Regiones[]): Profesionals[] {
-    return professionals.filter(professional => {
-      // Filtro por nombre
-      const nameMatch = !this.searchName || 
-        professional.name.toLowerCase().includes(this.searchName.toLowerCase());
-      
-      // Filtro por región
-      let regionMatch = true;
-      if (this.selectedRegionId && regiones) {
-        const region = regiones.find(r => r.id === this.selectedRegionId);
-        regionMatch = !!region && !!professional.regions && 
-          professional.regions.some((r: any) => r.id === region?.id);
-      }
-      
-      // Filtro por corriente
-      let corrienteMatch = true;
-      if (this.selectedCorrienteId && this.corrientes) {
-        const corriente = this.corrientes.find(c => c.id === this.selectedCorrienteId);
-        corrienteMatch = !!corriente && !!professional.corriente && 
-          professional.corriente.some((c: any) => c.id === corriente?.id);
-      }
-      
-      return nameMatch && regionMatch && corrienteMatch;
-    });
-  }
 
-  onRegionChange(event: any): void {
-    this.selectedRegionId = event.target.value;
-    this.applyFilters();
-  }
+// Métodos para manejar cambios en los filtros
+onRegionChange(event: any): void {
+  this.selectedRegionId = event.value;
+  this.applyFilters(  this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes   );
+}
 
-  onNameChange(event: any): void {
-    this.searchName = event.target.value;
-    this.applyFilters();
-  }
+onNameChange(event: any): void {
+  this.searchName = event.target.value;
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+}
 
-  onCorrienteChange(event: any): void {
-    this.selectedCorrienteId = event.target.value;
-    this.applyFilters();
-  }
+onCorrienteChange(event: any): void {
+  this.selectedCorrienteId = event.value;
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+}
 
-  applyFilters(): void {
-    this.filteredProfesionales = combineLatest([
-      this.realtimeProfesionales.profesionales$,
-     
-      this.realtimeRegiones.regiones$
-    ]).pipe(
-      map(([professionals, regiones]) => {
-        return this.applyFiltersToProfesionales(professionals, regiones);
-      })
-    );
-  }
+onTratamientoChange(event: any): void {
+  this.selectedTratamientos = event.value;
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+}
+
+onEspecialidadChange(event: any): void {
+  this.selectedEspecialidades = event.value;
+  this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
+}
+
+toggleFilters(): void {
+  this.showFilters = !this.showFilters;
+}
+
 
   getFormattedTargets(targets: {
     'niños y niñas'?: boolean;
@@ -142,7 +258,7 @@ export class ProfessionalsComponent {
   // Para acceder al valor del observable (si filteredProfesionales es un observable)
   get filteredProfesionalesValue() {
     let value: any[] = [];
-    this.filteredProfesionales?.subscribe(data => value = data).unsubscribe();
+    this.filteredProfesionales$?.subscribe(data => value = data).unsubscribe();
     return value;
   }
   

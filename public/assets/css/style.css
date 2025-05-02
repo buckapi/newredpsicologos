@@ -623,6 +623,19 @@ img {
   justify-content: space-between;
 }
 
+@media (max-width: 768px) {
+  .main-header .btn-box{
+    display: none;
+  }
+  .main-header .outer-box{
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
 
 
 /** main-menu **/

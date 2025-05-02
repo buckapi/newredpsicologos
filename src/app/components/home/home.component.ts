@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { GlobalService } from '../../service/global.service';
 import { RealtimeProfessionalsService } from '../../service/realtime-professionals';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 interface profesional {
   id: string;
   name: string;
@@ -91,13 +92,15 @@ interface Targets {
 }
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
   /* specialists: any[] = []; */
   specialists: profesional[] = [];
+  searchTerm: string = '';
 
 constructor(
   public global: GlobalService,
@@ -119,4 +122,13 @@ getFormattedTargets(targets: any): string {
   
   return activeTargets.join(', ') || 'No especificado';
 }
+
+
+  searchProfessionals(term: string) {
+    if (term.trim()) {
+      // Navega al componente de profesionales con el término de búsqueda como parámetro
+      this.global.activeRoute = 'professionals';
+      this.searchTerm = term.trim().toLowerCase();
+    }
+  }
 }

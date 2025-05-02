@@ -17,6 +17,8 @@ import { HomeadminComponent } from './components/dahsboard/homeadmin/homeadmin.c
 import { HomeprofessionalComponent } from './components/dahsboard/homeprofessional/homeprofessional.component';
 import { SettingsComponent } from './components/dahsboard/settings/settings.component';
 import { ReviewsComponent } from './components/dahsboard/reviews/reviews.component';
+import { HostListener } from '@angular/core';
+
 import { filter } from 'rxjs';
 @Component({
   selector: 'app-root',
@@ -44,7 +46,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   showUserMenu = false;
   isLogin: boolean = false;
   userFullName: string = '';
-  
+  isSticky = false;
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    this.isSticky = window.pageYOffset > 100; // Ajusta el valor según tu diseño
+  }
+  menuItems = [
+    { label: 'Inicio', route: 'home', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
+    { label: 'Profesionales', route: 'professionals', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
+    { label: 'Contacto', route: 'contact', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() }
+  ];
 
   constructor(
     public globalService: GlobalService,
@@ -200,4 +212,9 @@ export class AppComponent implements OnInit, AfterViewInit {
           break;
       }
     }
+
+    closeMobileMenu() {
+      
+    } 
+    
 }

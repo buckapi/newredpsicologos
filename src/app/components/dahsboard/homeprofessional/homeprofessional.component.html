@@ -11,7 +11,7 @@
                         <p>Usuario: <span>{{ global.professionalInfo?.username }}</span></p>
                         <p>Numero de registro: <span>{{ global.professionalInfo?.registrationNumber }}</span></p>
                         <p>Genero: <span>{{ global.professionalInfo?.gender  }}</span></p>
-                        <p>Idiomas: <span>{{ global.professionalInfo?.languages && hasSelectedItems(global.professionalInfo.languages) ? getSelectedItems(global.professionalInfo.languages).join(', ') : 'No especificado' }}</span></p>
+                        <p>Idiomas: <span>{{ global.professionalInfo?.languages && hasSelectedItems(global.professionalInfo?.languages) ? getSelectedItems(global.professionalInfo?.languages).join(', ') : 'No especificado' }}</span></p>
                         <p>Bienvenido(a) a tu panel de control</p>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                                     <li><i class="icon-Trust-2"></i></li>
                                 </ul>
                                 <span class="designation" style="color: #0f405f;">Especialista en: <span style="color: #808080;">
-                                    {{ global.professionalInfo.typeEspeciality && global.professionalInfo.typeEspeciality.length ? global.professionalInfo.typeEspeciality[0].name : 'No especificado' }}</span></span>
+                                    {{ global.professionalInfo?.typeEspeciality && global.professionalInfo?.typeEspeciality.length ? global.professionalInfo?.typeEspeciality[0].name : 'No especificado' }}</span></span>
                                 <!-- <div class="rating-box clearfix">
                                     <ul class="rating clearfix">
                                         <li><i class="icon-Star"></i></li>
@@ -67,7 +67,7 @@
                                     </ul>
                                 </div> -->
                                 <div class="text">
-                                    <span style="color: #0f405f;">Dirigido a: <span style="color: #808080;"> {{ global.getFormattedTargets(global.professionalInfo.targets) }}</span></span>
+                                    <span style="color: #0f405f;">Dirigido a: <span style="color: #808080;"> {{ global.getFormattedTargets(global.professionalInfo?.targets) }}</span></span>
                                 </div>
                                 
                                 <div class="lower-box clearfix">
@@ -96,43 +96,43 @@
                                         </p>
                                         <h3>Especialista en: </h3>
                                         <li>
-                                            <span *ngIf="!global.professionalInfo.typeEspeciality || !global.professionalInfo.typeEspeciality.length">No especificado</span>
-                                            <ul *ngIf="global.professionalInfo.typeEspeciality && global.professionalInfo.typeEspeciality.length">
-                                              <li *ngFor="let especialidad of global.professionalInfo.typeEspeciality">
+                                            <span *ngIf="!global.professionalInfo?.typeEspeciality || !global.professionalInfo?.typeEspeciality.length">No especificado</span>
+                                            <ul *ngIf="global.professionalInfo?.typeEspeciality && global.professionalInfo?.typeEspeciality.length">
+                                              <li *ngFor="let especialidad of global.professionalInfo?.typeEspeciality">
                                                 {{ especialidad.name }}
                                               </li>
                                             </ul>
                                           </li>
                                         <h3>Dificultades en (Tratamientos):</h3>
                                         <li>
-                                            <span *ngIf="!global.professionalInfo.typeTreatment || !global.professionalInfo.typeTreatment.length">No especificado</span>
-                                            <ul *ngIf="global.professionalInfo.typeTreatment && global.professionalInfo.typeTreatment.length">
-                                              <li *ngFor="let tratamiento of global.professionalInfo.typeTreatment">
+                                            <span *ngIf="!global.professionalInfo?.typeTreatment || !global.professionalInfo?.typeTreatment.length">No especificado</span>
+                                            <ul *ngIf="global.professionalInfo?.typeTreatment && global.professionalInfo?.typeTreatment.length">
+                                              <li *ngFor="let tratamiento of global.professionalInfo?.typeTreatment">
                                                 {{ tratamiento.name }}
                                               </li>
                                             </ul>
                                           </li>
                                         <h3>Corrientes</h3>
                                         <li>
-                                            <span *ngIf="!global.professionalInfo.corriente || !global.professionalInfo.corriente.length">No especificado</span>
-                                            <ul *ngIf="global.professionalInfo.corriente && global.professionalInfo.corriente.length">
-                                              <li *ngFor="let corriente of global.professionalInfo.corriente">
+                                            <span *ngIf="!global.professionalInfo?.corriente || !global.professionalInfo?.corriente.length">No especificado</span>
+                                            <ul *ngIf="global.professionalInfo?.corriente && global.professionalInfo?.corriente.length">
+                                              <li *ngFor="let corriente of global.professionalInfo?.corriente">
                                                 {{ corriente.name }}
                                               </li>
                                             </ul>
                                           </li>
                                         <h3>Tipo de atención</h3>
                                         <li>
-                                            <span *ngIf="!global.professionalInfo.typeAttention || !hasSelectedItems(global.professionalInfo.typeAttention)">No especificado</span>
-                                            <ul *ngIf="global.professionalInfo.typeAttention && hasSelectedItems(global.professionalInfo.typeAttention)">
-                                              <li *ngFor="let type of getSelectedItems(global.professionalInfo.typeAttention)">{{ type }}</li>
+                                            <span *ngIf="!global.professionalInfo?.typeAttention || !hasSelectedItems(global.professionalInfo?.typeAttention)">No especificado</span>
+                                            <ul *ngIf="global.professionalInfo?.typeAttention && hasSelectedItems(global.professionalInfo?.typeAttention)">
+                                              <li *ngFor="let type of getSelectedItems(global.professionalInfo?.typeAttention)">{{ type }}</li>
                                             </ul>
                                           </li>
-                                        <h3>Horario de atención: <span>{{global.professionalInfo.openingHours || 'No especificado'}}</span></h3>
+                                        <h3>Horario de atención: <span>{{global.professionalInfo?.openingHours || 'No especificado'}}</span></h3>
                                         <h3>Días de atención:</h3>
-                                        <span *ngIf="!global.professionalInfo.days || !hasSelectedItems(global.professionalInfo.days)">No especificado</span>
-                                        <ul *ngIf="global.professionalInfo.days && hasSelectedItems(global.professionalInfo.days)">
-                                          <li *ngFor="let day of getSelectedItems(global.professionalInfo.days)">{{ day }}</li>
+                                        <span *ngIf="!global.professionalInfo?.days || !hasSelectedItems(global.professionalInfo?.days)">No especificado</span>
+                                        <ul *ngIf="global.professionalInfo?.days && hasSelectedItems(global.professionalInfo?.days)">
+                                          <li *ngFor="let day of getSelectedItems(global.professionalInfo?.days)">{{ day }}</li>
                                         </ul>
                                         <h3>Costo de atención</h3>
                                         <ul class="list clearfix">
@@ -142,16 +142,16 @@
 
                                     <div class="location-box">
                                         <h3>Formación Académica</h3>
-                                        <span *ngIf="!global.professionalInfo.academicTitles || global.professionalInfo.academicTitles.length === 0">
+                                        <span *ngIf="!global.professionalInfo?.academicTitles || global.professionalInfo?.academicTitles.length === 0">
                                           No especificado
                                         </span>
-                                        <ul class="list clearfix" *ngIf="global.professionalInfo.academicTitles && global.professionalInfo.academicTitles.length > 0">
-                                          <li *ngFor="let title of global.professionalInfo.academicTitles">
+                                        <ul class="list clearfix" *ngIf="global.professionalInfo?.academicTitles && global.professionalInfo?.academicTitles.length > 0">
+                                          <li *ngFor="let title of global.professionalInfo?.academicTitles">
                                             {{ title.institution }} - {{ title.specialization }} ({{ title.year }})
                                           </li>
                                         </ul>
                                         <h3>Certificados</h3>
-<!--                                         <img *ngIf="global.professionalInfo.certificates.length > 0" [src]="global.professionalInfo.certificates[0].image" alt="Certificados" />
+<!--                                         <img *ngIf="global.professionalInfo?.certificates.length > 0" [src]="global.professionalInfo?.certificates[0].image" alt="Certificados" />
  -->                                    </div>
                                 </div>
                             </div>

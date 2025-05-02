@@ -3,6 +3,7 @@ import { GlobalService } from '../../../service/global.service';
 import { AuthPocketbaseService } from '../../../service/auth-pocketbase.service';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
+import { RealtimeProfessionalsService } from '../../../service/realtime-professionals';
 @Component({
   selector: 'app-reviews',
   standalone: true,
@@ -14,10 +15,13 @@ export class ReviewsComponent {
   constructor(
     public global: GlobalService,
     public authService: AuthPocketbaseService,
-    
-  ) { }
+    public realtimeProfesionales: RealtimeProfessionalsService
+  ) {
+    this.global.professionalInfo = this.global.professionalInfo || {};
+   }
 
   ngOnInit(): void {
+   
   }
   hasSelectedItems(obj: any): boolean {
     if (!obj) return false;

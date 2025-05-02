@@ -59,7 +59,7 @@
                             <ul class="doctors-list clearfix">
                                 <li><a >Gestalt, Psicodinámico, Psicoanálisis ... </a></li>
                             </ul>
-                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='corrientes'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
                             <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <a (click)="global.goToDetail(profesional)" style="cursor: pointer; color: #0f405f;">Ver perfil</a>
+                                <div class="btn-box"><a (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer;">Agendar</a></div>
                             </div>
                         </div>
                     </div>
@@ -160,7 +160,7 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <a (click)="global.goToDetail(profesional)" style="cursor: pointer; color: #0f405f;">Ver perfil</a>
+                                <a (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer; color: #0f405f;">Ver perfil</a>
                             </div>
                         </div>
                     </div>

@@ -203,6 +203,8 @@ this.typeAttentionSelected = [];
     certificates: this.fb.array([]),
    
   });
+  this.global.professionalInfo = this.global.professionalInfo || {};
+  this.initForms();
  }
  
  async initializeData() {

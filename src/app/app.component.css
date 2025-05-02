@@ -45,7 +45,7 @@ nav.main-menu .navigation li.active a {
 }
 
 .btn-box {
-    display: inline-block; /* Asegura que los botones se alineen horizontalmente */
+    display: contents; /* Asegura que los botones se alineen horizontalmente */
     margin: 5px; /* Espaciado entre los botones */
 }
 
@@ -61,5 +61,24 @@ nav.main-menu .navigation li.active a {
         text-align: center; /* Centrar texto en pantallas pequeñas */
     }
 }
+.sticky-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #fff; /* O el color de tu header */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .sticky-header.visible {
+    display: block;
+    animation: fadeInDown 0.3s;
+  }
+  /* Opcional: animación */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+  
 
 

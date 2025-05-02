@@ -36,7 +36,7 @@ constructor(
   
 )
 {
-  
+  this.global.professionalInfo = this.global.professionalInfo || {};
  }
  
  ngOnInit() {

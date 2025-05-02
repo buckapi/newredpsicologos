@@ -271,7 +271,12 @@ getPreviewProfesional(): Profesionals {
     this.professionalInfo = null;
     // Agrega aquí cualquier otra propiedad que necesites limpiar
   }
-
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
   
 }
 

@@ -8,7 +8,7 @@
             </div>
             <div class="auto-container">
                 <div class="title">
-                    <h1>Especialistas</h1>
+                    <h1>Profesionales en salud mental</h1>
                 </div>
             </div>
         </div>
@@ -18,31 +18,21 @@
         <div class="auto-container">
             <div class="content-box">
                 <div class="form-inner clearfix">
-                    <form method="post" class="filter-form">
-                        <div class="form-group clearfix">
-                            <mat-form-field appearance="fill" style="width: 50%">
-                                <mat-label>Región</mat-label>
-                                <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)" style="background-color: white">
-                                  <mat-option [value]="''">Todas las regiones</mat-option>
-                                  <mat-option *ngFor="let region of regiones" [value]="region.id">
-                                    {{region.name}}
-                                  </mat-option>
-                                </mat-select>
-                              </mat-form-field>
-                            
-                          
-                          <input type="text" 
-                            class="search-input"
-                            name="name" 
-                            placeholder="Buscar por nombre..." 
-                            [(ngModel)]="searchName"
-                            (input)="onNameChange($event)">
-                            
-                          <button type="button" class="search-button" (click)="applyFilters()">
-                            <i class="icon-Arrow-Right"></i>
-                          </button>
-                        </div>
-                      </form>
+                  <form method="post" class="filter-form">
+                    <div class="form-group clearfix">
+                      <input type="text" 
+                        class="search-input"
+                        name="searchTerm" 
+                        placeholder="Buscar por nombre, tratamiento, especialidad o corriente..." 
+                        [(ngModel)]="searchTerm"
+                        (input)="onSearchTermChange($event)">
+                        
+                      <button type="button" class="search-button" 
+                        (click)="applyFilters(professionals, selectedRegionId, selectedCorrienteId, searchTerm, selectedTratamientos, selectedEspecialidades, tratamientos, especialidades, corrientes)">
+                        <i class="icon-Arrow-Right"></i>
+                      </button>
+                    </div>
+                  </form>
                 </div>
             </div>
         </div>
@@ -74,6 +64,46 @@
                               </div>
                         </div>
                         <div class="right-column pull-right clearfix">
+
+                          <div class="short-box clearfix">
+                            <div class="select-box">
+                                <mat-form-field appearance="fill" style="width: 100%">
+                                    <mat-label>Region</mat-label>
+                                    <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)">
+                                      <mat-option [value]="''">Todas las regiones</mat-option>
+                                      <mat-option *ngFor="let region of regiones" [value]="region.id">
+                                        {{region.name}}
+                                      </mat-option>
+                                    </mat-select>
+                                  </mat-form-field>
+                            </div>
+                          </div>
+                          <div class="short-box clearfix">
+                            <div class="select-box">
+                                <mat-form-field appearance="fill" style="width: 100%">
+                                    <mat-label>Tratamiento</mat-label>
+                                    <mat-select [(ngModel)]="selectedTratamientos" (selectionChange)="onTratamientoChange($event)">
+                                      <mat-option [value]="''">Todos los tratamientos</mat-option>
+                                      <mat-option *ngFor="let tratamiento of realtimeTratamientos.tratamientos$ | async" [value]="tratamiento.id">
+                                        {{tratamiento.name}}
+                                      </mat-option>
+                                    </mat-select>
+                                  </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="short-box clearfix">
+                          <div class="select-box">
+                              <mat-form-field appearance="fill" style="width: 100%">
+                                  <mat-label>Especialidad</mat-label>
+                                  <mat-select [(ngModel)]="selectedEspecialidades" (selectionChange)="onEspecialidadChange($event)">
+                                    <mat-option [value]="''">Todos las especialidades</mat-option>
+                                    <mat-option *ngFor="let especialidad of realtimeEspecialidades.especialidades$ | async" [value]="especialidad.id">
+                                      {{especialidad.name}}
+                                    </mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                          </div>
+                      </div>
                             <div class="short-box clearfix">
                                 <div class="select-box">
                                     <mat-form-field appearance="fill" style="width: 100%">
@@ -96,7 +126,7 @@
                     <div class="wrapper" *ngIf="view === 'list'">
                         
                         <!-- BLOQUE DE LISTA -->
-                        <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="clinic-list-content list-item" 
+                        <div (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer;" class="clinic-list-content list-item" 
                         *ngFor="let profesional of paginatedProfesionales">                        
                             <div class="clinic-block-one">
                                 <div class="inner-box">
@@ -142,7 +172,7 @@
                                         <div class="lower-box clearfix">
                                             <p><i class="fas fa-heart" style="color: #0f405f;"></i> Sesion: <span style="color: #808080;">{{profesional.priceSession}}</span></p>
                                         </div>
-                                        <div class="btn-box"><a (click)="global.goToDetail(profesional)" style="cursor: pointer;">Agendar</a></div>
+                                        <div class="btn-box"><a (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer;">Agendar</a></div>
                                     </div>
                                 </div>
                             </div>
@@ -152,9 +182,9 @@
                     </div>
                     <div class="wrapper" *ngIf="view === 'grid'">
                         <!-- BLOQUE DE GRILLA -->
-                        <div class="clinic-grid-content">
+                        <div class="clinic-grid-content" style="cursor: pointer;">
                             <div class="row clearfix" >
-                                <div (click)="global.goToDetail(profesional)" style="cursor: pointer;" class="col-lg-4 col-md-4 col-sm-6 col-xs-6 team-block" 
+                                <div (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer;" class="col-lg-4 col-md-4 col-sm-6 col-xs-6 team-block" 
                                 *ngFor="let profesional of paginatedProfesionales">
                                     <div class="team-block-three">
                                         <div class="inner-box">
@@ -164,11 +194,11 @@
                                                   [src]="profesional.images[0] || 'assets/images/user.png'" 
                                                   [alt]="profesional.name || 'Professional'"
                                                 >
-                                                <a (click)="global.goToDetail(profesional)"> <i class="far fa-shield"></i></a>
+                                                <a (click)="global.goToDetail(profesional); global.scrollToTop()"> <i class="far fa-shield"></i></a>
                                               </figure>
                                             <div class="lower-content">
                                                 <ul class="name-box clearfix">
-                                                    <li class="name"><h3><a (click)="global.goToDetail(profesional)">{{profesional.name}}</a></h3></li>
+                                                    <li class="name"><h3><a (click)="global.goToDetail(profesional); global.scrollToTop()">{{profesional.name}}</a></h3></li>
                                                     <li><i class="icon-Trust-1"></i></li>
                                                     <li><i class="icon-Trust-2"></i></li>
                                                 </ul>
@@ -189,7 +219,7 @@
                                                 </div>
                                                 <div class="lower-box clearfix">
                                                     <span class="text" style="color: #0f405f;"><i class="fas fa-heart" > Sesion:</i> <span style="color: #808080;"> {{profesional.priceSession}}</span></span>
-                                                    <a (click)="global.goToDetail(profesional)" style="cursor: pointer;">Agendar</a>
+                                                    <a (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer;">Agendar</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -234,16 +264,41 @@
       
       <div class="filter-panel-content">
         <form method="post">
-            <div class="form-group">
+            <div class="form-group">              
+               <!-- Select de Región -->
                 <mat-form-field appearance="fill" style="width: 100%">
-                    <mat-label>Región</mat-label>
-                    <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)">
-                      <mat-option [value]="''">Todas las regiones</mat-option>
-                  <mat-option *ngFor="let region of regiones" [value]="region.id">
-                    {{region.name}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+                  <mat-label>Región</mat-label>
+                  <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)" name="region">
+                    <mat-option [value]="''">Todas las regiones</mat-option>
+                    <mat-option *ngFor="let region of regiones" [value]="region.id">
+                      {{region.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="form-group">
+                <!-- Select de Tratamiento -->
+                <mat-form-field appearance="fill" style="width: 100%">
+                  <mat-label>Tratamiento</mat-label>
+                  <mat-select [(ngModel)]="selectedTratamientos" (selectionChange)="onTratamientoChange($event)" name="tratamiento">
+                    <mat-option [value]="''">Todos los tratamientos</mat-option>
+                    <mat-option *ngFor="let tratamiento of tratamientos" [value]="tratamiento.id">
+                      {{tratamiento.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="form-group">
+                <!-- Select de Especialidad -->
+                <mat-form-field appearance="fill" style="width: 100%">
+                  <mat-label>Especialidad</mat-label>
+                  <mat-select [(ngModel)]="selectedEspecialidades" (selectionChange)="onEspecialidadChange($event)" name="especialidad">
+                    <mat-option [value]="''">Todas las especialidades</mat-option>
+                    <mat-option *ngFor="let especialidad of especialidades" [value]="especialidad.id">
+                      {{especialidad.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
             </div>
             <div class="form-group">
               <mat-form-field appearance="fill" style="width: 100%">
@@ -266,7 +321,7 @@
               (input)="onNameChange($event)">
           </div>
           
-          <button type="button" class="apply-filters-button" (click)="applyFilters(); toggleFilters()">
+          <button type="button" class="apply-filters-button" (click)="applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes); toggleFilters()">
             Aplicar Filtros
           </button>
         </form>
