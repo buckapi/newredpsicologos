@@ -95,8 +95,8 @@
   }
   
   .floating-filter-button {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background-color: #0f405f;
     color: white;
@@ -106,7 +106,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 20px;
     transition: all 0.3s ease;
   }
   
@@ -199,7 +199,7 @@
   /* Responsive */
   @media (max-width: 768px) {
     .floating-filter-container {
-      bottom: 20px;
+      bottom: 50px;
       right: 20px;
     }
     
