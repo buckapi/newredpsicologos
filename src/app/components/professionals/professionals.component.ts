@@ -229,6 +229,7 @@ onEspecialidadChange(event: any): void {
   this.applyFilters(this.professionals, this.selectedRegionId, this.selectedCorrienteId, this.searchName, this.selectedTratamientos, this.selectedEspecialidades, this.tratamientos, this.especialidades, this.corrientes);
 }
 
+
 toggleFilters(): void {
   this.showFilters = !this.showFilters;
 }

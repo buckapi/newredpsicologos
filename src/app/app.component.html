@@ -1,77 +1,36 @@
 <div class="boxed_wrapper">
 
   <!-- main header -->
-  <header class="main-header style-two">
-     
-
-      <!-- header-lower -->
-      <div class="header-lower">
-          <div class="auto-container">
-              <div class="outer-box">
-                  <div class="logo-box">
-                      <figure class="logo"><a (click)="globalService.activeRoute = 'home'; globalService.scrollToTop()"><img src="assets/images/logo-3.png" alt=""></a></figure>
-                  </div>
-                  <div class="menu-area">
-                      <!--Mobile Navigation Toggler-->
-                      <div class="mobile-nav-toggler">
-                          <i class="icon-bar"></i>
-                          <i class="icon-bar"></i>
-                          <i class="icon-bar"></i>
-                      </div>
-                      <nav class="main-menu navbar-expand-md navbar-light">
-                          <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
-                            <ul class="navigation clearfix">
-                                <ng-container *ngFor="let item of menuItems">
-                                  <li *ngIf="item.visible()">
-                                    <a (click)="globalService.activeRoute = item.route" style="cursor: pointer;">
-                                      {{item.label}}
-                                    </a>
-                                  </li>
-                                </ng-container>
-                              </ul>
-                          </div>
-                      </nav>
-                  </div>
-                  <div class="btn-box" *ngIf="!auth.isLogin()">
-                    <a (click)="onAction('login')" class="theme-btn-one" [hidden]="globalService.activeRoute === 'login' " style="cursor: pointer;">
-                        <i class="fa fa-sign-in"></i>Ingresar
-                    </a>
-                </div>
-                <div class="btn-box" *ngIf="!auth.isLogin()">
-                    <a (click)="onAction('register')" class="theme-btn-two" [hidden]="globalService.activeRoute === 'register' " style="cursor: pointer;">
-                        <i class="fa fa-user"></i> Registrate
-                    </a>
-                </div>
-                <div class="btn-box" *ngIf="auth.isLogin()">
-                    <a (click)="logoutUser()" class="theme-btn-two">
-                        <i class="fa fa-sign-out" style="cursor: pointer; padding-right: 5px;"></i>Cerrar Sesión
-                    </a>
-                </div>
-            </div>
-          </div>
-      </div>
-
-      <!--sticky Header-->
-      <div class="sticky-header" [class.visible]="isSticky">
+  <header class="main-header style-two fixed-header">
+    <!-- header-lower -->
+    <div class="header-lower">
         <div class="auto-container">
-              <div class="outer-box">
-                  <div class="logo-box">
-                      <figure class="logo"><a (click)="globalService.activeRoute = 'home'; globalService.scrollToTop()"><img src="assets/images/logo-3.png" alt=""></a></figure>
-                  </div>
-                  <div class="menu-area">
-                      <nav class="main-menu clearfix">
-                        <ul class="navigation clearfix">
-                            <ng-container *ngFor="let item of menuItems">
-                              <li *ngIf="item.visible()">
-                                <a (click)="globalService.activeRoute = item.route" style="cursor: pointer;">
-                                  {{item.label}}
-                                </a>
-                              </li>
-                            </ng-container>
-                          </ul>
-                      </nav>
-                  </div>
-                  <div class="btn-box" *ngIf="!auth.isLogin()">
+            <div class="outer-box">
+                <div class="logo-box">
+                    <figure class="logo"><a (click)="globalService.activeRoute = 'home'; globalService.scrollToTop()"><img src="assets/images/logo-3.png" alt=""></a></figure>
+                </div>
+                <div class="menu-area">
+                    <!--Mobile Navigation Toggler-->
+                    <div class="mobile-nav-toggler" (click)="toggleMobileMenu()">
+                        <i class="icon-bar"></i>
+                        <i class="icon-bar"></i>
+                        <i class="icon-bar"></i>
+                    </div>
+                    <nav class="main-menu navbar-expand-md navbar-light">
+                        <div class="collapse navbar-collapse show" id="navbarSupportedContent">
+                            <ul class="navigation">
+                                <ng-container *ngFor="let item of menuItems">
+                                    <li *ngIf="item.visible()">
+                                        <a (click)="globalService.activeRoute = item.route; " style="cursor: pointer;">
+                                            {{item.label}}
+                                        </a>
+                                    </li>
+                                </ng-container>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="btn-box" *ngIf="!auth.isLogin()">
                     <a (click)="onAction('login')" class="theme-btn-one" [hidden]="globalService.activeRoute === 'login' " style="cursor: pointer;">
                         <i class="fa fa-sign-in"></i>Ingresar
                     </a>
@@ -87,33 +46,58 @@
                     </a>
                 </div>
             </div>
-          </div>
-      </div>
-  </header>
+        </div>
+    </div>
+</header>
   <!-- main-header end -->
 
   <!-- Mobile Menu  -->
   <div class="mobile-menu">
-      <div class="menu-backdrop"></div>
-      <div class="close-btn"><i class="fas fa-times"></i></div>
-      
-      <nav class="menu-box">
-          <div class="nav-logo"><a (click)="globalService.activeRoute = 'home'; globalService.scrollToTop()" style="cursor: pointer;"><img src="assets/images/logo-2.png" alt="" title=""></a></div>
-          <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
-          <div class="contact-info">
-              <h4>Información de contacto</h4>
-              <ul>
-                  <li>Chile</li>
-                  <li><a href="mailto:contacto&#64;redpsicologos.cl">contacto&#64;redpsicologos.cl</a></li>
-              </ul>
-          </div>
-          <div class="social-links">
-              <ul class="clearfix">
-                  <li><a href="https://www.instagram.com/redpsicologos_cl/?igsh=dDJoMGM4MGVvNWk0&utm_source=qr" target="_blank"><span class="fab fa-instagram"></span></a></li>
-              </ul>
-          </div>
-      </nav>
-  </div><!-- End Mobile Menu -->
+    <div class="menu-backdrop"></div>
+    <div class="close-btn"><i class="fas fa-times"></i></div>
+    
+    <nav class="menu-box">
+        <div class="nav-logo"><a (click)="globalService.activeRoute = 'home'; globalService.scrollToTop(); closeMobileMenu()" style="cursor: pointer;"><img src="assets/images/logo-2.png" alt="" title=""></a></div>
+        <div class="menu-outer">
+            <ul class="navigation">
+                <ng-container *ngFor="let item of menuItems">
+                    <li *ngIf="item.visible()">
+                        <a (click)="globalService.activeRoute = item.route; closeMobileMenu()" style="cursor: pointer;">
+                            {{item.label}}
+                        </a>
+                    </li>
+                </ng-container>
+                <li *ngIf="!auth.isLogin()">
+                    <a (click)="onAction('login'); closeMobileMenu()" style="cursor: pointer;">
+                        <i class="fa fa-sign-in"></i> Ingresar
+                    </a>
+                </li>
+                <li *ngIf="!auth.isLogin()">
+                    <a (click)="onAction('register'); closeMobileMenu()" style="cursor: pointer;">
+                        <i class="fa fa-user"></i> Registrate
+                    </a>
+                </li>
+                <li *ngIf="auth.isLogin()">
+                    <a (click)="logoutUser(); closeMobileMenu()" style="cursor: pointer;">
+                        <i class="fa fa-sign-out"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="contact-info">
+            <h4>Información de contacto</h4>
+            <ul>
+                <li>Chile</li>
+                <li><a href="mailto:contacto&#64;redpsicologos.cl">contacto&#64;redpsicologos.cl</a></li>
+            </ul>
+        </div>
+        <div class="social-links">
+            <ul class="clearfix">
+                <li><a href="https://www.instagram.com/redpsicologos_cl/?igsh=dDJoMGM4MGVvNWk0&utm_source=qr" target="_blank"><span class="fab fa-instagram"></span></a></li>
+            </ul>
+        </div>
+    </nav>
+</div><!-- End Mobile Menu -->
 
   <app-home [hidden]="globalService.activeRoute !== 'home'"></app-home> 
   <app-contact [hidden]="globalService.activeRoute !== 'contact'"></app-contact>
@@ -152,9 +136,9 @@
                             </div>
                             <div class="widget-content">
                                 <ul class="links clearfix">
-                                    <li><a (click)="globalService.activeRoute = 'professionals'">Especialistas</a></li>
-                                    <li><a (click)="globalService.activeRoute = 'register'">Registro</a></li>
-                                    <li><a (click)="globalService.activeRoute = 'login'">Iniciar Sesión</a></li>
+                                    <li><a (click)="globalService.activeRoute = 'professionals'; globalService.scrollToTop()">Especialistas</a></li>
+                                    <li><a (click)="globalService.activeRoute = 'register'; globalService.scrollToTop()">Registro</a></li>
+                                    <li><a (click)="globalService.activeRoute = 'login'; globalService.scrollToTop()">Iniciar Sesión</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -166,11 +150,11 @@
                             </div>
                             <div class="widget-content">
                                 <ul class="links clearfix">
-                                    <li><a (click)="globalService.activeRoute = 'professionals'">Especialistas</a></li>
+                                    <li><a (click)="globalService.activeRoute = 'professionals'; globalService.scrollToTop()">Especialistas</a></li>
                                     <li><a >Politicas de privacidad</a></li>
                                     <li><a >Terminos y condiciones</a></li>
-                                    <li><a (click)="globalService.activeRoute = 'login'">Planes de suscripción</a></li>
-                                    <li><a (click)="globalService.activeRoute = 'contact'">Ayuda</a></li>
+                                    <li><a (click)="globalService.activeRoute = 'login'; globalService.scrollToTop()">Planes de suscripción</a></li>
+                                    <li><a (click)="globalService.activeRoute = 'contact'; globalService.scrollToTop()">Ayuda</a></li>
                                 </ul>
                             </div>
                         </div>

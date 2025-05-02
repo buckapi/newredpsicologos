@@ -116,7 +116,9 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <div class="btn-box"><a (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer;">Agendar</a></div>
+                                <div class="btn-box">
+                                    <button class="btn theme-btn-one" (click)="global.activeRoute='professionals'">Todos los Especialistas <i class="icon-Arrow-Right"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,9 +140,10 @@
                 <div class="team-block-two wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                     <div class="inner-box">
                         <div class="pattern" style="background-image: url(assets/images/shape/shape-43.png);"></div>
-                        <figure class="image-box">
-                            <img [src]="profesional.images[0] || 'assets/images/user.png'" alt="" (click)="global.goToDetail(profesional)">
-    
+                        <figure class="image-box" style="width: 100%; height: 250px;">
+                            <div class="image-container">
+                                <img class="uniform-image" [src]="profesional.images[0] || 'assets/images/user.png'" alt="" (click)="global.goToDetail(profesional)">
+                            </div>
                             <a><i class="far fa-shield"></i></a>
                         </figure>
                         <div class="lower-content">
@@ -168,7 +171,7 @@
             </div>
         </div>
         <div class="more-btn centred">
-            <a class="theme-btn-one" (click)="global.activeRoute='professionals'">Todos los Especialistas <i class="icon-Arrow-Right"></i></a>
+            <button class="btn theme-btn-one" (click)="global.activeRoute='professionals'">Todos los Especialistas <i class="icon-Arrow-Right"></i></button>
         </div>
     </div>
 </section>

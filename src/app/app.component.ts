@@ -47,16 +47,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   isLogin: boolean = false;
   userFullName: string = '';
   isSticky = false;
-
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    this.isSticky = window.pageYOffset > 100; // Ajusta el valor según tu diseño
-  }
   menuItems = [
     { label: 'Inicio', route: 'home', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
     { label: 'Profesionales', route: 'professionals', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
     { label: 'Contacto', route: 'contact', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() }
-  ];
+  ]; 
 
   constructor(
     public globalService: GlobalService,
@@ -121,11 +116,17 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
     }
     ngAfterViewInit() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth' // Opcional: para un scroll suave
-      });
-    }
+      this.adjustBodyPadding();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  
+  adjustBodyPadding() {
+      const header = document.querySelector('.fixed-header');
+      if (header) {
+          const height = header.clientHeight;
+          document.body.style.paddingTop = `${height}px`;
+      }
+  }
     loadScripts() {
       const scripts = [  
         'assets/js/jquery.js',
@@ -213,8 +214,30 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
 
-    closeMobileMenu() {
+   // Modifica tus métodos así:
+
+closeMobileMenu() {
+  // Verifica que estamos en el cliente (no en SSR)
+  if (typeof window !== 'undefined') {
+      const mobileMenu = document?.querySelector('.mobile-menu');
+      const toggler = document?.querySelector('.mobile-nav-toggler');
       
-    } 
-    
+      mobileMenu?.classList.remove('active');
+      toggler?.classList.remove('active');
+      
+      // Asegúrate de que el scroll esté en la parte superior
+      this.globalService.scrollToTop();
+  }
+}
+
+toggleMobileMenu() {
+  // Alternar el menú móvil
+  if (typeof window !== 'undefined') {
+      const mobileMenu = document?.querySelector('.mobile-menu');
+      const toggler = document?.querySelector('.mobile-nav-toggler');
+      
+      mobileMenu?.classList.toggle('active');
+      toggler?.classList.toggle('active');
+  }
+}
 }

@@ -80,5 +80,43 @@ nav.main-menu .navigation li.active a {
     to { opacity: 1; transform: translateY(0);}
   }
   
+  .fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+    background: white; /* O el color de fondo de tu header */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Opcional: sombra para mejor visibilidad */
+    transition: all 0.3s ease; /* Opcional: animación suave */
+}
 
+/* Añade padding al body para compensar el espacio del header fijo */
+body {
+    padding-top: 80px; /* Ajusta este valor según la altura de tu header */
+}
+.mobile-menu {
+    position: fixed;
+    /* otros estilos... */
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 9999;
+}
 
+.mobile-menu.active {
+    transform: translateX(0);
+}
+
+.menu-backdrop {
+    position: fixed;
+    /* otros estilos... */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu.active .menu-backdrop {
+    opacity: 1;
+    visibility: visible;
+}
