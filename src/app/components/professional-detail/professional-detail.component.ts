@@ -55,11 +55,25 @@ sendToWhatsApp() {
 }
 
 sendToEmail() {
-  const message = `Hola, mi nombre es ${this.name}.`;
-  const emailUrl = `mailto:${this.email}?subject=Consulta&body=${encodeURIComponent(message)}`;
+  // Get the professional's email
+  const professionalEmail = this.global.previewProfesionals?.email || '';
+  
+  // Build the message with all form data
+  const message = `Hola, mi nombre es ${this.name}.\n` +
+                  `Mi teléfono es: ${this.phone}\n` +
+                  `Mi correo electrónico es: ${this.email}\n` +
+                  `Me gustaría contactarte para una consulta.`;
+  
+  // Create email URL with the professional's email
+  const emailUrl = `mailto:${professionalEmail}?subject=Consulta&body=${encodeURIComponent(message)}`;
+  
+  // Log the email being used (for debugging)
+  console.log('Sending email to:', professionalEmail);
+  
   window.open(emailUrl, '_blank');
   this.resetForm();
 }
+
 resetForm() {
   this.name = '';
   this.phone = 0;
