@@ -103,6 +103,7 @@ export class GlobalService {
   storedRegiones: any[] = [];
   imageUrl: string = '';
   isLoading = false;
+  loading = false;
   professionalToEdit: any={};
   professionalInfo: any = {};
   professionalInfoLanguages: { [key: string]: boolean } = {}; // Inicializar como objeto vacío
@@ -110,8 +111,7 @@ export class GlobalService {
   professionalInfoDay: { [key: string]: boolean } = {};
   professionalInfoTargets: { [key: string]: boolean } = {};
   profileComplete=false;
-  loading = false;
-  activeRoute = 'home';
+   activeRoute = 'home';
   menuSelected = '';
   islogged=false;
   private pb: PocketBase;

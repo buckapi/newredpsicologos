@@ -103,6 +103,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
     }
     ngOnInit(): void {
+      document.body.classList.add('no-padding-top');
       this.loadScripts();
       this.checkLoginStatus();
       this.getProfessionlINfo();

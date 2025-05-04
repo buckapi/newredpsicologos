@@ -1,387 +1,349 @@
-<section  class="doctors-dashboard bg-color-3">
+<div class="loading-container">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando datos...</p>
+  </div>
+
+  <div *ngIf="!isLoading && !isDataLoaded" class="error-container">
+    <p class="error-message">Error al cargar los datos. Por favor, intenta recargar la página.</p>
+    <button mat-button (click)="fetchDataFromServer()">Reintentar</button>
+  </div>
+
+  <section class="doctors-dashboard bg-color-3">
     <div class="left-panel">
-        <div class="profile-box">
-            <div class="upper-box">
-                <figure class="profile-image">
-                    <img [src]="authService.getImage()" alt="Profile Image" />
-                </figure>
-                <div class="title-box centred">
-                    <div class="inner">
-                        <h3> {{ global.professionalInfo.name }}</h3>
-                        <span>Genero: {{ global.professionalInfo.gender  }}</span>
-                        <p>{{ global.professionalInfo.languages && hasSelectedItems(global.professionalInfo.languages) ? 'Idiomas: ' + getSelectedItems(global.professionalInfo.languages).join(', ') : 'No especificado' }}</p>
-                        <p>Bienvenido(a) a tu panel de control</p>
-                    </div>
-                </div>
+      <div class="profile-box">
+        <div class="upper-box">
+          <figure class="profile-image">
+            <img [src]="authService.getImage()" alt="Profile Image" />
+          </figure>
+          <div class="title-box centred">
+            <div class="inner">
+              <h3>{{ global.professionalInfo?.name || 'Nuevo Profesional' }}</h3>
+             
+              <p>Bienvenido(a) a tu panel de control</p>
             </div>
-            <div class="profile-info">
-                <ul class="list clearfix">
-                   
-                    <li><a href="dashboard" style="cursor: pointer;"><i
-                                class="fas fa-home"></i>Cuenta</a></li>
-                    <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i
-                                class="fas fa-user"></i>Actualizar datos</a></li>
-                    <li><a style="cursor: pointer;"><i class="fas fa-unlock-alt"></i>Cambiar contraseña</a></li>
-                    <li><a (click)="global.activeRoute = 'reviews'" style="cursor: pointer;"><i class="fas fa-comment"></i>Comentarios y Calificaciones</a></li>
-                    <li>
-                        <div class="btn-box" *ngIf="authService.isLogin()">
-                            <a (click)="confirmLogout()" style="cursor: pointer;">
-                                <i class="fa fa-sign-out"></i>Cerrar Sesión
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+          </div>
         </div>
+        <div class="profile-info">
+          <ul class="list clearfix">
+            <li><a (click)="global.activeRoute = 'homeprofessional'" style="cursor: pointer;"><i class="fas fa-home"></i>Cuenta</a></li>
+            <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i class="fas fa-user"></i>Perfil</a></li>
+            <li><a style="cursor: pointer;"><i class="fas fa-unlock-alt"></i>Cambiar contraseña</a></li>
+            <li><a (click)="global.activeRoute = 'reviews'" style="cursor: pointer;"><i class="fas fa-comment"></i>Comentarios y Calificaciones</a></li>
+            <li>
+              <div class="btn-box" *ngIf="authService.isLogin()">
+                <a (click)="confirmLogout()" style="cursor: pointer;">
+                  <i class="fa fa-sign-out"></i>Cerrar Sesión
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
     <div class="right-panel">
-        <div class="content-container" id="profile" [hidden]="global.menuSelected !== 'profile'" >
-            <div class="outer-container">
-                <div class="add-listing my-profile">
-                    <div class="single-box">
-                        <div class="title-box">
-                            <h3>Datos personales y de contacto</h3>
-                        </div>
-                        <div class="inner-box">
-                            <div class="profile-title">
-                                <figure class="image-box">
-                                    <img [src]="authService.getImage()" alt="Profile Image" />
-                                </figure>
-                                <div class="upload-photo">
-                                    <input type="file" (change)="onFileSelected($event)" accept="image/*" #fileInput
-                                        hidden />
-                                    <a (click)="openFileSelector()" style="cursor: pointer;"><i
-                                            class="icon-Upload"></i>Cargar imagen</a>
-                                    <span>Formato JPG, GIF o PNG. Max 2MB</span>
-                                </div>
-                            </div>
-
-                            <form [formGroup]="profileForm" (ngSubmit)="sendToUpdate()">
-
-                                <div class="row clearfix">
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Nombre y apellido*</label>
-                                        <input type="text" formControlName="name" placeholder="Nombres*"
-                                            required>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Rut*</label>
-                                        <input type="text" class="mil-rut-input" formControlName="rut"
-                                            placeholder="Ingrese su Rut*" required 
-                                            (input)="formatRutInput($event)">
-                                        <div *ngIf="rutError" class="error-message">RUT inválido</div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Telefono / whatsapp
-                                            <span *ngIf="global.professionalInfo.phone" style="color: red;">*</span>
-                                        </label>
-                                        <input type="text" class="mil-phone-input" formControlName="phone"
-                                            placeholder="Telefono / whatsapp" required
-                                            >
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Correo
-                                            <span *ngIf="!global.professionalInfo.email" style="color: red;" required
-                                                >*</span>
-                                        </label>
-                                        <input type="email" formControlName="email" placeholder="Correo" required
-                                            >
-                                    </div>
-                                    <div class="col-lg-5 col-md-5 col-sm-12 form-group">
-                                        <label>Sitio Web
-                                            <span *ngIf="!global.professionalInfo.website"></span>
-                                        </label>
-                                        <input type="text" formControlName="website"
-                                            placeholder="https://www.ejemplo.com" >
-                                    </div>
-                                    
-                                    
-                                    <div class="col-lg-3 col-md-3 col-sm-12 form-group">
-                                        <mat-form-field appearance="fill" style="width: 100%">
-                                          <mat-label>Género</mat-label>
-                                          <mat-select formControlName="gender" (selectionChange)="onGenderChange()">
-                                            <mat-option value="">Seleccione</mat-option>
-                                            <mat-option value="M">Masculino</mat-option>
-                                            <mat-option value="F">Femenino</mat-option>
-                                            <mat-option value="NB">No Binarie</mat-option>
-                                          </mat-select>
-                                          <mat-error *ngIf="profileForm.get('gender')?.invalid && profileForm.get('gender')?.touched">
-                                            Este campo es requerido
-                                          </mat-error>
-                                        </mat-form-field>
-                                      </div>
-                                  
-                                    <div class="col-lg-4 col-md-4 col-sm-12 form-group">
-                                        <label>Fecha de nacimiento
-                                            <span *ngIf="!global.professionalInfo.birthday" style="color: red;">*</span>
-                                        </label>
-                                        <input type="date" formControlName="birthday" required>
-                                    </div>
-                                    <div class="title-box">
-                                        <h3>Datos profesionales</h3>
-                                    </div>
-                                    <div class="row clearfix">
-                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                            <label>Número de registro superintendencia de salud
-                                                <span *ngIf="!global.professionalInfo.registrationNumber"
-                                                    style="color: red;">*</span>
-                                            </label>
-                                            <input type="text" formControlName="registrationNumber"
-                                                placeholder="Escribe tu número de registro aquí..."
-                                                >
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                            <label>Descripción breve
-                                                <span *ngIf="!global.professionalInfo.biography"
-                                                    style="color: red;">*</span>
-                                            </label>
-                                            <textarea formControlName="biography"
-                                                placeholder="Escribe tu descripción breve aquí..."
-                                                ></textarea>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                            <label>Descripción extendida
-                                                <span *ngIf="!global.professionalInfo.biography2"
-                                                    style="color: red;">*</span>
-                                            </label>
-                                            <textarea formControlName="biography2"
-                                                placeholder="Escribe tu descripción extendida aquí..."
-                                                ></textarea>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 form-group">
-                                            <div formGroupName="languages" class="row">
-                                                <div *ngFor="let idioma of ['es', 'en', 'fr', 'de']" class="col-6">
-                                                    <div class="form-check">
-                                                        <input type="checkbox" formControlName="{{idioma}}"
-                                                            class="form-check-input" />
-                                                        <label class="form-check-label">
-                                                            {{ idioma === 'es' ? 'Español' : idioma === 'en' ? 'Inglés'
-                                                            : idioma === 'fr' ? 'Francés' : 'Alemán' }}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 form-group">
-                                            <div formGroupName="targets" class="row">
-                                                <div *ngFor="let grupo of ['niños y niñas', 'adultos', 'jóvenes y adolecentes', 'adultos mayores', 'todos']"
-                                                    class="col-6">
-                                                    <div class="form-check">
-                                                        <input type="checkbox" formControlName="{{grupo}}"
-                                                            class="form-check-input" />
-                                                        <label class="form-check-label">
-                                                            {{ grupo === 'niños y niñas' ? 'Niños y niñas' :
-                                                            grupo === 'adultos' ? 'Adultos' :
-                                                            grupo === 'jóvenes y adolecentes' ? 'Jóvenes y adolescentes'
-                                                            :
-                                                            grupo === 'adultos mayores' ? 'Adultos mayores' : 'Todos' }}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Payments (Métodos de pago) -->
-                                        <div class="col-lg-4 col-md-4 col-sm-4 form-group">
-                                            <div formGroupName="payments" class="row">
-                                                <div *ngFor="let metodo of ['efectivo', 'transferencia', 'tarjetas', 'webpay']"
-                                                    class="col-6">
-                                                    <div class="form-check">
-                                                        <input type="checkbox" formControlName="{{metodo}}"
-                                                            class="form-check-input" />
-                                                        <label class="form-check-label">
-                                                            {{ metodo === 'efectivo' ? 'Efectivo' :
-                                                            metodo === 'transferencia' ? 'Transferencia' :
-                                                            metodo === 'tarjetas' ? 'Tarjetas' : 'Webpay' }}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                            <label>Región
-                                                <span
-                                                    *ngIf="global.professionalInfo.region">{{global.professionalInfo.region.name}}</span>
-                                                <span *ngIf="!global.professionalInfo.region"
-                                                    style="color: red;">*</span>
-                                            </label>
-                                            <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="regionesList"
-                                                [settings]="dropdownSettings" formControlName="region"
-                                                (ngModelChange)="onRegionChange($event)">
-                                            </ng-multiselect-dropdown>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                            <label>Comuna
-                                                <span
-                                                    *ngIf="global.professionalInfo.comuna">{{global.professionalInfo.comuna.name}}</span>
-                                                <span *ngIf="!global.professionalInfo.comuna"
-                                                    style="color: red;">*</span>
-                                            </label>
-                                            <ng-multiselect-dropdown [placeholder]="'Seleccione'"
-                                                [data]="comunasFiltered" [settings]="dropdownSettings"
-                                                formControlName="comuna" (ngModelChange)="onComunaChange($event)">
-                                            </ng-multiselect-dropdown>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                            <label>Direccion exacta de consultorio
-                                                <span *ngIf="!global.professionalInfo.consultationAddress"
-                                                    style="color: red;">*</span>
-                                            </label>
-                                            <input type="text" formControlName="consultationAddress"
-                                                placeholder="Dirección" required >
-                                        </div>
-                                    </div>
-                                    <div class="title-box">
-                                        <h3>Formación académica </h3>
-                                    </div>
-                                    <div formArrayName="academicTitles">
-                                        <div class="row" *ngFor="let title of academicTitles.controls; let i = index" [formGroupName]="i">
-                                          <div class="col-lg-4 col-md-4 col-sm-12 form-group">
-                                            <label>Nombre de la institución<span style="color: red;">*</span></label>
-                                            <input type="text" formControlName="institution" placeholder="Formación académica" required>
-                                          </div>
-                                          <div class="col-lg-4 col-md-4 col-sm-12 form-group">
-                                            <label>Título de especialización<span style="color: red;">*</span></label>
-                                            <input type="text" formControlName="specialization" placeholder="Título de especialización" required>
-                                          </div>
-                                          <div class="col-lg-3 col-md-3 col-sm-12 form-group">
-                                            <label>Año de egreso<span style="color: red;">*</span></label>
-                                            <input type="text" formControlName="year" placeholder="Año de egreso" required>
-                                          </div>
-                                          <div class="col-lg-1 col-md-1 col-sm-12 form-group d-flex align-items-end">
-                                            <!-- Botón "+" siempre visible -->
-                                            <button type="button" (click)="addTitle()" class="btn btn-success" title="Agregar título">+</button>
-                                            <!-- Botón "-" solo visible si hay más de un título -->
-                                            <button type="button" (click)="removeTitle(i)" class="btn btn-danger ml-2" *ngIf="academicTitles.length > 1" title="Eliminar título">-</button>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <!-- <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                        <label>Certificados</label>
-                                        <div class="profile-title row">
-                                          <div class="certificates-container  col-6">
-                                            <div *ngFor="let cert of global.professionalInfo.certificates || []" class="certificate-item">
-                                              <figure class="image-box">
-                                                <img [src]="cert" alt="Certificate Image" class="certificate-image" />
-                                                <button type="button" (click)="removeCertificate(cert)" class="btn btn-danger btn-sm remove-certificate">
-                                                  <i class="fas fa-times"></i>
-                                                </button>
-                                              </figure>
-                                            </div>
-                                          </div>
-                                          <div class="upload-photo col-6">
-                                            <input type="file" 
-                                                   (change)="onCertificateSelected($event)" 
-                                                   accept="image/*,.pdf" 
-                                                   #certificateInput 
-                                                   hidden />
-                                            <a (click)="uploadCertificate()" style="cursor: pointer;">
-                                              <i class="icon-Upload"></i>Cargar certificado
-                                            </a>
-                                            <span>Formato JPG, PNG, GIF o PDF. Máx. 5MB</span>
-                                          </div>
-                                        </div>
-                                      </div> -->
-                                    
-                                    <div class="col-12 title-box">
-                                        <h3>Tipo de Atención</h3>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 form-group">
-                                        <label>Valor por sesión (señalando si hace arancel diferenciado)
-                                            <span *ngIf="!global.professionalInfo.priceSession"
-                                                style="color: red;">*</span>
-                                        </label>
-                                        <input type="text" formControlName="priceSession" placeholder="Valor por sesión"
-                                            required >
-                                    </div>
-                                    <!-- TypeAttention (Modalidad) -->
-                                    <div formGroupName="typeAttention" class="row">
-                                        <div *ngFor="let modalidad of ['Online', 'Presencial', 'A domicilio']"
-                                            class="col-6">
-                                            <div class="form-check">
-                                                <input type="checkbox" formControlName="{{modalidad}}"
-                                                    class="form-check-input" />
-                                                <label class="form-check-label">
-                                                    {{ modalidad === 'Online' ? 'Online' :
-                                                    modalidad === 'Presencial' ? 'Presencial' : 'A domicilio' }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 form-group">
-                                        <div formGroupName="days" class="row">
-                                            <div *ngFor="let dia of ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']" class="col-6 col-md-4">
-                                            <div class="form-check">
-                                                <input 
-                                                type="checkbox" 
-                                                formControlName="{{dia}}"
-                                                class="form-check-input" />
-                                                <label class="form-check-label">{{dia}}</label>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 form-group">
-                                        <label>Horario de atención am/pm
-                                            <span *ngIf="!global.professionalInfo.openingHours"
-                                                style="color: red;">*</span>
-                                        </label>
-                                        <input type="text" formControlName="openingHours" placeholder="8:00 - 18:00"
-                                            required >
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-12 form-group">
-                                        <label>Corriente
-                                            <span *ngIf="!global.professionalInfo.corriente"
-                                                style="color: red;">*</span>
-                                        </label>
-                                        <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="corrientes"
-                                            [settings]="dropdownCorrientesSettings" formControlName="corriente"
-                                            (ngModelChange)="onCorrienteChange($event)">
-                                        </ng-multiselect-dropdown>
-                                    </div>
-
-
-                                    <div class="col-lg-4 col-md-4 col-sm-12 form-group">
-                                        <label>Tipo de terapia
-                                            <span *ngIf="!global.professionalInfo.typeTherapy"
-                                                style="color: red;">*</span>
-                                        </label>
-                                        <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="terapias"
-                                            [settings]="dropdownTherapySettings" formControlName="typeTherapy"
-                                            (ngModelChange)="onTypeTherapyChange($event)">
-                                        </ng-multiselect-dropdown>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Tipo de tratamientos
-                                            <span *ngIf="!global.professionalInfo.typeTreatment"
-                                                style="color: red;">*</span>
-                                        </label>
-                                        <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="tratamientos"
-                                            [settings]="dropdownTherapySettings" formControlName="typeTreatment"
-                                            (ngModelChange)="onTypeTreatmentChange($event)">
-                                        </ng-multiselect-dropdown>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-                                        <label>Tipo de especialidades
-                                            <span *ngIf="!global.professionalInfo.typeEspeciality"
-                                                style="color: red;">*</span>
-                                        </label>
-                                        <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="especialidades"
-                                            [settings]="dropdownTherapySettings" formControlName="typeEspeciality"
-                                            (ngModelChange)="onTypeEspecialityChange($event)">
-                                        </ng-multiselect-dropdown>
-                                    </div>
-                                </div>
-                                <div class="btn-box">
-                                    <button type="submit" class="theme-btn-one">
-                                        Guardar<i class="icon-Arrow-Right"></i>
-                                    </button>
-                                    <a class="cancel-btn" (click)="global.activeRoute = 'homeprofessional'">Cancelar</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+      <div class="content-container" id="profile" [hidden]="global.menuSelected !== 'profile'" >
+        <div class="outer-container">
+          <div class="add-listing my-profile">
+            <div class="single-box">
+              <div class="title-box">
+                <h3>Datos personales y de contacto</h3>
+              </div>
+              <div class="inner-box">
+                <div class="profile-title">
+                  <figure class="image-box">
+                    <img [src]="authService.getImage()" alt="Profile Image" />
+                  </figure>
+                  <div class="upload-photo">
+                    <input type="file" (change)="onFileSelected($event)" accept="image/*" #fileInput
+                      hidden />
+                    <a (click)="openFileSelector()" style="cursor: pointer;"><i
+                        class="icon-Upload"></i>Cargar imagen</a>
+                    <span>Formato JPG, GIF o PNG. Max 2MB</span>
+                  </div>
                 </div>
+
+                <form [formGroup]="profileForm" (ngSubmit)="sendToUpdate()">
+
+                  <div class="row clearfix">
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                      <label>Nombre y apellido*</label>
+                      <input type="text" formControlName="name" placeholder="Nombres*" required>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                      <label>Rut*</label>
+                      <input type="text" class="mil-rut-input" formControlName="rut" placeholder="Ingrese su Rut*" required 
+                        (input)="formatRutInput($event)">
+                      <div *ngIf="rutError" class="error-message">RUT inválido</div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                      <label>Telefono / whatsapp
+                        <span *ngIf="global.professionalInfo?.phone" style="color: red;">*</span>
+                      </label>
+                      <input type="text" class="mil-phone-input" formControlName="phone" placeholder="Telefono / whatsapp" required>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                      <label>Correo
+                        <span *ngIf="!global.professionalInfo?.email" style="color: red;" required
+                          >*</span>
+                      </label>
+                      <input type="email" formControlName="email" placeholder="Correo" required>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-12 form-group">
+                      <label>Sitio Web
+                        <span *ngIf="!global.professionalInfo?.website"></span>
+                      </label>
+                      <input type="text" formControlName="website" placeholder="https://www.ejemplo.com" >
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-3 col-sm-12 form-group">
+                      <mat-form-field appearance="fill" style="width: 100%">
+                        <mat-label>Género</mat-label>
+                        <mat-select formControlName="gender" (selectionChange)="onGenderChange()">
+                          <mat-option value="">Seleccione</mat-option>
+                          <mat-option value="M">Masculino</mat-option>
+                          <mat-option value="F">Femenino</mat-option>
+                          <mat-option value="NB">No Binarie</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="profileForm.get('gender')?.invalid && profileForm.get('gender')?.touched">
+                          Este campo es requerido
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  
+                    <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                      <label>Fecha de nacimiento
+                        <span *ngIf="!global.professionalInfo?.birthday" style="color: red;">*</span>
+                      </label>
+                      <input type="date" formControlName="birthday" required>
+                    </div>
+                    <div class="title-box">
+                      <h3>Datos profesionales</h3>
+                    </div>
+                    <div class="row clearfix">
+                      <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                        <label>Número de registro superintendencia de salud
+                          <span *ngIf="!global.professionalInfo?.registrationNumber"
+                            style="color: red;">*</span>
+                        </label>
+                        <input type="text" formControlName="registrationNumber" placeholder="Escribe tu número de registro aquí...">
+                      </div>
+                      <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                        <label>Descripción breve
+                          <span *ngIf="!global.professionalInfo?.biography"
+                            style="color: red;">*</span>
+                        </label>
+                        <textarea formControlName="biography" placeholder="Escribe tu descripción breve aquí...">
+                        </textarea>
+                      </div>
+                      <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                        <label>Descripción extendida
+                          <span *ngIf="!global.professionalInfo?.biography2"
+                            style="color: red;">*</span>
+                        </label>
+                        <textarea formControlName="biography2" placeholder="Escribe tu descripción extendida aquí...">
+                        </textarea>
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-4 form-group">
+                        <div formGroupName="languages" class="row">
+                          <div *ngFor="let idioma of ['es', 'en', 'fr', 'de']" class="col-6">
+                            <div class="form-check">
+                              <input type="checkbox" formControlName="{{idioma}}" class="form-check-input" />
+                              <label class="form-check-label">
+                                {{ idioma === 'es' ? 'Español' : idioma === 'en' ? 'Inglés'
+                                : idioma === 'fr' ? 'Francés' : 'Alemán' }}
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-4 form-group">
+                        <div formGroupName="targets" class="row">
+                          <div *ngFor="let grupo of ['niños y niñas', 'adultos', 'jóvenes y adolecentes', 'adultos mayores', 'todos']"
+                            class="col-6">
+                            <div class="form-check">
+                              <input type="checkbox" formControlName="{{grupo}}" class="form-check-input" />
+                              <label class="form-check-label">
+                                {{ grupo === 'niños y niñas' ? 'Niños y niñas' :
+                                grupo === 'adultos' ? 'Adultos' :
+                                grupo === 'jóvenes y adolecentes' ? 'Jóvenes y adolescentes'
+                                :
+                                grupo === 'adultos mayores' ? 'Adultos mayores' : 'Todos' }}
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Payments (Métodos de pago) -->
+                      <div class="col-lg-4 col-md-4 col-sm-4 form-group">
+                        <div formGroupName="payments" class="row">
+                          <div *ngFor="let metodo of ['efectivo', 'transferencia', 'tarjetas', 'webpay']"
+                            class="col-6">
+                            <div class="form-check">
+                              <input type="checkbox" formControlName="{{metodo}}" class="form-check-input" />
+                              <label class="form-check-label">
+                                {{ metodo === 'efectivo' ? 'Efectivo' :
+                                metodo === 'transferencia' ? 'Transferencia' :
+                                metodo === 'tarjetas' ? 'Tarjetas' : 'Webpay' }}
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                        <label>Región
+                          <span *ngIf="global.professionalInfo?.region">{{global.professionalInfo?.region.name}}</span>
+                          <span *ngIf="!global.professionalInfo?.region" style="color: red;">*</span>
+                        </label>
+                        <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="regionesList" [settings]="dropdownSettings" formControlName="region" (ngModelChange)="onRegionChange($event)">
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                        <label>Comuna
+                          <span *ngIf="global.professionalInfo?.comuna">{{global.professionalInfo?.comuna.name}}</span>
+                          <span *ngIf="!global.professionalInfo?.comuna" style="color: red;">*</span>
+                        </label>
+                        <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="comunasFiltered" [settings]="dropdownSettings" formControlName="comuna" (ngModelChange)="onComunaChange($event)">
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                        <label>Direccion exacta de consultorio
+                          <span *ngIf="!global.professionalInfo?.consultationAddress" style="color: red;">*</span>
+                        </label>
+                        <input type="text" formControlName="consultationAddress" placeholder="Dirección" required >
+                      </div>
+                    </div>
+                    <div class="title-box">
+                      <h3>Formación académica </h3>
+                    </div>
+                    <div formArrayName="academicTitles">
+                      <div class="row" *ngFor="let title of academicTitles.controls; let i = index" [formGroupName]="i">
+                        <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                          <label>Nombre de la institución<span style="color: red;">*</span></label>
+                          <input type="text" formControlName="institution" placeholder="Formación académica" required>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                          <label>Título de especialización<span style="color: red;">*</span></label>
+                          <input type="text" formControlName="specialization" placeholder="Título de especialización" required>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 form-group">
+                          <label>Año de egreso<span style="color: red;">*</span></label>
+                          <input type="text" formControlName="year" placeholder="Año de egreso" required>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-12 form-group d-flex align-items-end">
+                          <!-- Botón "+" siempre visible -->
+                          <button type="button" (click)="addTitle()" class="btn btn-success" title="Agregar título">+</button>
+                          <!-- Botón "-" solo visible si hay más de un título -->
+                          <button type="button" (click)="removeTitle(i)" class="btn btn-danger ml-2" *ngIf="academicTitles.length > 1" title="Eliminar título">-</button>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                      <label>Certificados</label>
+                      <div class="profile-title row">
+                        <div class="certificates-container  col-6">
+                          <div *ngFor="let cert of global.professionalInfo?.certificates || []" class="certificate-item">
+                            <figure class="image-box">
+                              <img [src]="cert" alt="Certificate Image" class="certificate-image" />
+                              <button type="button" (click)="removeCertificate(cert)" class="btn btn-danger btn-sm remove-certificate">
+                                <i class="fas fa-times"></i>
+                              </button>
+                            </figure>
+                          </div>
+                        </div>
+                        <div class="upload-photo col-6">
+                          <input type="file" 
+                                 (change)="onCertificateSelected($event)" 
+                                 accept="image/*,.pdf" 
+                                 #certificateInput 
+                                 hidden />
+                          <a (click)="uploadCertificate()" style="cursor: pointer;">
+                            <i class="icon-Upload"></i>Cargar certificado
+                          </a>
+                          <span>Formato JPG, PNG, GIF o PDF. Máx. 5MB</span>
+                        </div>
+                      </div>
+                    </div> -->
+                    
+                    <div class="col-12 title-box">
+                      <h3>Tipo de Atención</h3>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 form-group">
+                      <label>Valor por sesión (señalando si hace arancel diferenciado)
+                        <span *ngIf="!global.professionalInfo?.priceSession" style="color: red;">*</span>
+                      </label>
+                      <input type="text" formControlName="priceSession" placeholder="Valor por sesión" required >
+                    </div>
+                    <!-- TypeAttention (Modalidad) -->
+                    <div formGroupName="typeAttention" class="row">
+                      <div *ngFor="let modalidad of ['Online', 'Presencial', 'A domicilio']" class="col-6">
+                        <div class="form-check">
+                          <input type="checkbox" formControlName="{{modalidad}}" class="form-check-input" />
+                          <label class="form-check-label">
+                            {{ modalidad === 'Online' ? 'Online' :
+                            modalidad === 'Presencial' ? 'Presencial' : 'A domicilio' }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 form-group">
+                      <div formGroupName="days" class="row">
+                        <div *ngFor="let dia of ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']" class="col-6 col-md-4">
+                        <div class="form-check">
+                          <input type="checkbox" formControlName="{{dia}}" class="form-check-input" />
+                          <label class="form-check-label">{{dia}}</label>
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 form-group">
+                      <label>Horario de atención am/pm
+                        <span *ngIf="!global.professionalInfo?.openingHours" style="color: red;">*</span>
+                      </label>
+                      <input type="text" formControlName="openingHours" placeholder="8:00 - 18:00" required >
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                      <label>Corriente
+                        <span *ngIf="!global.professionalInfo?.corriente" style="color: red;">*</span>
+                      </label>
+                      <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="corrientes" [settings]="dropdownCorrientesSettings" formControlName="corriente" (ngModelChange)="onCorrienteChange($event)">
+                      </ng-multiselect-dropdown>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                      <label>Tipo de terapia
+                        <span *ngIf="!global.professionalInfo?.typeTherapy" style="color: red;">*</span>
+                      </label>
+                      <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="terapias" [settings]="dropdownTherapySettings" formControlName="typeTherapy" (ngModelChange)="onTypeTherapyChange($event)">
+                      </ng-multiselect-dropdown>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                      <label>Tipo de tratamientos
+                        <span *ngIf="!global.professionalInfo?.typeTreatment" style="color: red;">*</span>
+                      </label>
+                      <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="tratamientos" [settings]="dropdownTherapySettings" formControlName="typeTreatment" (ngModelChange)="onTypeTreatmentChange($event)">
+                      </ng-multiselect-dropdown>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                      <label>Tipo de especialidades
+                        <span *ngIf="!global.professionalInfo?.typeEspeciality" style="color: red;">*</span>
+                      </label>
+                      <ng-multiselect-dropdown [placeholder]="'Seleccione'" [data]="especialidades" [settings]="dropdownTherapySettings" formControlName="typeEspeciality" (ngModelChange)="onTypeEspecialityChange($event)">
+                      </ng-multiselect-dropdown>
+                    </div>
+                  </div>
+                  <div class="btn-box">
+                    <button type="submit" class="theme-btn-one">
+                      Guardar<i class="icon-Arrow-Right"></i>
+                    </button>
+                    <a class="cancel-btn" (click)="global.activeRoute = 'homeprofessional'">Cancelar</a>
+                  </div>
+                </form>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
+  </section>
+</div>

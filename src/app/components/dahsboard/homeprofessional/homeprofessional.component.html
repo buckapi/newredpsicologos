@@ -17,12 +17,9 @@
                 </div>
             </div>
             <div class="profile-info">
-                <ul class="list clearfix">
-                   
-                    <li><a href="dashboard" style="cursor: pointer;"><i
-                                class="fas fa-home"></i>Cuenta</a></li>
-                    <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i
-                                class="fas fa-user"></i>Actualizar datos</a></li>
+                <ul class="list clearfix">                   
+                    <li><a (click)="global.activeRoute = 'homeprofessional'" style="cursor: pointer;"><i class="fas fa-home"></i>Cuenta</a></li>
+                    <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i class="fas fa-user"></i>Perfil</a></li>
                     <li><a style="cursor: pointer;"><i class="fas fa-unlock-alt"></i>Cambiar contraseña</a></li>
                     <li><a (click)="global.activeRoute = 'reviews'" style="cursor: pointer;"><i class="fas fa-comment"></i>Comentarios y Calificaciones</a></li>
                     <li>

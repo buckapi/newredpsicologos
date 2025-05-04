@@ -1,8 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { GlobalService } from '../../service/global.service';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PsychologistRatingService } from '../../service/psychologistRatingService.service';
+import { AuthPocketbaseService } from '../../service/auth-pocketbase.service';
+import { ElementRef } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import Swal from 'sweetalert2';
 
+declare var grecaptcha: any; 
 @Component({
   selector: 'app-professional-detail',
   standalone: true,
@@ -15,18 +21,46 @@ name: string = '';
 phone: number = 0;
 email: string = '';
 profesional: any;
+reviewForm: FormGroup;
+  currentRating = 0;
+  predefinedTags = [
+    'Profesional', 
+    'Puntual', 
+    'Buen trato', 
+    'Resultados excelentes', 
+    'Recomendaría'
+  ];
+  selectedTags: string[] = [];
+  @ViewChild('recaptcha') recaptchaElement!: ElementRef;
+  isRecaptchaLoaded = false;
+  averageRating = 0;
+  ratingDistribution = [0, 0, 0, 0, 0];
+  ratings: any[] = [];
+  isSubmitting = false;
 constructor(
-  public global: GlobalService
-){}
+  public global: GlobalService,
+  public fb: FormBuilder,
+  public ratingService: PsychologistRatingService,
+  public authService: AuthPocketbaseService
+){
+  this.reviewForm = this.fb.group({
+    title: [''],
+    comment: [''],
+    recaptcha: [''],
+    terms: [false]
+  });
+}
 ngOnInit() {
   this.profesional = this.global.previewProfesionals;
   this.resetForm();  
+  this.loadRatings();
 }
 ngAfterViewInit() {
   window.scrollTo({
     top: 0,
     behavior: 'smooth' // Opcional: para un scroll suave
   });
+  this.loadRecaptchaScript();
 }
 
 private cleanPhoneNumber(phone: string): string {
@@ -99,5 +133,192 @@ getRegionDisplay(): string {
 getSelectedDays(daysObj: {[key: string]: boolean}): string[] {
   if (!daysObj) return [];
   return Object.keys(daysObj).filter(day => daysObj[day]);
+}
+initForm() {
+  this.reviewForm = this.fb.group({
+    title: ['', Validators.required],
+    comment: [''],
+    recaptcha: ['', Validators.required],
+    terms: [false, Validators.requiredTrue]
+  });
+}
+
+async loadRatings() {
+  try {
+    const specialistId = this.global.previewProfesionals?.id;
+    if (specialistId) {
+      this.ratings = await this.ratingService.getRatingsBySpecialist(specialistId);
+      this.calculateRatingStats();
+    }
+  } catch (error) {
+    console.error('Error loading ratings:', error);
+  }
+}
+
+calculateRatingStats() {
+  if (this.ratings.length === 0) return;
+  
+  // Calcular promedio
+  const total = this.ratings.reduce((sum, rating) => sum + rating.score, 0);
+  this.averageRating = total / this.ratings.length;
+  
+  // Calcular distribución
+  this.ratingDistribution = [0, 0, 0, 0, 0];
+  this.ratings.forEach(rating => {
+    if (rating.score >= 1 && rating.score <= 5) {
+      this.ratingDistribution[5 - rating.score]++;
+    }
+  });
+}
+
+setRating(rating: number) {
+  this.currentRating = rating;
+}
+
+toggleTag(tag: string) {
+  const index = this.selectedTags.indexOf(tag);
+  if (index > -1) {
+    this.selectedTags.splice(index, 1);
+  } else {
+    this.selectedTags.push(tag);
+  }
+}
+
+loadRecaptchaScript() {
+  // Verificar si ya está cargado
+  if (typeof grecaptcha !== 'undefined') {
+    this.isRecaptchaLoaded = true;
+    console.log('reCAPTCHA ya está cargado');
+    return;
+  }
+
+  // Verificar si el script ya existe
+  const existingScript = document.querySelector('script[src*="recaptcha/api.js"]');
+  if (existingScript) {
+    console.log('Script de reCAPTCHA ya existe');
+    return;
+  }
+
+  // Cargar el script dinámicamente
+  const script = document.createElement('script');
+  script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
+  script.async = true;
+  script.defer = true;
+  script.id = 'recaptcha-script';
+
+  script.onload = () => {
+    console.log('reCAPTCHA cargado correctamente');
+    this.isRecaptchaLoaded = true;
+    // Inicializar reCAPTCHA
+    grecaptcha.ready(() => {
+      console.log('reCAPTCHA inicializado');
+    });
+  };
+
+  script.onerror = (error) => {
+    console.error('Error al cargar reCAPTCHA:', error);
+    this.isRecaptchaLoaded = false;
+    alert('Error al cargar el sistema de verificación. Por favor, intenta recargar la página.');
+  };
+
+  document.head.appendChild(script);
+}
+
+async executeRecaptcha(action: string): Promise<string> {
+  try {
+    if (!this.isRecaptchaLoaded) {
+      throw new Error('reCAPTCHA no cargado');
+    }
+
+    return await new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+        if (typeof grecaptcha !== 'undefined') {
+          clearInterval(interval);
+          grecaptcha.ready(() => {
+            grecaptcha.execute(environment.recaptchaSiteKey, { action })
+              .then(resolve)
+              .catch((error: any) => {
+                console.error('Error ejecutando reCAPTCHA:', error);
+                reject(error);
+              });
+          });
+        }
+      }, 100);
+
+      // Increase timeout to 5 seconds
+      setTimeout(() => {
+        clearInterval(interval);
+        reject(new Error('Tiempo de espera agotado para reCAPTCHA'));
+      }, 3000);
+    });
+  } catch (error) {
+    console.error('Error en reCAPTCHA:', error);
+    // Fallback for development
+    if (window.location.hostname === 'localhost') {
+      return 'TEST_TOKEN_LOCALHOST';
+    }
+    throw error;
+  }
+}
+
+async submitReview() {
+  try {
+    if (!this.isRecaptchaLoaded || this.isSubmitting) {
+      if (!this.isRecaptchaLoaded) {
+        alert('El sistema de verificación no está listo. Por favor espera un momento.');
+        return;
+      }
+      if (this.isSubmitting) {
+        alert('Ya se está procesando tu solicitud. Por favor espera.');
+        return;
+      }
+    }
+
+    this.isSubmitting = true;
+    
+    const token = await this.executeRecaptcha('submit_review');
+    
+    // Verificar el token con el backend
+    const isValid = await this.ratingService.verifyToken(token);
+    if (!isValid) {
+      alert('Error en la verificación de seguridad. Por favor intenta nuevamente.');
+      this.isSubmitting = false;
+      return;
+    }
+
+    // Resto de tu lógica de envío...
+    const reviewData = {
+      ...this.reviewForm.value,
+      recaptchaToken: token,
+      idUser: this.authService.getCurrentUser()?.id,
+      idSpecialist: this.global.previewProfesionals.id,
+      score: this.currentRating,
+      tags: this.selectedTags.join(', ')
+    };
+
+    await this.ratingService.createRating(reviewData);
+    
+    // Resetear el formulario y mostrar mensaje de éxito
+    this.resetFormReview();
+    Swal.fire('Éxito', '¡Gracias por tu opinión! Se ha enviado con éxito.', 'success');
+    
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire('Error', 'Error al procesar tu solicitud. Por favor intenta nuevamente.', 'error');
+  } finally {
+    this.isSubmitting = false;
+  }
+}
+
+resetFormReview() {
+  this.reviewForm.reset();
+  this.currentRating = 0;
+  this.selectedTags = [];
+  this.reviewForm.get('terms')?.setValue(false);
+}
+
+openTerms(event: Event) {
+  event.preventDefault();
+  // Lógica para mostrar términos y condiciones
 }
 }

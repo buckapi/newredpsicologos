@@ -67,15 +67,15 @@
 
                           <div class="short-box clearfix desktop-only">
                             <div class="select-box">
-                                <mat-form-field appearance="fill" style="width: 100%">
-                                    <mat-label>Region</mat-label>
-                                    <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)">
-                                      <mat-option [value]="''">Todas las regiones</mat-option>
-                                      <mat-option *ngFor="let region of regiones" [value]="region.id">
-                                        {{region.name}}
-                                      </mat-option>
-                                    </mat-select>
-                                  </mat-form-field>
+                              <mat-form-field appearance="fill" style="width: 100%">
+                                <mat-label>Región</mat-label>
+                                <mat-select [(ngModel)]="selectedRegionId" name="region" (selectionChange)="onRegionChange($event)">
+                                  <mat-option [value]="''">Todas las regiones</mat-option>
+                                  <mat-option *ngFor="let region of regiones" [value]="region.id">
+                                    {{region.name}}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
                             </div>
                           </div>
                           <div class="short-box clearfix desktop-only">
@@ -108,7 +108,7 @@
                                 <div class="select-box">
                                     <mat-form-field appearance="fill" style="width: 100%">
                                         <mat-label>Corriente</mat-label>
-                                        <mat-select [(ngModel)]="selectedCorrienteId" (selectionChange)="onCorrienteChange($event)">
+                                        <mat-select [(ngModel)]="selectedCorrienteId" name="corriente" (selectionChange)="onCorrienteChange($event)">
                                           <mat-option [value]="''">Todas las corrientes</mat-option>
                                           <mat-option *ngFor="let corriente of corrientes" [value]="corriente.id">
                                             {{corriente.name}}
@@ -269,15 +269,15 @@
         <form method="post">
             <div class="form-group">              
                <!-- Select de Región -->
-                <mat-form-field appearance="fill" style="width: 100%">
-                  <mat-label>Región</mat-label>
-                  <mat-select [(ngModel)]="selectedRegionId" (selectionChange)="onRegionChange($event)" name="region">
-                    <mat-option [value]="''">Todas las regiones</mat-option>
-                    <mat-option *ngFor="let region of regiones" [value]="region.id">
-                      {{region.name}}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
+               <mat-form-field appearance="fill" style="width: 100%">
+                <mat-label>Región</mat-label>
+                <mat-select [(ngModel)]="selectedRegionId" name="region" (selectionChange)="onRegionChange($event)">
+                  <mat-option [value]="''">Todas las regiones</mat-option>
+                  <mat-option *ngFor="let region of regiones" [value]="region.id">
+                    {{region.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
             <div class="form-group">
                 <!-- Select de Tratamiento -->
@@ -306,7 +306,7 @@
             <div class="form-group">
               <mat-form-field appearance="fill" style="width: 100%">
                 <mat-label>Corriente</mat-label>
-                <mat-select [(ngModel)]="selectedCorrienteId" (selectionChange)="onCorrienteChange($event)">
+                <mat-select [(ngModel)]="selectedCorrienteId" name="corriente" (selectionChange)="onCorrienteChange($event)">
                   <mat-option [value]="''">Todas las corrientes</mat-option>
                   <mat-option *ngFor="let corriente of corrientes" [value]="corriente.id">
                     {{corriente.name}}

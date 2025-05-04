@@ -7306,6 +7306,7 @@ div#mCSB_1_container{
 .submit-review .review-box .content-box .content-inner{
   position: relative;
   padding: 36px 40px 40px 40px;
+  background: azure;
 }
 
 .submit-review .review-box .content-inner .rating-box h4{

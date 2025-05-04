@@ -50,6 +50,7 @@ constructor(
   } else {
     // Si no hay datos en cache, cargarlos del servidor
     this.global.loadProfessionalInfo();
+    this.getProfessionlInfo();
   }
 }
 confirmLogout() {
@@ -88,7 +89,7 @@ confirmLogout() {
     const professionalInfo = JSON.parse(localStorage.getItem('professionalInfo') || '{}');  
     this.imageUrl = professionalInfo.images?.[0] || 'assets/images/user.png'; 
   }
-  async getProfessionlINfo() {
+  async getProfessionlInfo() {
         try {
           // Limpiar datos existentes primero
           

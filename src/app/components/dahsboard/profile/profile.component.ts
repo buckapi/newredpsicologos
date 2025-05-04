@@ -18,7 +18,7 @@ import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input'; // si usas matInput en otros campos
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // Agrega este módulo
 
 interface Comunas {
   id: string;
@@ -40,7 +40,7 @@ type PaymentsArray = string[];
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule,NgMultiSelectDropDownModule, MatFormFieldModule, MatSelectModule, MatInputModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule,NgMultiSelectDropDownModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatProgressSpinnerModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -87,6 +87,8 @@ export class ProfileComponent implements AfterViewInit {
   imageUrl: string = 'assets/images/resource/profile-3.png'; 
   private pb = new PocketBase('https://db.redpsicologos.cl:8090');
   isLoading: boolean = false;
+  isDataLoaded: boolean = false;
+  private loadingTimeout: any;
   regiones: any[] = []; 
   comunas: Comunas[] = []; 
   terapias:any [] = [];
@@ -142,6 +144,7 @@ constructor(
 {
 this.initializeData();
 this.typeAttentionSelected = [];
+  // Initialize form with default values
   this.profileForm = this.fb.group({
     name: ['', Validators.required],
     rut: ['', Validators.required],
@@ -152,12 +155,9 @@ this.typeAttentionSelected = [];
     website: [''],
     birthday: ['', [Validators.required]],
     consultationAddress: ['', [Validators.required]],
-    region: ['', this.global.professionalInfo.region ? null : Validators.required],
-    comuna: ['', this.global.professionalInfo.comuna ? null : Validators.required],
-    gender: [
-      this.global.professionalInfo?.gender || '', // Valor inicial
-      null // No validation
-    ],
+    region: ['', null],
+    comuna: ['', null],
+    gender: ['', null],
     languages: this.fb.group({
       es: [false],
       en: [false],
@@ -191,22 +191,85 @@ this.typeAttentionSelected = [];
       Presencial: [false],
       'A domicilio': [false]
     }),    
-    priceSession: ['',[Validators.required]],
-    titleUniversity: ['', ],
+    priceSession: ['', [Validators.required]],
+    titleUniversity: ['', null],
     typeTherapy: ['', [Validators.required]],
     typeTreatment: ['', [Validators.required]],
     typeEspeciality: ['', [Validators.required]],
     corriente: ['', [Validators.required]],
-    openingHours: ['', ],
-    registrationNumber: ['', ],
+    openingHours: ['', null],
+    registrationNumber: ['', null],
     academicTitles: this.fb.array([]),
     certificates: this.fb.array([]),
    
   });
-  this.global.professionalInfo = this.global.professionalInfo || {};
-  this.initForms();
+
+  // Update form when professionalInfo is available
+  if (this.global.professionalInfo) {
+    this.updateFormWithProfessionalInfo();
+  }
+  this.initializeFormWithDefaults();
+
  }
- 
+ private initializeFormWithDefaults() {
+  this.profileForm = this.fb.group({
+    name: ['', [Validators.required]],
+    rut: ['', [Validators.required]],
+    biography: ['', null],
+    biography2: ['', null],
+    phone: ['', [Validators.required]],
+    email: ['', [Validators.required]],
+    website: ['', null],
+    birthday: ['', null],
+    consultationAddress: ['', null],
+    region: ['', [Validators.required]],
+    comuna: ['', [Validators.required]],
+    gender: ['', [Validators.required]],
+    priceSession: ['', [Validators.required]],
+    titleUniversity: ['', null],
+    typeTherapy: ['', [Validators.required]],
+    typeTreatment: ['', [Validators.required]],
+    typeEspeciality: ['', [Validators.required]],
+    corriente: ['', [Validators.required]],
+    openingHours: ['', null],
+    registrationNumber: ['', null],
+    academicTitles: this.fb.array([]),
+    certificates: this.fb.array([]),
+    targets: this.fb.group({
+      'niños y niñas': [false],
+      adultos: [false],
+      'jóvenes y adolecentes': [false],
+      'adultos mayores': [false],
+      todos: [false]
+    }),
+    payments: this.fb.group({
+      efectivo: [false],
+      transferencia: [false],
+      tarjetas: [false],
+      webpay: [false]
+    }),
+    days: this.fb.group({
+      Lunes: [false],
+      Martes: [false],
+      Miercoles: [false],
+      Jueves: [false],
+      Viernes: [false],
+      Sabado: [false],
+      Domingo: [false]
+    }),
+    typeAttention: this.fb.group({
+      Online: [false],
+      Presencial: [false],
+      'A domicilio': [false]
+    }),
+    languages: this.fb.group({
+      es: [false],
+      en: [false],
+      fr: [false],
+      de: [false]
+    })
+  });
+}
  async initializeData() {
   this.regionesList = await this.regionesService.getAllRegiones();
   this.comunasList = await this.comunasService.getAllComunas();
@@ -700,6 +763,8 @@ onFileSelected(event: any) {
       // 1. Validación general del formulario (sin validar género)
       if (this.profileForm.valid) {
         try {
+          this.isLoading = true;
+          this.global.isLoading = true;
           const formValue = this.profileForm.value;
           
           // Preparar datos para enviar
@@ -748,11 +813,12 @@ onFileSelected(event: any) {
             text: 'Datos actualizados correctamente',
             icon: 'success',
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
+            allowOutsideClick: true
           });
     
           // Recargar datos del profesional
-          await this.getProfessionlINfo();
+          await this.getProfessionlINfo(); 
     
         } catch (error: unknown) {
           console.error('Error al actualizar:', error);
@@ -763,6 +829,11 @@ onFileSelected(event: any) {
             icon: 'error',
             confirmButtonText: 'Aceptar'
           });
+        } finally {
+          this.isLoading = false;
+          this.global.isLoading = false;
+          this.isDataLoaded = true;
+          clearTimeout(this.loadingTimeout);
         }
       } else {
         // Mostrar errores de validación detallados (excluyendo género)
@@ -782,7 +853,14 @@ onFileSelected(event: any) {
       }
     }
     
-    
+    public isDataReady(): boolean {
+      return this.isDataLoaded && 
+             this.regiones.length > 0 &&
+             this.terapias.length > 0 &&
+             this.tratamientos.length > 0 &&
+             this.especialidades.length > 0 &&
+             this.corrientes.length > 0;
+    }
   
   // Métodos auxiliares
   private prepareLanguagesData(languages: any): any {
@@ -841,18 +919,7 @@ onFileSelected(event: any) {
       Object.entries(obj).filter(([_, v]) => v !== null && v !== undefined && v !== '')
     );
   }
-  /* private getInvalidFields(): string[] {
-    const invalidFields = [];
-    const controls = this.profileForm.controls;
   
-    for (const key in controls) {
-      if (controls[key].invalid) {
-        invalidFields.push(this.getFieldName(key));
-      }
-    }
-  
-    return invalidFields;
-  } */
   private getInvalidFields(): string[] {
     const fieldNames: {[key: string]: string} = {
       gender: 'Género',
@@ -999,22 +1066,94 @@ async updateCertificate(certificateUrl: string) {
     }
   }
 }
-  ngOnInit() {
-    this.initializeData();
-    this.getProfessionlINfo();
-    this.loadComunas(); 
-    this.loadRegiones(); 
+  async ngOnInit() {
+    this.initializeFormWithDefaults();
+    
+    // Cargar datos adicionales
+    this.loadRegiones();
     this.loadTerapias();
     this.loadTratamientos();
     this.loadEspecialidades();
     this.loadCorrientes();
-    // Inicializar academicTitles con al menos un grupo vacío si no hay datos
-  if (this.academicTitles.length === 0) {
-    this.addTitle(); // Agrega un grupo vacío inicial
+    this.loadComunas();
+
+    // Esperar a que las regiones se carguen antes de filtrar comunas
+    this.regionesService.regiones$.subscribe(() => {
+      this.filterComunas();
+    });
+
+    // Intentar cargar datos desde localStorage primero
+    const storedInfo = localStorage.getItem('professionalInfo');
+    if (storedInfo) {
+      try {
+        const professionalInfo = JSON.parse(storedInfo);
+        this.global.professionalInfo = professionalInfo;
+        this.updateFormWithProfessionalInfo();
+        this.isDataLoaded = true;
+      } catch (error) {
+        console.error('Error parsing stored info:', error);
+      }
+    }
+
+    // Si no hay datos en localStorage, cargar desde el servidor
+    if (!this.isDataLoaded) {
+      await this.getProfessionlINfo();
+    }
   }
-  if (!this.global.professionalInfo.certificates) {
-    this.global.professionalInfo.certificates = [];
+
+  
+
+  async fetchDataFromServer() {
+    try {
+      this.isLoading = true;
+      const profesional = await this.realtimeProfesionales.getProfesionalById(this.authService.getUserId()).toPromise();
+      
+      if (profesional) {
+        this.global.setPreviewProfesional(profesional);
+        localStorage.setItem('professionalInfo', JSON.stringify(profesional));
+        this.updateFormWithProfessionalInfo();
+        this.isDataLoaded = true;
+      } else {
+        // Inicializar nuevo profesional
+        this.initializeNewProfessional();
+      }
+    } catch (error) {
+      console.error('Error fetching professional info:', error);
+      this.isDataLoaded = false;
+    } finally {
+      this.isLoading = false;
+      clearTimeout(this.loadingTimeout);
+    }
   }
+
+  private initializeNewProfessional() {
+    const newProfessional = {
+      name: '',
+      gender: '',
+      languages: [],
+      phone: '',
+      email: '',
+      website: '',
+      registrationNumber: '',
+      biography: '',
+      biography2: '',
+      region: null,
+      comuna: null,
+      consultationAddress: '',
+      priceSession: '',
+      openingHours: '',
+      corriente: [],
+      typeTherapy: [],
+      typeTreatment: [],
+      typeEspeciality: [],
+      typeAttention: [],
+      days: [],
+      payments: []
+    };
+    
+    this.global.professionalInfo = newProfessional;
+    this.updateFormWithProfessionalInfo();
+    this.isDataLoaded = true;
   }
   createTitleGroup(): FormGroup {
     return this.fb.group({
@@ -1053,16 +1192,56 @@ async updateCertificate(certificateUrl: string) {
   }
 
   async loadTerapias() {
-    this.terapias = await this.TerapiaService.getAllTerapias();
+    try {
+      this.terapias = await this.TerapiaService.getAllTerapias();
+      // Si hay datos guardados, seleccionar los que corresponden
+      if (this.global.professionalInfo?.typeTherapy) {
+        this.terapiaSelected = this.terapias.filter(t => 
+          this.global.professionalInfo.typeTherapy.includes(t.id)
+        );
+      }
+    } catch (error) {
+      console.error('Error al cargar terapias:', error);
+    }
   }
   async loadTratamientos() {
-    this.tratamientos = await this.TratamientoService.getAllTratamientos();
+    try {
+      this.tratamientos = await this.TratamientoService.getAllTratamientos();
+      // Si hay datos guardados, seleccionar los que corresponden
+      if (this.global.professionalInfo?.typeTreatment) {
+        this.tratamientoSelected = this.tratamientos.filter(t => 
+          this.global.professionalInfo.typeTreatment.includes(t.id)
+        );
+      }
+    } catch (error) {
+      console.error('Error al cargar tratamientos:', error);
+    }
   }
   async loadEspecialidades() {
-    this.especialidades = await this.EspecialidadService.getAllEspecialidades();
+    try {
+      this.especialidades = await this.EspecialidadService.getAllEspecialidades();
+      // Si hay datos guardados, seleccionar los que corresponden
+      if (this.global.professionalInfo?.typeEspeciality) {
+        this.especialidadSelected = this.especialidades.filter(e => 
+          this.global.professionalInfo.typeEspeciality.includes(e.id)
+        );
+      }
+    } catch (error) {
+      console.error('Error al cargar especialidades:', error);
+    }
   }
   async loadCorrientes() {
-    this.corrientes = await this.realtimeCorrientes.getAllCorrientes();
+    try {
+      this.corrientes = await this.realtimeCorrientes.getAllCorrientes();
+      // Si hay datos guardados, seleccionar los que corresponden
+      if (this.global.professionalInfo?.corriente) {
+        this.corrienteSelected = this.corrientes.filter(c => 
+          this.global.professionalInfo.corriente.includes(c.id)
+        );
+      }
+    } catch (error) {
+      console.error('Error al cargar corrientes:', error);
+    }
   }
 
   loadComunas() {
@@ -1073,13 +1252,18 @@ async updateCertificate(certificateUrl: string) {
   }
 
   filterComunas() {
-    const selectedRegionId = this.global.professionalInfo.region; 
-    this.filteredComunas = this.comunas.filter(comuna => comuna.idFather === selectedRegionId); 
+    if (!this.global.professionalInfo?.region) {
+      this.filteredComunas = [];
+      return;
+    }
+    this.filteredComunas = this.comunas.filter(comuna => comuna.idFather === this.global.professionalInfo.region);
   }
   setImage() {
     const professionalInfo = JSON.parse(localStorage.getItem('professionalInfo') || '{}');  
     this.imageUrl = professionalInfo.images?.[0] || 'assets/images/user.png'; 
-  } async getProfessionlINfo() {
+  } 
+  async getProfessionlINfo() {
+        this.isLoading = true;
         try {
           // Limpiar datos existentes primero
           this.clearUserData();
@@ -1093,8 +1277,6 @@ async updateCertificate(certificateUrl: string) {
             profesional.payments = profesional.payments || {};
             profesional.days = profesional.days || {};
             profesional.typeAttention = profesional.typeAttention || {};
-            profesional.certificates = profesional.certificates || [];
-
             
             // Guardar en el servicio global
             this.global.setPreviewProfesional(profesional);
@@ -1106,13 +1288,17 @@ async updateCertificate(certificateUrl: string) {
             
             // Actualizar el formulario
             if (this.profileForm) {
-              this.ngAfterViewInit();
+              this.updateFormWithProfessionalInfo();
             }
+            
+            this.isDataLoaded = true;
           }
         } catch (error) {
           console.error('Error al cargar info profesional:', error);
           // Limpiar datos si hay error
           this.clearUserData();
+        } finally {
+          this.isLoading = false;
         }
       }
   async fetchPsychologistData(profesionalId: string) {
@@ -1172,5 +1358,96 @@ confirmLogout() {
         this.profileForm.reset();
       }
      
+ // Add this method to update the form when professionalInfo is available
+ updateFormWithProfessionalInfo() {
+  if (this.global.professionalInfo) {
+    this.profileForm.patchValue({
+      name: this.global.professionalInfo.name,
+      rut: this.global.professionalInfo.rut,
+      biography: this.global.professionalInfo.biography,
+      biography2: this.global.professionalInfo.biography2,
+      phone: this.global.professionalInfo.phone,
+      email: this.global.professionalInfo.email,
+      website: this.global.professionalInfo.website,
+      birthday: this.global.professionalInfo.birthday,
+      consultationAddress: this.global.professionalInfo.consultationAddress,
+      region: this.global.professionalInfo.region,
+      comuna: this.global.professionalInfo.comuna,
+      gender: this.global.professionalInfo.gender,
+      priceSession: this.global.professionalInfo.priceSession,
+      titleUniversity: this.global.professionalInfo.titleUniversity,
+      openingHours: this.global.professionalInfo.openingHours,
+      registrationNumber: this.global.professionalInfo.registrationNumber
+    });
 
+    // Update nested form groups
+    Object.keys(this.global.professionalInfo.languages || {}).forEach(lang => {
+      this.profileForm.get(`languages.${lang}`)?.setValue(this.global.professionalInfo.languages[lang]);
+    });
+
+    Object.keys(this.global.professionalInfo.targets || {}).forEach(target => {
+      this.profileForm.get(`targets.${target}`)?.setValue(this.global.professionalInfo.targets[target]);
+    });
+
+    Object.keys(this.global.professionalInfo.payments || {}).forEach(payment => {
+      this.profileForm.get(`payments.${payment}`)?.setValue(this.global.professionalInfo.payments[payment]);
+    });
+
+    Object.keys(this.global.professionalInfo.days || {}).forEach(day => {
+      this.profileForm.get(`days.${day}`)?.setValue(this.global.professionalInfo.days[day]);
+    });
+
+    Object.keys(this.global.professionalInfo.typeAttention || {}).forEach(attention => {
+      this.profileForm.get(`typeAttention.${attention}`)?.setValue(this.global.professionalInfo.typeAttention[attention]);
+    });
+  }
+}
+
+getLanguagesText(): string {
+  if (!this.global.professionalInfo?.languages) return 'No especificado';
+  const languages = Object.entries(this.global.professionalInfo.languages)
+    .filter(([_, value]) => value)
+    .map(([lang]) => {
+      const langMap = {
+        es: 'Español',
+        en: 'Inglés',
+        fr: 'Francés',
+        de: 'Alemán'
+      };
+      return langMap[lang as keyof typeof langMap] || 'Desconocido';
+    });
+  return languages.length > 0 ? languages.join(', ') : 'No especificado';
+}
+
+getCorrientesText(): string {
+  if (!this.global.professionalInfo?.corriente) return 'No especificado';
+  const selectedCorrientes = this.corrientes.filter(corriente => 
+    this.global.professionalInfo.corriente.includes(corriente.id)
+  );
+  return selectedCorrientes.length > 0 ? selectedCorrientes.map(c => c.name).join(', ') : 'No especificado';
+}
+
+getTypeTherapyText(): string {
+  if (!this.global.professionalInfo?.typeTherapy) return 'No especificado';
+  const selectedTherapies = this.terapias.filter(therapy => 
+    this.global.professionalInfo.typeTherapy.includes(therapy.id)
+  );
+  return selectedTherapies.length > 0 ? selectedTherapies.map(t => t.name).join(', ') : 'No especificado';
+}
+
+getTypeTreatmentText(): string {
+  if (!this.global.professionalInfo?.typeTreatment) return 'No especificado';
+  const selectedTreatments = this.tratamientos.filter(treatment => 
+    this.global.professionalInfo.typeTreatment.includes(treatment.id)
+  );
+  return selectedTreatments.length > 0 ? selectedTreatments.map(t => t.name).join(', ') : 'No especificado';
+}
+
+getTypeEspecialityText(): string {
+  if (!this.global.professionalInfo?.typeEspeciality) return 'No especificado';
+  const selectedEspecialities = this.especialidades.filter(especiality => 
+    this.global.professionalInfo.typeEspeciality.includes(especiality.id)
+  );
+  return selectedEspecialities.length > 0 ? selectedEspecialities.map(e => e.name).join(', ') : 'No especificado';
+}
 }
