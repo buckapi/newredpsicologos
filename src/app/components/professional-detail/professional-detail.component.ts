@@ -8,6 +8,7 @@ import { ElementRef } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import Swal from 'sweetalert2';
 
+
 declare var grecaptcha: any; 
 @Component({
   selector: 'app-professional-detail',
@@ -56,11 +57,35 @@ ngOnInit() {
   this.loadRatings();
 }
 ngAfterViewInit() {
+  // Verificar explícitamente si estamos en producción
+  if (!environment.production) {
+    console.error('¡ADVERTENCIA! Estás usando el entorno de desarrollo');
+    // En producción, forzar el uso del site key de producción
+    if (window.location.hostname === 'redpsicologos.cl') {
+      console.log('Forzando uso de site key de producción');
+      environment.recaptchaSiteKey = '6Leeui0rAAAAAMyUKhrnhgGwJDajrKJ8yk3FZK7T';
+      environment.recaptchaSecretKey = '6Leeui0rAAAAAFPGCAomijcMLh0ewkApJvXxcB5d';
+    }
+  }
+
+  console.log('Entorno actual:', environment);
+  console.log('Production:', environment.production);
+  console.log('Site key:', environment.recaptchaSiteKey);
+  
   window.scrollTo({
     top: 0,
-    behavior: 'smooth' // Opcional: para un scroll suave
+    behavior: 'smooth'
   });
   this.loadRecaptchaScript();
+  // Inicializar el widget de reCAPTCHA
+  if (typeof grecaptcha !== 'undefined') {
+    grecaptcha.ready(() => {
+      grecaptcha.render('recaptcha-container', {
+        sitekey: environment.recaptchaSiteKey,
+        size: 'invisible'
+      });
+    });
+  }
 }
 
 private cleanPhoneNumber(phone: string): string {
@@ -184,7 +209,7 @@ toggleTag(tag: string) {
   }
 }
 
-loadRecaptchaScript() {
+/* loadRecaptchaScript() {
   // Verificar si ya está cargado
   if (typeof grecaptcha !== 'undefined') {
     this.isRecaptchaLoaded = true;
@@ -222,38 +247,109 @@ loadRecaptchaScript() {
   };
 
   document.head.appendChild(script);
-}
+} */
+  loadRecaptchaScript() {
+    try {
+      // Verificar si ya está cargado
+      if (typeof grecaptcha !== 'undefined') {
+        this.isRecaptchaLoaded = true;
+        console.log('reCAPTCHA ya está cargado');
+        return;
+      }
+  
+      // Verificar si el script ya existe
+      const existingScript = document.querySelector('script[src*="recaptcha/api.js"]');
+      if (existingScript) {
+        console.log('Script de reCAPTCHA ya existe');
+        return;
+      }
+  
+      // Verificar si tenemos el site key
+      if (!environment.recaptchaSiteKey) {
+        console.error('Site key de reCAPTCHA no configurado');
+        return;
+      }
+  
+      // Cargar el script dinámicamente
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
+      script.async = true;
+      script.defer = true;
+      script.id = 'recaptcha-script';
+  
+      script.onload = () => {
+        console.log('Script de reCAPTCHA cargado');
+        // Esperar un poco más para asegurarnos que grecaptcha está completamente listo
+        setTimeout(() => {
+          if (typeof grecaptcha !== 'undefined') {
+            console.log('reCAPTCHA inicializado correctamente');
+            this.isRecaptchaLoaded = true;
+          } else {
+            console.error('reCAPTCHA no se inicializó correctamente');
+            this.isRecaptchaLoaded = false;
+          }
+        }, 1000);
+      };
+  
+      script.onerror = (error) => {
+        console.error('Error al cargar reCAPTCHA:', error);
+        this.isRecaptchaLoaded = false;
+        alert('Error al cargar el sistema de verificación. Por favor, intenta recargar la página.');
+      };
+  
+      document.head.appendChild(script);
+    } catch (error) {
+      console.error('Error al cargar reCAPTCHA:', error);
+      this.isRecaptchaLoaded = false;
+    }
+  }
 
 async executeRecaptcha(action: string): Promise<string> {
   try {
     if (!this.isRecaptchaLoaded) {
-      throw new Error('reCAPTCHA no cargado');
+      throw new Error('reCAPTCHA no está listo');
     }
 
-    return await new Promise((resolve, reject) => {
-      const interval = setInterval(() => {
-        if (typeof grecaptcha !== 'undefined') {
-          clearInterval(interval);
-          grecaptcha.ready(() => {
-            grecaptcha.execute(environment.recaptchaSiteKey, { action })
-              .then(resolve)
-              .catch((error: any) => {
-                console.error('Error ejecutando reCAPTCHA:', error);
-                reject(error);
-              });
-          });
-        }
-      }, 100);
+    if (!environment.recaptchaSiteKey) {
+      throw new Error('Site key de reCAPTCHA no configurado');
+    }
 
-      // Increase timeout to 5 seconds
-      setTimeout(() => {
-        clearInterval(interval);
-        reject(new Error('Tiempo de espera agotado para reCAPTCHA'));
-      }, 3000);
+    return new Promise((resolve, reject) => {
+      if (typeof grecaptcha !== 'undefined') {
+        grecaptcha.ready(() => {
+          grecaptcha.execute(environment.recaptchaSiteKey, { action })
+            .then(resolve)
+            .catch((error: any) => {
+              console.error('Error ejecutando reCAPTCHA:', error);
+              reject(error);
+            });
+        });
+      } else {
+        // Si no está listo, esperar un poco más
+        const checkInterval = setInterval(() => {
+          if (typeof grecaptcha !== 'undefined') {
+            clearInterval(checkInterval);
+            grecaptcha.ready(() => {
+              grecaptcha.execute(environment.recaptchaSiteKey, { action })
+                .then(resolve)
+                .catch((error: any) => {
+                  console.error('Error ejecutando reCAPTCHA:', error);
+                  reject(error);
+                });
+            });
+          }
+        }, 100);
+
+        // Timeout más largo (5 segundos)
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          reject(new Error('Tiempo de espera agotado para reCAPTCHA'));
+        }, 5000);
+      }
     });
   } catch (error) {
     console.error('Error en reCAPTCHA:', error);
-    // Fallback for development
+    // Fallback para desarrollo
     if (window.location.hostname === 'localhost') {
       return 'TEST_TOKEN_LOCALHOST';
     }
