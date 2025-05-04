@@ -67,3 +67,8 @@
     font-size: 12px;
     margin-top: 5px;
   }
+  .spinner-border {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 10px;
+  }

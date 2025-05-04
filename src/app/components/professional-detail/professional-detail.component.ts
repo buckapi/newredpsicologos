@@ -209,100 +209,62 @@ toggleTag(tag: string) {
   }
 }
 
-/* loadRecaptchaScript() {
-  // Verificar si ya está cargado
-  if (typeof grecaptcha !== 'undefined') {
-    this.isRecaptchaLoaded = true;
-    console.log('reCAPTCHA ya está cargado');
-    return;
-  }
+loadRecaptchaScript() {
+  try {
+    // Verificar si ya está cargado
+    if (typeof grecaptcha !== 'undefined') {
+      this.isRecaptchaLoaded = true;
+      console.log('reCAPTCHA ya está cargado');
+      return;
+    }
 
-  // Verificar si el script ya existe
-  const existingScript = document.querySelector('script[src*="recaptcha/api.js"]');
-  if (existingScript) {
-    console.log('Script de reCAPTCHA ya existe');
-    return;
-  }
+    // Verificar si el script ya existe
+    const existingScript = document.querySelector('script[src*="recaptcha/api.js"]');
+    if (existingScript) {
+      console.log('Script de reCAPTCHA ya existe');
+      return;
+    }
 
-  // Cargar el script dinámicamente
-  const script = document.createElement('script');
-  script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
-  script.async = true;
-  script.defer = true;
-  script.id = 'recaptcha-script';
+    // Cargar el script dinámicamente
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
+    script.async = true;
+    script.defer = true;
+    script.id = 'recaptcha-script';
 
-  script.onload = () => {
-    console.log('reCAPTCHA cargado correctamente');
-    this.isRecaptchaLoaded = true;
-    // Inicializar reCAPTCHA
-    grecaptcha.ready(() => {
-      console.log('reCAPTCHA inicializado');
-    });
-  };
+    script.onload = () => {
+      console.log('Script de reCAPTCHA cargado');
+      // Esperar un poco más para asegurarnos que grecaptcha está completamente listo
+      setTimeout(() => {
+        if (typeof grecaptcha !== 'undefined') {
+          console.log('reCAPTCHA inicializado correctamente');
+          this.isRecaptchaLoaded = true;
+          // Inicializar el widget de reCAPTCHA
+          grecaptcha.ready(() => {
+            grecaptcha.render('recaptcha-container', {
+              sitekey: environment.recaptchaSiteKey,
+              size: 'invisible'
+            });
+          });
+        } else {
+          console.error('reCAPTCHA no se inicializó correctamente');
+          this.isRecaptchaLoaded = false;
+        }
+      }, 1000);
+    };
 
-  script.onerror = (error) => {
-    console.error('Error al cargar reCAPTCHA:', error);
-    this.isRecaptchaLoaded = false;
-    alert('Error al cargar el sistema de verificación. Por favor, intenta recargar la página.');
-  };
-
-  document.head.appendChild(script);
-} */
-  loadRecaptchaScript() {
-    try {
-      // Verificar si ya está cargado
-      if (typeof grecaptcha !== 'undefined') {
-        this.isRecaptchaLoaded = true;
-        console.log('reCAPTCHA ya está cargado');
-        return;
-      }
-  
-      // Verificar si el script ya existe
-      const existingScript = document.querySelector('script[src*="recaptcha/api.js"]');
-      if (existingScript) {
-        console.log('Script de reCAPTCHA ya existe');
-        return;
-      }
-  
-      // Verificar si tenemos el site key
-      if (!environment.recaptchaSiteKey) {
-        console.error('Site key de reCAPTCHA no configurado');
-        return;
-      }
-  
-      // Cargar el script dinámicamente
-      const script = document.createElement('script');
-      script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
-      script.async = true;
-      script.defer = true;
-      script.id = 'recaptcha-script';
-  
-      script.onload = () => {
-        console.log('Script de reCAPTCHA cargado');
-        // Esperar un poco más para asegurarnos que grecaptcha está completamente listo
-        setTimeout(() => {
-          if (typeof grecaptcha !== 'undefined') {
-            console.log('reCAPTCHA inicializado correctamente');
-            this.isRecaptchaLoaded = true;
-          } else {
-            console.error('reCAPTCHA no se inicializó correctamente');
-            this.isRecaptchaLoaded = false;
-          }
-        }, 1000);
-      };
-  
-      script.onerror = (error) => {
-        console.error('Error al cargar reCAPTCHA:', error);
-        this.isRecaptchaLoaded = false;
-        alert('Error al cargar el sistema de verificación. Por favor, intenta recargar la página.');
-      };
-  
-      document.head.appendChild(script);
-    } catch (error) {
+    script.onerror = (error) => {
       console.error('Error al cargar reCAPTCHA:', error);
       this.isRecaptchaLoaded = false;
-    }
+      alert('Error al cargar el sistema de verificación. Por favor, intenta recargar la página.');
+    };
+
+    document.head.appendChild(script);
+  } catch (error) {
+    console.error('Error al cargar reCAPTCHA:', error);
+    this.isRecaptchaLoaded = false;
   }
+}
 
 async executeRecaptcha(action: string): Promise<string> {
   try {
@@ -310,99 +272,91 @@ async executeRecaptcha(action: string): Promise<string> {
       throw new Error('reCAPTCHA no está listo');
     }
 
-    if (!environment.recaptchaSiteKey) {
-      throw new Error('Site key de reCAPTCHA no configurado');
-    }
-
     return new Promise((resolve, reject) => {
       if (typeof grecaptcha !== 'undefined') {
         grecaptcha.ready(() => {
+          console.log('Intentando ejecutar reCAPTCHA');
           grecaptcha.execute(environment.recaptchaSiteKey, { action })
-            .then(resolve)
+            .then((token: string) => {
+              console.log('reCAPTCHA ejecutado correctamente');
+              resolve(token);
+            })
             .catch((error: any) => {
               console.error('Error ejecutando reCAPTCHA:', error);
               reject(error);
             });
         });
       } else {
-        // Si no está listo, esperar un poco más
-        const checkInterval = setInterval(() => {
-          if (typeof grecaptcha !== 'undefined') {
-            clearInterval(checkInterval);
-            grecaptcha.ready(() => {
-              grecaptcha.execute(environment.recaptchaSiteKey, { action })
-                .then(resolve)
-                .catch((error: any) => {
-                  console.error('Error ejecutando reCAPTCHA:', error);
-                  reject(error);
-                });
-            });
-          }
-        }, 100);
-
-        // Timeout más largo (5 segundos)
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          reject(new Error('Tiempo de espera agotado para reCAPTCHA'));
-        }, 5000);
+        reject(new Error('reCAPTCHA no está disponible'));
       }
     });
   } catch (error) {
     console.error('Error en reCAPTCHA:', error);
-    // Fallback para desarrollo
-    if (window.location.hostname === 'localhost') {
-      return 'TEST_TOKEN_LOCALHOST';
-    }
     throw error;
   }
 }
 
 async submitReview() {
   try {
-    if (!this.isRecaptchaLoaded || this.isSubmitting) {
-      if (!this.isRecaptchaLoaded) {
-        alert('El sistema de verificación no está listo. Por favor espera un momento.');
-        return;
-      }
-      if (this.isSubmitting) {
-        alert('Ya se está procesando tu solicitud. Por favor espera.');
-        return;
-      }
+    if (!this.isRecaptchaLoaded) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El sistema de verificación no está listo. Por favor espera un momento.'
+      });
+      return;
     }
 
     this.isSubmitting = true;
     
-    const token = await this.executeRecaptcha('submit_review');
-    
-    // Verificar el token con el backend
-    const isValid = await this.ratingService.verifyToken(token);
-    if (!isValid) {
-      alert('Error en la verificación de seguridad. Por favor intenta nuevamente.');
+    try {
+      const token = await this.executeRecaptcha('submit_review');
+      console.log('Token obtenido:', token);
+      
+      // Verificar el token con el backend
+      const isValid = await this.ratingService.verifyToken(token);
+      if (!isValid) {
+        throw new Error('Token de verificación inválido');
+      }
+
+      // Resto de tu lógica de envío...
+      const reviewData = {
+        ...this.reviewForm.value,
+        recaptchaToken: token,
+        idUser: this.authService.getCurrentUser()?.id,
+        idSpecialist: this.global.previewProfesionals.id,
+        score: this.currentRating,
+        tags: this.selectedTags.join(', ')
+      };
+
+      await this.ratingService.createRating(reviewData);
+      
+      // Resetear el formulario y mostrar mensaje de éxito
+      this.resetFormReview();
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito',
+        text: '¡Gracias por tu opinión! Se ha enviado con éxito.'
+      });
+
+    } catch (error) {
+      console.error('Error en el proceso de envío:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al procesar tu solicitud. Por favor intenta nuevamente.'
+      });
+    } finally {
       this.isSubmitting = false;
-      return;
     }
 
-    // Resto de tu lógica de envío...
-    const reviewData = {
-      ...this.reviewForm.value,
-      recaptchaToken: token,
-      idUser: this.authService.getCurrentUser()?.id,
-      idSpecialist: this.global.previewProfesionals.id,
-      score: this.currentRating,
-      tags: this.selectedTags.join(', ')
-    };
-
-    await this.ratingService.createRating(reviewData);
-    
-    // Resetear el formulario y mostrar mensaje de éxito
-    this.resetFormReview();
-    Swal.fire('Éxito', '¡Gracias por tu opinión! Se ha enviado con éxito.', 'success');
-    
   } catch (error) {
-    console.error('Error:', error);
-    Swal.fire('Error', 'Error al procesar tu solicitud. Por favor intenta nuevamente.', 'error');
-  } finally {
-    this.isSubmitting = false;
+    console.error('Error general:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Error inesperado. Por favor intenta recargar la página.'
+    });
   }
 }
 
