@@ -1,7 +1,7 @@
 <section class="doctors-dashboard bg-color-3">
     <div class="left-panel">
-        <div class="profile-box">
-            <div class="upper-box">
+        <div class="profile-box" *ngIf="!isProfessional && !isAdmin">
+            <div class="upper-box" >
                 <figure class="profile-image">
                     <img [src]="authService.getImage()" alt="Profile Image" />
                 </figure>
@@ -14,13 +14,14 @@
                     </div>
                 </div>
             </div>
-            <div class="profile-info">
+            
+            <div class="profile-info" >
                 <ul class="list clearfix">
                    
                     <li><a href="dashboard" style="cursor: pointer;"><i
                                 class="fas fa-home"></i>Cuenta</a></li>
                     <li><a (click)="global.activeRoute = 'profile'" style="cursor: pointer;"><i
-                                class="fas fa-user"></i>Actualizar datos</a></li>
+                                class="fas fa-user"></i>Perfil</a></li>
                     <li><a style="cursor: pointer;"><i class="fas fa-unlock-alt"></i>Cambiar contraseña</a></li>
                     <li><a (click)="global.activeRoute = 'reviews'" style="cursor: pointer;"><i class="fas fa-comment"></i>Comentarios y Calificaciones</a></li>
                     <li>
@@ -33,20 +34,37 @@
                 </ul>
             </div>
         </div>
+        <div class="profile-box" *ngIf="isAdmin">
+            <div class="upper-box">
+                <figure class="profile-image"><img src="assets/images/team/avatar.png" alt="" style="width: 50%;
+                    padding: 10px;
+                    margin: 10px;
+                "></figure>
+                <div class="title-box centred">
+                    <div class="inner">
+                        <h3>Administrador</h3>
+                        <p>Red Psicólogos Chile</p>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-info" >
+                <ul class="list clearfix">
+                    <li><a (click)="global.setMenuOption('settings')" [class.current]="global.menuSelected === 'settings'" style="cursor: pointer;"><i class="fas fa-cog"></i>Ajustes</a></li>
+                    <li><a (click)="global.setMenuOption('dashboard')" [class.current]="global.menuSelected === 'dashboard'" style="cursor: pointer;"><i class="fas fa-users"></i>Especialistas</a></li>
+                    <li><a (click)="global.setMenuOption('reviews')" [class.current]="global.menuSelected === 'reviews'" style="cursor: pointer;"><i class="fas fa-star"></i>Calificaciones</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
     
     <div class="right-panel">
-        <div class="content-container">
+        <div class="content-container" *ngIf="!isProfessional && !isAdmin">
             <div class="outer-container">
                 <div class="review-list">
                     <div class="title-box clearfix">
                         <div class="text pull-left"><h3>Comentarios y Calificaciones</h3></div>
                         <div class="select-box pull-right">
-                            <!-- <select class="wide">
-                               <option data-display="Any Time">Any Time</option>
-                               <option value="1">Latest Reviews</option>
-                               <option value="2">Oldest Reviews</option>
-                            </select> -->
+                           
                         </div>
                     </div>
                     <div class="comment-inner">
@@ -128,6 +146,65 @@
                                 </ul>
                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod ux tempor incididunt labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.</p>
                                 <a href="review.html" class="replay-btn"><i class="fas fa-share"></i>Reply Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination-wrapper">
+                    <ul class="pagination">
+                        <li><a href="clinic-1.html" class="current">1</a></li>
+                        <li><a href="clinic-1.html">2</a></li>
+                        <li><a href="clinic-1.html">3</a></li>
+                        <li><a href="clinic-1.html"><i class="icon-Arrow-Right"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="content-container" *ngIf="isAdmin">
+            <div class="outer-container">
+                <div class="review-list">
+                    <div class="title-box clearfix">
+                        <div class="text pull-left"><h3>Comentarios y Calificaciones</h3></div>
+                        <div class="select-box pull-right">
+                           
+                        </div>
+                    </div>
+                    <div class="comment-inner">
+                        <div class="single-comment-box" *ngFor="let rating of realtimeRatings.ratings$ | async">
+                            <div class="comment">
+                                <figure class="comment-thumb"><img src="assets/images/team/avatar.png" alt=""></figure>
+                                <div class="comment-info">
+                                    <h3>{{getProfessionalNameById(rating.idSpecialist)}}</h3>
+                                    <h4>{{rating.title}}</h4>
+                                    <h4>{{rating.comment}}</h4>
+                                    <span class="comment-time"><i class="fas fa-calendar-alt"></i>{{rating.created | date:'mediumDate'}}</span>
+                                </div>
+                                <div class="rating-container">
+                                    <ul class="rating clearfix">
+                                        <li *ngFor="let star of getStarArray(5); index as i">
+                                            <i class="fas fa-star" [class.light]="i < rating.score"></i>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tags-container">
+                                    <ul class="tags">
+                                        <li >
+                                            <span class="tag">{{rating.tags}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="actions review-actions col-6" *ngIf="isAdmin">
+                                    <button class="review-action-btn approve-btn" (click)="approveReview(rating)" [disabled]="rating.status === 'approved'">
+                                        {{ rating.status === 'approved' ? 'Aprobado' : 'Aprobar' }}
+                                    </button>
+                                    <button class="review-action-btn reject-btn" (click)="rejectReview(rating)" [disabled]="rating.status === 'rejected'">
+                                        {{ rating.status === 'rejected' ? 'Rechazado' : 'Rechazar' }}
+                                    </button>
+                                    <button class="review-action-btn reject-btn" (click)="deleteRating(rating.id)">
+                                        Eliminar
+                                    </button>
+                                </div>
+                                <div class="status-badge">{{getStatusText(rating)}}</div>
                             </div>
                         </div>
                     </div>

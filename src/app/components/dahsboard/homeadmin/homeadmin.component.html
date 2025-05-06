@@ -15,9 +15,9 @@
             </div>
             <div class="profile-info">
                 <ul class="list clearfix">
-                    <li><a (click)="global.setMenuOption('settings')" style="cursor: pointer;"><i class="fas fa-cog"></i>Ajustes</a></li>
-                    <li><a (click)="global.setMenuOption('dashboard')" class="current" style="cursor: pointer;"><i class="fas fa-users"></i>Especialistas</a></li>
-                    <li><a (click)="global.setMenuOption('settings')" style="cursor: pointer;"><i class="fas fa-calendar-alt"></i>Planes de suscripción</a></li>
+                    <li><a (click)="global.setMenuOption('settings')" [class.current]="global.menuSelected === 'settings'" style="cursor: pointer;"><i class="fas fa-cog"></i>Ajustes</a></li>
+                    <li><a (click)="global.setMenuOption('dashboard')" [class.current]="global.menuSelected === 'dashboard'" style="cursor: pointer;"><i class="fas fa-users"></i>Especialistas</a></li>
+                    <li><a (click)="global.setMenuOption('reviews')" [class.current]="global.menuSelected === 'reviews'" style="cursor: pointer;"><i class="fas fa-star"></i>Calificaciones</a></li>
                 </ul>
             </div>
         </div>
@@ -53,7 +53,7 @@
                                         <div class="pattern-2" style="background-image: url(assets/images/shape/shape-82.png);"></div>
                                     </div>
                                     <div class="icon-box"><i class="icon-Dashboard-5"></i></div>
-                                    <h3>320</h3>
+                                    <h3>{{totalRatings}}</h3>
                                     <h5>Total comentarios</h5>
                                 </div>
                             </div>
@@ -109,7 +109,7 @@
                                         <div class="pattern-2" style="background-image: url(assets/images/shape/shape-82.png);"></div>
                                     </div>
                                     <div class="icon-box"><i class="icon-Dashboard-5"></i></div>
-                                    <h3>320</h3>
+                                    <h3>{{totalRatings}}</h3>
                                     <h5>Total comentarios</h5>
 <!--                                     <p>Lorem ipsum dolor  amet eiusmod tempor.</p>
  -->                                </div>
@@ -212,5 +212,5 @@
    
     
     <app-settings [hidden]="global.menuSelected !== 'settings' || auth.getType() !== 'admin'"></app-settings>
-    
+    <app-reviews [hidden]="global.menuSelected !== 'reviews' || auth.getType() !== 'admin'"></app-reviews>
 </section>

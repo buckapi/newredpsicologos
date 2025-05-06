@@ -55,7 +55,7 @@
                             <ul class="doctors-list clearfix">
                                 <li><a >Individual, grupal o de pareja</a></li>
                             </ul>
-                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'; global.scrollToTop()" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
                             <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                             <ul class="doctors-list clearfix">
                                 <li><a >Gestalt, Psicodinámico, Psicoanálisis ... </a></li>
                             </ul>
-                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'; global.scrollToTop()" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
                             <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                             <ul class="doctors-list clearfix">
                                 <li><a>Ubica a un especialista según la región</a></li>
                             </ul>
-                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
+                            <div class="btn-box"><a  class="theme-btn-one" (click)="global.activeRoute='professionals'; global.scrollToTop()" style="cursor: pointer;">Ver todas<i class="icon-Arrow-Right"></i></a></div>
                             <div class="link"><a ><i class="icon-Arrow-Right"></i></a></div>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <a class="btn theme-btn-one" (click)="global.goToDetail(profesional); global.scrollToTop()">Ver perfil <i class="icon-Arrow-Right"></i></a>
+                                <a class="btn theme-btn-one" (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer; margin-top: 10px;">Ver perfil <i class="icon-Arrow-Right"></i></a>
 
                                 
                             </div>
@@ -177,7 +177,7 @@
                             </ul>
                             <div class="location-box">
                                 <p><i class="fas fa-map-marker-alt"></i>{{profesional.consultationAddress}}</p>
-                                <a class="btn theme-btn-one" (click)="global.goToDetail(profesional); global.scrollToTop()">Ver perfil <i class="icon-Arrow-Right"></i></a>
+                                <a class="btn theme-btn-one" (click)="global.goToDetail(profesional); global.scrollToTop()" style="cursor: pointer; margin-top: 10px;">Ver perfil <i class="icon-Arrow-Right"></i></a>
 
                             </div>
                         </div>
@@ -186,7 +186,7 @@
             </div>
         </div>
         <div class="more-btn centred">
-            <button class="btn theme-btn-one" (click)="global.activeRoute='professionals'">Todos los Especialistas <i class="icon-Arrow-Right"></i></button>
+            <button class="btn theme-btn-one" (click)="global.activeRoute='professionals'; global.scrollToTop()">Todos los Especialistas <i class="icon-Arrow-Right"></i></button>
         </div>
     </div>
 </section>
@@ -213,7 +213,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12 processing-block">
                     <div class="processing-block-two">
                         <div class="inner-box">
-                            <figure class="icon-box"><img src="assets/images/icons/icon-9.png" alt=""></figure>
+                            <figure class="icon-box"><img src="assets/images/icons/icon-9.png" alt="" (click)="global.activeRoute='professionals'; global.scrollToTop()"></figure>
                             <h3>Buscar Psicologo</h3>
                         </div>
                     </div>
@@ -221,7 +221,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12 processing-block">
                     <div class="processing-block-two">
                         <div class="inner-box">
-                            <figure class="icon-box"><img src="assets/images/icons/icon-10.png" alt=""></figure>
+                            <figure class="icon-box"><img src="assets/images/icons/icon-10.png" alt="" (click)="global.activeRoute='professionals'; global.scrollToTop()"></figure>
                             <h3>Ver Perfil Profesional</h3>
                         </div>
                     </div>
@@ -229,7 +229,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12 processing-block">
                     <div class="processing-block-two">
                         <div class="inner-box">
-                            <figure class="icon-box"><img src="assets/images/icons/icon-11.png" alt=""></figure>
+                            <figure class="icon-box"><img src="assets/images/icons/icon-11.png" alt="" (click)="global.activeRoute='professionals'; global.scrollToTop()"></figure>
                             <h3>Reserva tu cita</h3>
                         </div>
                     </div>
@@ -448,7 +448,7 @@
                             <a (click)="global.activeRoute='register'" class="download-btn app-store">
                                 <i class="fa fa-user"></i>
                                 <span>REGISTRATE</span>
-                                <h3>Gana tu primer cliente y un descuento por invitación</h3>
+                                <h3>Accede a un amplio directorio de psicólogos!</h3>
                             </a>
                             <!-- <a (click)="global.setRoute('login')" class="download-btn play-store">
                                 <i class="fab fa-google-play"></i>

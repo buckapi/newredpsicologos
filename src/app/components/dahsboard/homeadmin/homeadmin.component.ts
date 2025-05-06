@@ -9,11 +9,14 @@ import { GlobalService } from '../../../service/global.service';
 import { RealtimeEspecialidadesService } from '../../../service/realtime-especialidades.service';
 import { RealtimeTerapiaService } from '../../../service/realtime-terapia.service';
 import { RealtimeTratamientosService } from '../../../service/realtime-tratamientos.service';
+import { ReviewsComponent } from '../reviews/reviews.component';
+import { PsychologistRatingService } from '../../../service/psychologistRatingService.service';
+import { RealtimeRatingsService } from '../../../service/realtime-ratings.service';
 @Component({
   selector: 'app-homeadmin',
   standalone: true,
   imports: [CommonModule,
-    SettingsComponent
+    SettingsComponent, ReviewsComponent
   ],
   templateUrl: './homeadmin.component.html',
   styleUrl: './homeadmin.component.css'
@@ -24,14 +27,17 @@ export class HomeadminComponent {
   profesionals: any[] = [];
   specialists: any[] = [];
   selectedRequest: any = null;
+  totalRatings: number = 0;
+
 constructor(
   public auth:AuthPocketbaseService,
   public realtimeProfesionales: RealtimeProfessionalsService,
   public global: GlobalService,
   public realtimeEspecialidades: RealtimeEspecialidadesService,
   public realtimeTerapias: RealtimeTerapiaService,
-  public realtimeTratamientos: RealtimeTratamientosService
-){
+  public realtimeTratamientos: RealtimeTratamientosService,
+  public ratingService: PsychologistRatingService,
+  public realtimeRatings: RealtimeRatingsService){
   
 }
 showDetails(profesional: any) {
@@ -133,7 +139,8 @@ hoursDate(date: string): string {
 ngOnInit(): void {
   this.realtimeProfesionales.profesionales$.subscribe(data => {
     this.profesionals = data; // Almacena los datos en la propiedad
-});
+    this.global.setMenuOption('dashboard');
+  });
 
   this.realtimeEspecialidades.especialidades$.subscribe(especialidades => {
     this.specialists = especialidades;
@@ -144,6 +151,11 @@ ngOnInit(): void {
   this.realtimeTratamientos.tratamientos$.subscribe(tratamientos => {
     this.specialists = tratamientos;
   });
+  // Suscribirse al Observable de ratings
+  this.realtimeRatings.ratings$.subscribe(ratings => {
+    this.totalRatings = ratings.length;
+  });
+  
 }
 
 async deleteEspecialidad(especialidad: any) {

@@ -72,4 +72,12 @@ export class PsychologistRatingService {
         return false;
       }
     }
+    async updateReviewStatus(id: string, status: string) {
+      try {
+        await this.pb.collection('psychologistsRatings').update(id, { status });
+      } catch (error) {
+        console.error('Error updating review status:', error);
+        throw error;
+      }
+    }
   }

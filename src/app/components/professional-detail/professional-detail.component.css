@@ -3,7 +3,6 @@
 /* Estilos para las reseñas */
 .review-box {
     background: #fff;
-    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
   }
@@ -71,4 +70,47 @@
     width: 2rem;
     height: 2rem;
     margin-right: 10px;
+  }
+  
+  .custom-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  
+  .material-control-indicator {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #4e6baf;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .material-control-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 0;
+    height: 0;
+  }
+  
+  .material-control-input:checked + .material-control-indicator {
+    background-color: #4e6baf;
+    border-color: #4e6baf;
+  }
+  
+  .material-control-input:checked + .material-control-indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 4px;
+    border-bottom: 2px solid white;
+    border-right: 2px solid white;
+    transform: translate(-50%, -50%) rotate(45deg);
   }

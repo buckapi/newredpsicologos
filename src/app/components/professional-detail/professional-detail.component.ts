@@ -38,6 +38,8 @@ reviewForm: FormGroup;
   ratingDistribution = [0, 0, 0, 0, 0];
   ratings: any[] = [];
   isSubmitting = false;
+
+  
 constructor(
   public global: GlobalService,
   public fb: FormBuilder,
@@ -370,5 +372,8 @@ resetFormReview() {
 openTerms(event: Event) {
   event.preventDefault();
   // Lógica para mostrar términos y condiciones
+}
+get Array() {
+  return Array;
 }
 }
