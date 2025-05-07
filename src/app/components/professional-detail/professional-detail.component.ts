@@ -8,8 +8,13 @@ import { ElementRef } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import Swal from 'sweetalert2';
 
-
 declare var grecaptcha: any; 
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
+
 @Component({
   selector: 'app-professional-detail',
   standalone: true,
@@ -38,7 +43,7 @@ reviewForm: FormGroup;
   ratingDistribution = [0, 0, 0, 0, 0];
   ratings: any[] = [];
   isSubmitting = false;
-
+  recaptchaLoaded = false;
   
 constructor(
   public global: GlobalService,
@@ -52,45 +57,15 @@ constructor(
     recaptcha: [''],
     terms: [false]
   });
+
 }
 ngOnInit() {
   this.profesional = this.global.previewProfesionals;
   this.resetForm();  
   this.loadRatings();
 }
-ngAfterViewInit() {
-  // Verificar explícitamente si estamos en producción
-  if (!environment.production) {
-    console.error('¡ADVERTENCIA! Estás usando el entorno de desarrollo');
-    // En producción, forzar el uso del site key de producción
-    if (window.location.hostname === 'redpsicologos.cl') {
-      console.log('Forzando uso de site key de producción');
-      environment.recaptchaSiteKey = '6Leeui0rAAAAAMyUKhrnhgGwJDajrKJ8yk3FZK7T';
-      environment.recaptchaSecretKey = '6Leeui0rAAAAAFPGCAomijcMLh0ewkApJvXxcB5d';
-    }
-  }
 
-  console.log('Entorno actual:', environment);
-  console.log('Production:', environment.production);
-  console.log('Site key:', environment.recaptchaSiteKey);
-  
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-  this.loadRecaptchaScript();
-  // Inicializar el widget de reCAPTCHA
-  if (typeof grecaptcha !== 'undefined') {
-    grecaptcha.ready(() => {
-      grecaptcha.render('recaptcha-container', {
-        sitekey: environment.recaptchaSiteKey,
-        size: 'invisible'
-      });
-    });
-  }
-}
-
-private cleanPhoneNumber(phone: string): string {
+public cleanPhoneNumber(phone: string): string {
   return phone.replace(/[^0-9]/g, '');
 }
 
@@ -211,86 +186,58 @@ toggleTag(tag: string) {
   }
 }
 
-loadRecaptchaScript() {
-  try {
-    // Verificar si ya está cargado
-    if (typeof grecaptcha !== 'undefined') {
-      this.isRecaptchaLoaded = true;
-      console.log('reCAPTCHA ya está cargado');
+ngAfterViewInit() {
+  this.loadRecaptchaV3();
+}
+
+private loadRecaptchaV3(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Si ya está cargado
+    if (window.grecaptcha) {
+      resolve();
       return;
     }
 
-    // Verificar si el script ya existe
-    const existingScript = document.querySelector('script[src*="recaptcha/api.js"]');
-    if (existingScript) {
-      console.log('Script de reCAPTCHA ya existe');
-      return;
-    }
-
-    // Cargar el script dinámicamente
+    // 1. Crea el script
     const script = document.createElement('script');
     script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
     script.async = true;
     script.defer = true;
-    script.id = 'recaptcha-script';
+    script.id = 'recaptcha-v3-script';
 
+    // 2. Define callbacks
     script.onload = () => {
-      console.log('Script de reCAPTCHA cargado');
-      // Esperar un poco más para asegurarnos que grecaptcha está completamente listo
-      setTimeout(() => {
-        if (typeof grecaptcha !== 'undefined') {
-          console.log('reCAPTCHA inicializado correctamente');
-          this.isRecaptchaLoaded = true;
-          // Inicializar el widget de reCAPTCHA
-          grecaptcha.ready(() => {
-            grecaptcha.render('recaptcha-container', {
-              sitekey: environment.recaptchaSiteKey,
-              size: 'invisible'
-            });
-          });
-        } else {
-          console.error('reCAPTCHA no se inicializó correctamente');
-          this.isRecaptchaLoaded = false;
-        }
-      }, 1000);
+      this.isRecaptchaLoaded = true;
+      resolve();
     };
 
-    script.onerror = (error) => {
-      console.error('Error al cargar reCAPTCHA:', error);
-      this.isRecaptchaLoaded = false;
-      alert('Error al cargar el sistema de verificación. Por favor, intenta recargar la página.');
+    script.onerror = () => {
+      reject(new Error('Error al cargar reCAPTCHA'));
     };
 
-    document.head.appendChild(script);
-  } catch (error) {
-    console.error('Error al cargar reCAPTCHA:', error);
-    this.isRecaptchaLoaded = false;
-  }
-}
-
-async executeRecaptcha(action: string): Promise<string> {
-  try {
-    if (!this.isRecaptchaLoaded) {
-      throw new Error('reCAPTCHA no está listo');
+    // 3. Elimina scripts anteriores si existen
+    const oldScript = document.getElementById('recaptcha-v3-script');
+    if (oldScript) {
+      document.head.removeChild(oldScript);
     }
 
-    return new Promise((resolve, reject) => {
-      if (typeof grecaptcha !== 'undefined') {
-        grecaptcha.ready(() => {
-          console.log('Intentando ejecutar reCAPTCHA');
-          grecaptcha.execute(environment.recaptchaSiteKey, { action })
-            .then((token: string) => {
-              console.log('reCAPTCHA ejecutado correctamente');
-              resolve(token);
-            })
-            .catch((error: any) => {
-              console.error('Error ejecutando reCAPTCHA:', error);
-              reject(error);
-            });
-        });
-      } else {
-        reject(new Error('reCAPTCHA no está disponible'));
-      }
+    // 4. Añade el nuevo script
+    document.head.appendChild(script);
+  });
+}
+
+async executeRecaptchaV3(): Promise<string> {
+  try {
+    if (!this.isRecaptchaLoaded) {
+      await this.loadRecaptchaV3();
+    }
+
+    return new Promise((resolve) => {
+      window.grecaptcha.ready(() => {
+        window.grecaptcha.execute(environment.recaptchaSiteKey, {
+          action: 'submit_review' // Acción específica para tracking
+        }).then(resolve);
+      });
     });
   } catch (error) {
     console.error('Error en reCAPTCHA:', error);
@@ -298,67 +245,67 @@ async executeRecaptcha(action: string): Promise<string> {
   }
 }
 
-async submitReview() {
-  try {
-    if (!this.isRecaptchaLoaded) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'El sistema de verificación no está listo. Por favor espera un momento.'
-      });
-      return;
-    }
 
-    this.isSubmitting = true;
+public initializeRecaptcha() {
+  if (typeof grecaptcha === 'undefined') {
+    console.error('reCAPTCHA not available');
+    this.isRecaptchaLoaded = false;
+    return;
+  }
+
+  grecaptcha.ready(() => {
+    console.log('reCAPTCHA ready');
+    this.isRecaptchaLoaded = true;
     
-    try {
-      const token = await this.executeRecaptcha('submit_review');
-      console.log('Token obtenido:', token);
-      
-      // Verificar el token con el backend
-      const isValid = await this.ratingService.verifyToken(token);
-      if (!isValid) {
-        throw new Error('Token de verificación inválido');
-      }
+    // Para reCAPTCHA v3 no necesitamos renderizar un widget visible
+    // Solo verificamos que la librería está cargada
+  });
+}
 
-      // Resto de tu lógica de envío...
-      const reviewData = {
-        ...this.reviewForm.value,
-        recaptchaToken: token,
-        idUser: this.authService.getCurrentUser()?.id,
-        idSpecialist: this.global.previewProfesionals.id,
-        score: this.currentRating,
-        tags: this.selectedTags.join(', ')
-      };
+async submitReview() {
+  // Validar formulario primero
+  if (this.reviewForm.invalid) {
+    this.reviewForm.markAllAsTouched();
+    return;
+  }
 
-      await this.ratingService.createRating(reviewData);
-      
-      // Resetear el formulario y mostrar mensaje de éxito
-      this.resetFormReview();
-      Swal.fire({
-        icon: 'success',
-        title: 'Éxito',
-        text: '¡Gracias por tu opinión! Se ha enviado con éxito.'
-      });
-
-    } catch (error) {
-      console.error('Error en el proceso de envío:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error al procesar tu solicitud. Por favor intenta nuevamente.'
-      });
-    } finally {
-      this.isSubmitting = false;
+  try {
+    const token = await this.executeRecaptchaV3();
+    
+    if (!await this.ratingService.verifyToken(token)) {
+      throw new Error('Verificación de seguridad fallida');
     }
+
+    // Preparar datos del review
+    const reviewData = {
+      ...this.reviewForm.value,
+      recaptchaToken: token,
+      idUser: this.authService.getCurrentUser()?.id,
+      idSpecialist: this.global.previewProfesionals.id,
+      score: this.currentRating,
+      tags: this.selectedTags.join(', ')
+    };
+
+    // Enviar review
+    await this.ratingService.createRating(reviewData);
+    
+    // Mostrar éxito y resetear
+    Swal.fire({
+      icon: 'success',
+      title: '¡Gracias!',
+      text: 'Tu reseña ha sido enviada correctamente.'
+    });
+    this.resetFormReview();
 
   } catch (error) {
-    console.error('Error general:', error);
+    console.error('Error submitting review:', error);
     Swal.fire({
       icon: 'error',
       title: 'Error',
-      text: 'Error inesperado. Por favor intenta recargar la página.'
+      text: 'Hubo un problema al enviar tu reseña. Por favor intenta nuevamente.'
     });
+  } finally {
+    this.isSubmitting = false;
   }
 }
 
@@ -375,5 +322,16 @@ openTerms(event: Event) {
 }
 get Array() {
   return Array;
+}
+// Prueba esta función en tu componente
+async testRecaptcha() {
+  try {
+    const token = await this.executeRecaptchaV3();
+    console.log('Token obtenido:', token);
+    alert('reCAPTCHA funciona correctamente! Token: ' + token);
+  } catch (error) {
+    console.error('Error en prueba:', error);
+    alert('Error: ' + (error as Error).message);
+  }
 }
 }

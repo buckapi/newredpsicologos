@@ -63,6 +63,21 @@ export class ReviewsComponent {
     if (!obj) return false;
     return Object.values(obj).some(val => val === true);
   }
+   // Método para normalizar el score
+   getNormalizedScore(score: number): number {
+    if (!score) return 0;
+    return Math.min(Math.max(0, score), 5); // Limitar entre 0 y 5
+  }
+
+  // Método para obtener el número de estrellas completas
+  getFilledStars(score: number): number {
+    return Math.floor(this.getNormalizedScore(score));
+  }
+
+  // Método para obtener el número de estrellas vacías
+  getEmptyStars(score: number): number {
+    return 5 - this.getFilledStars(score);
+  }
   
   getSelectedItems(obj: any): string[] {
     if (!obj) return [];

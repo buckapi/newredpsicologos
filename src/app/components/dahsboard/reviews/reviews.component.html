@@ -181,6 +181,8 @@
                                 </div>
                                 <div class="rating-container">
                                     <ul class="rating clearfix">
+                                        <span class="">{{rating.score}}</span>
+
                                         <li *ngFor="let star of getStarArray(5); index as i">
                                             <i class="fas fa-star" [class.light]="i < rating.score"></i>
                                         </li>

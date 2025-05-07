@@ -170,11 +170,11 @@
                                       <div class="content-box">
                                         <div class="title-inner">
                                           <h3>Deja un comentario</h3>
-                                          <p>Deja un comentario para el especialista, nos ayuda a mejorar</p>
+                                          <p>Dejanos tu comentario para el especialista, nos ayuda a mejorar la atención</p>
                                         </div>
                                         <div class="content-inner">
                                           <div class="rating-box">
-                                            <h4>Calificación</h4>
+                                            <h4>Califica según tu experiencia</h4>
                                             <ul class="rating clearfix">
                                               <li *ngFor="let star of [1,2,3,4,5]; let i = index" 
                                                   (click)="setRating(i+1)">
@@ -188,8 +188,8 @@
                                               <div class="row clearfix">
                                                 <!-- Título -->
                                                 <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                                  <label style="color: #00224f;">¿Qué dirías?</label>
-                                                  <input type="text" formControlName="title" placeholder="Si puedes decirlo en una frase, ¿qué dirías?" required>
+                                                  <label style="color: #00224f;">Dinos tu nombre</label>
+                                                  <input type="text" formControlName="title" placeholder="Nombre de paciente atendido" required>
                                                   <div *ngIf="reviewForm.get('title')?.errors && reviewForm.get('title')?.touched" class="error-message">
                                                     Por favor ingresa tu opinión
                                                   </div>
@@ -210,8 +210,8 @@
                                                 
                                                 <!-- Comentario -->
                                                 <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-                                                  <label style="color: #00224f;">Comentario (opcional)</label>
-                                                  <textarea formControlName="comment" placeholder="Escribe tu comentario aquí..."></textarea>
+                                                  <label style="color: #00224f;">¿Qué dirías?</label>
+                                                  <textarea formControlName="comment" placeholder="Si puedes decirlo en una frase, ¿qué dirías?"></textarea>
                                                 </div>
                                                 
                                                 
@@ -227,7 +227,6 @@
                                                     Por favor completa la verificación de seguridad
                                                   </div>
                                                 </div>
-                                                <div id="recaptcha-container"></div>
                                                 <!-- Términos -->
                                                 <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                                   <div class="custom-control material-checkbox">
