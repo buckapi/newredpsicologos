@@ -1,7 +1,6 @@
-/* Mover estos estilos al principio del archivo */
-:root {
-    --header-height: 0px; /* Altura del header */
-}
+.mat-typography {
+    padding-top: 0 !important;
+  }
 
 body {
     padding-top: var(--header-height) !important;
@@ -47,10 +46,6 @@ body.no-padding-top {
 .swal2-popup .swal2-confirm, .swal2-popup .swal2-cancel {
     border-radius: 25px !important; /* Adjust the value for more or less rounding */
 }
-/* nav.main-menu {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e7e7e7;
-} */
 
 nav.main-menu .navigation li {
     display: inline-block;
@@ -122,7 +117,8 @@ nav.main-menu .navigation li.active a {
 
 /* Añade padding al body para compensar el espacio del header fijo */
 body {
-    padding-top: 0px; /* Ajusta este valor según la altura de tu header */
+    padding-top: 0 !important;
+    margin-top: 0 !important;
 }
 
 @media (max-width: 768px) {
@@ -130,21 +126,4 @@ body {
         display: none;
     }
 }
-body {
-    padding-top: 80px; /* Ajusta este valor según la altura de tu header */
-}
-body {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
 
-/* Agregar esto al final de app.component.css */
-:host {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  body {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }

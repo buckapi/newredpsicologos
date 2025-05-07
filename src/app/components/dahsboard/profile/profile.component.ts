@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef,EventEmitter, NO_ERRORS_SCHEMA, AfterViewInit} from '@angular/core';
-import PocketBase from 'pocketbase';
+import PocketBase, { RecordModel } from 'pocketbase';
 import { BehaviorSubject } from 'rxjs';
 import { FormGroup,FormBuilder, ReactiveFormsModule, FormsModule, Validators, FormArray } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -1066,6 +1066,7 @@ async updateCertificate(certificateUrl: string) {
     }
   }
 }
+
   async ngOnInit() {
     this.initializeFormWithDefaults();
     
@@ -1449,5 +1450,36 @@ getTypeEspecialityText(): string {
     this.global.professionalInfo.typeEspeciality.includes(especiality.id)
   );
   return selectedEspecialities.length > 0 ? selectedEspecialities.map(e => e.name).join(', ') : 'No especificado';
+}
+// En tu servicio de autenticación o profesional
+async loadProfessionalData(): Promise<RecordModel> {
+  try {
+    const userId = this.authService.getUserId();
+    const professionalData = await this.pb.collection('professionals').getOne(userId);
+    
+    // Guardar en localStorage
+    localStorage.setItem('professionalData', JSON.stringify(professionalData));
+    
+    return professionalData ;
+  } catch (error) {
+    console.error('Error loading professional data:', error);
+    throw error;
+  }
+}
+
+// Al iniciar la aplicación
+async initializeApp() {
+  const savedData = localStorage.getItem('professionalData');
+  if (savedData) {
+    this.global.professionalInfo = JSON.parse(savedData);
+  }
+  
+  // Actualizar con datos frescos del servidor
+  try {
+    const freshData = await this.loadProfessionalData();
+    this.global.professionalInfo = freshData;
+  } catch (error) {
+    console.error('Could not refresh data, using cached version', error);
+  }
 }
 }

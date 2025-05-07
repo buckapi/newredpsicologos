@@ -80,6 +80,23 @@ body {
   background-position:center top;
   -webkit-font-smoothing: antialiased;
 }
+body {
+  padding-top: 0 !important;
+}
+.mat-sidenav-container {
+  padding-top: 0 !important;
+}
+/* html, body { 
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: auto; 
+} */
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 100vh;
+}
 
   @media (min-width:1200px) {
   .container {
