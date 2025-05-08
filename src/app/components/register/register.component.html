@@ -12,43 +12,59 @@
                     <!-- <a href="register-page.html">Not a Doctor?</a> -->
                 </div>
                 <div class="inner">
-                    <form (ngSubmit)="specialistRegister()" method="post" class="registration-form">
+                    <form [formGroup]="registerForm" (ngSubmit)="specialistRegister()" method="post" class="registration-form">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                 <label>Nombres</label>
-                                <input type="text" name="name" placeholder="Ingrese su nombre"  id="name" placeholder="Ingrese su nombre completo" 
-                                [(ngModel)]="name" name="name" required>
+                                <input type="text" formControlName="name" placeholder="Ingrese su nombre completo">
+                                <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="text-danger">
+                                    Nombre es requerido
+                                </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                 <label>Email</label>
-                                <input type="email" name="email"  [(ngModel)]="email" name="email" required  placeholder="Ingrese su correo">
+                                <input type="email" formControlName="email" placeholder="Ingrese su correo">
+                                <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-danger">
+                                    Email es requerido y debe ser válido
+                                </div>
                             </div>
                             
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                 <label>Password</label>
-                                <input type="password" name="password" [(ngModel)]="password" name="password" required  placeholder="Ingrese su contrasena">
+                                <input type="password" formControlName="password" placeholder="Ingrese su contrasena">
+                                <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-danger">
+                                    Contraseña debe tener al menos 6 caracteres
+                                </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                 <label>Confirmar contrasena</label>
-                                <input type="password" name="cpassword" [(ngModel)]="cpassword" name="cpassword" required  placeholder="Confirme su contrasena">
-                            </div> 
+                                <input type="password" formControlName="cpassword" placeholder="Confirme su contrasena">
+                                <div *ngIf="registerForm.get('cpassword')?.invalid && registerForm.get('cpassword')?.touched" class="text-danger">
+                                    Debe confirmar la contraseña
+                                </div>
+                                <div *ngIf="registerForm.hasError('mismatch') && registerForm.get('cpassword')?.touched" class="text-danger">
+                                    Las contraseñas no coinciden
+                                </div>
+                            </div>
+                            
                             <!-- Términos y condiciones -->
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                 <div class="custom-check-box">
                                     <div class="custom-controls-stacked">
                                         <label class="custom-control material-checkbox">
-                                            <input type="checkbox" class="material-control-input" required>
+                                            <input type="checkbox" formControlName="terms" class="material-control-input" required>
                                             <span class="material-control-indicator"></span>
                                             <span class="description">Aceptar <a href="">terminos y condiciones</a> y la <a href="">política de privacidad</a></span>
                                         </label>
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="col-lg-12 col-md-12 col-sm-12 form-group message-btn">
-                                <button type="submit" class="theme-btn-one" [disabled]="loading">
+                                <button type="submit" class="theme-btn-one" [disabled]="loading || registerForm.invalid">
                                     {{ loading ? 'Solicitando registro' : 'Registrarse' }}
                                     <i [hidden]="loading" class="icon-Arrow-Right"></i>
-                                    <img [hidden]="!loading" src="assets/images/loader.gif" width="40" alt="Registrando" /> <!-- Adjust the path to your loader image -->
+                                    <img [hidden]="!loading" src="assets/images/loader.gif" width="40" alt="Registrando" />
                                 </button>
                             </div>
                         </div>

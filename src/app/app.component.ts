@@ -18,7 +18,6 @@ import { HomeprofessionalComponent } from './components/dahsboard/homeprofession
 import { SettingsComponent } from './components/dahsboard/settings/settings.component';
 import { ReviewsComponent } from './components/dahsboard/reviews/reviews.component';
 import { HostListener } from '@angular/core';
-
 import { filter } from 'rxjs';
 @Component({
   selector: 'app-root',

@@ -1,0 +1,10 @@
+{
+  "/email-api": {
+    "target": "https://db.redpsicologos.cl:5542",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/email-api": ""
+    }
+  }
+}
