@@ -193,6 +193,7 @@ export class RegisterComponent {
         },
         error: (error) => this.handleRegistrationError(error)
       });
+      this.resetForm();
     } else {
       this.markFormGroupTouched(this.registerForm);
       Swal.fire({
@@ -236,40 +237,12 @@ export class RegisterComponent {
     });
   }
 
- /*  specialistRegister() {
-    if (this.name && this.email && this.password && this.name) {
-      this.loading = true;
-      const username = this.email.split('@')[0];
-      this.auth.registerUser(this.email, this.password, 'especialista', this.name, this.address, username).subscribe(
-        (response) => {
-          this.loading = false;
-          this.loginAfterRegistration(this.email, this.password);
-        },
-        (error) => {
-          this.loading = false;
-          console.error('Error sregistering user', error);
-        }
-      );
-    } else {
-      console.error('Please complete all required fields');
-    }
+  resetForm() {
+    this.registerForm.reset();
+    this.markFormGroupTouched(this.registerForm);
   }
-  
-  
-  loginAfterRegistration(email: string, password: string) {
-  
-    this.auth.loginUser(email, password).subscribe({
-      next: (response) => {
-        console.log('Inicio de sesión exitoso', response);
-        localStorage.setItem('isLoggedin', 'true');
-        this.auth.setUser(response.user);
-        this.global.activeRoute = 'homeprofessional';
-        this.auth.permision();
-      },
-      error: (error) => {
-        console.error('Error en el inicio de sesión:', error);
-        this.errorMessage = 'Credenciales incorrectas, intenta de nuevo.';
-      }
-    });
-  } */ 
+
+  ngOnDestroy() {
+    this.resetForm();
+  }
 }
