@@ -20,7 +20,7 @@ private apiUrl = '/email-api/welcome';  // Usa la ruta del proxy
     };
     return this.http.post(this.apiUrl, body);
   } */
-  sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: any): Observable<any> {
+  /* sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: any): Observable<any> {
     const body = {
       toEmail,
       toName,
@@ -39,6 +39,31 @@ private apiUrl = '/email-api/welcome';  // Usa la ruta del proxy
         return throwError(() => new Error('Error al enviar el correo de bienvenida'));
       })
     );
-  }
+  } */
 
+    sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: any): Observable<any> {
+      const body = {
+        toEmail,
+        toName,
+        templateId,
+        params: {
+          name: params.name,
+          email: toEmail,
+          message: 'Bienvenido a RedPsicologos.cl',
+          date: new Date().toLocaleDateString('es-CL')
+        }
+      };
+    
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      });
+    
+      return this.http.post(this.apiUrl, body, { headers }).pipe(
+        catchError(error => {
+          console.error('Error en el servicio de email:', error);
+          return throwError(() => new Error('Error al enviar el correo de bienvenida'));
+        })
+      );
+    }
 }

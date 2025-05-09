@@ -54,7 +54,7 @@
                                         <label class="custom-control material-checkbox">
                                             <input type="checkbox" formControlName="terms" class="material-control-input" required>
                                             <span class="material-control-indicator"></span>
-                                            <span class="description">Aceptar <a href="">terminos y condiciones</a> y la <a href="">política de privacidad</a></span>
+                                            <span class="description">Aceptar <a (click)="global.activeRoute = 'terms'; global.scrollToTop()" style="cursor: pointer;">terminos y condiciones</a> y la <a (click)="global.activeRoute = 'privacy'; global.scrollToTop()" style="cursor: pointer;">política de privacidad</a></span>
                                         </label>
                                     </div>
                                 </div>
