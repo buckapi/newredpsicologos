@@ -104,7 +104,7 @@ filteredProfesionals() {
   });
 }
  
-  async updateProfesional(id: string, status: string) {
+async updateProfesional(id: string, status: string) {
     const data = {
         status: status // Actualiza el estado del profesional
     };
@@ -117,55 +117,28 @@ filteredProfesionals() {
         console.log('Professional data:', updatedProfesional); // Debug log
         
         // Send appropriate email based on status
-        if (status === 'Aprobado') {
-          console.log('Sending approval email...'); // Debug log
-          await this.emailService.sendStatusEmail(
-            updatedProfesional['email'],
-            updatedProfesional['name'],
-            2, // You'll need to define this constant
-            {
-              name: updatedProfesional['name'],
-              email: updatedProfesional['email'],
-              status: 'Aprobado',
-              message: 'Su solicitud ha sido aprobada exitosamente',
-              date: new Date().toLocaleDateString('es-CL')
-            }
-          );
-        } else if (status === 'Denegado') {
-          console.log('Sending denial email...'); // Debug log
-          await this.emailService.sendStatusEmail(
-            updatedProfesional['email'],
-            updatedProfesional['name'],
-            2, // You'll need to define this constant
-            {
-              name: updatedProfesional['name'],
-              email: updatedProfesional['email'],
-              status: 'Denegado',
-              message: 'Lamentamos informarle que su solicitud no ha sido aprobada',
-              date: new Date().toLocaleDateString('es-CL')
-            }
-          );
-        } else {
-          console.log('Unknown status:', status); // Debug log
-        }
-
-        // Send admin notification
-        console.log('Sending admin notification...'); // Debug log
-        await this.emailService.sendAdminNewRegisterEmail(
-          'admin@redpsicologos.cl',
-          'Administrador RedPsicologos',
-          2, // You'll need to define this constant
-          {
+        if (status === 'Aprobado' || status === 'Denegado') {
+          console.log(`Sending ${status.toLowerCase()} email...`); // Debug log
+          
+          // Define email parameters
+          const emailParams = {
             name: updatedProfesional['name'],
             email: updatedProfesional['email'],
             status: status,
+            message: status === 'Aprobado' 
+              ? 'Su solicitud ha sido aprobada exitosamente'
+              : 'Lamentamos informarle que su solicitud no ha sido aprobada',
             date: new Date().toLocaleDateString('es-CL')
-          }
-        ).subscribe(() => {
-          console.log('Admin notification sent successfully'); // Debug log
-        }, error => {
-          console.error('Error sending admin notification:', error); // Debug log
-        });
+          };
+
+          // Send email and await the response
+          await this.emailService.sendStatusEmail(
+            updatedProfesional['email'],
+            updatedProfesional['name'],
+            2, // Template ID - should be verified
+            emailParams
+          ).toPromise();
+        }
 
         // Refresh the list
         await this.global.getProfesionals();
@@ -173,7 +146,11 @@ filteredProfesionals() {
         Swal.fire('Éxito', `El estado ha sido actualizado a ${status}.`, 'success');
     } catch (error) {
         console.error('Error al actualizar el registro:', error);
-        Swal.fire('Error', 'No se pudo actualizar el registro.', 'error');
+        if (error instanceof Error) {
+          Swal.fire('Error', error.message, 'error');
+        } else {
+          Swal.fire('Error', 'No se pudo actualizar el registro.', 'error');
+        }
     }
 }
 
