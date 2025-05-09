@@ -12,6 +12,7 @@ import { RealtimeTratamientosService } from '../../../service/realtime-tratamien
 import { ReviewsComponent } from '../reviews/reviews.component';
 import { PsychologistRatingService } from '../../../service/psychologistRatingService.service';
 import { RealtimeRatingsService } from '../../../service/realtime-ratings.service';
+import { EmailService } from '../../../service/email.service';
 @Component({
   selector: 'app-homeadmin',
   standalone: true,
@@ -37,7 +38,9 @@ constructor(
   public realtimeTerapias: RealtimeTerapiaService,
   public realtimeTratamientos: RealtimeTratamientosService,
   public ratingService: PsychologistRatingService,
-  public realtimeRatings: RealtimeRatingsService){
+  public realtimeRatings: RealtimeRatingsService,
+  public emailService: EmailService
+){
   
 }
 showDetails(profesional: any) {
@@ -100,21 +103,81 @@ filteredProfesionals() {
       return true; // Por defecto, muestra todos si no hay estado activo
   });
 }
-async updateProfesional(id: string, status: string) {
-  const data = {
-      status: status // Actualiza el estado del profesional
-  };
+ 
+  async updateProfesional(id: string, status: string) {
+    const data = {
+        status: status // Actualiza el estado del profesional
+    };
+  
+    try {
+        const pb = new PocketBase('https://db.redpsicologos.cl:8090');
+        const updatedProfesional = await pb.collection('psychologistsProfessionals').update(id, data);
+        
+        console.log('Status updated to:', status); // Debug log
+        console.log('Professional data:', updatedProfesional); // Debug log
+        
+        // Send appropriate email based on status
+        if (status === 'Aprobado') {
+          console.log('Sending approval email...'); // Debug log
+          await this.emailService.sendStatusEmail(
+            updatedProfesional['email'],
+            updatedProfesional['name'],
+            2, // You'll need to define this constant
+            {
+              name: updatedProfesional['name'],
+              email: updatedProfesional['email'],
+              status: 'Aprobado',
+              message: 'Su solicitud ha sido aprobada exitosamente',
+              date: new Date().toLocaleDateString('es-CL')
+            }
+          );
+        } else if (status === 'Denegado') {
+          console.log('Sending denial email...'); // Debug log
+          await this.emailService.sendStatusEmail(
+            updatedProfesional['email'],
+            updatedProfesional['name'],
+            2, // You'll need to define this constant
+            {
+              name: updatedProfesional['name'],
+              email: updatedProfesional['email'],
+              status: 'Denegado',
+              message: 'Lamentamos informarle que su solicitud no ha sido aprobada',
+              date: new Date().toLocaleDateString('es-CL')
+            }
+          );
+        } else {
+          console.log('Unknown status:', status); // Debug log
+        }
 
-  try {
-      const pb = new PocketBase('https://db.redpsicologos.cl:8090');
-      await pb.collection('psychologistsProfessionals').update(id, data);
-      Swal.fire('Éxito', `El estado ha sido actualizado a ${status}.`, 'success');
-  } catch (error) {
-      console.error('Error al actualizar el registro:', error);
-      Swal.fire('Error', 'No se pudo actualizar el registro.', 'error');
-  }
+        // Send admin notification
+        console.log('Sending admin notification...'); // Debug log
+        await this.emailService.sendAdminNewRegisterEmail(
+          'admin@redpsicologos.cl',
+          'Administrador RedPsicologos',
+          2, // You'll need to define this constant
+          {
+            name: updatedProfesional['name'],
+            email: updatedProfesional['email'],
+            status: status,
+            date: new Date().toLocaleDateString('es-CL')
+          }
+        ).subscribe(() => {
+          console.log('Admin notification sent successfully'); // Debug log
+        }, error => {
+          console.error('Error sending admin notification:', error); // Debug log
+        });
+
+        // Refresh the list
+        await this.global.getProfesionals();
+        
+        Swal.fire('Éxito', `El estado ha sido actualizado a ${status}.`, 'success');
+    } catch (error) {
+        console.error('Error al actualizar el registro:', error);
+        Swal.fire('Error', 'No se pudo actualizar el registro.', 'error');
+    }
 }
-formatDate(date: string): string {
+
+  formatDate(date: string): string {
   const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: 'long',

@@ -181,7 +181,17 @@ export class RegisterComponent {
           this.loading = false;
           
           // Envío de correo con templateId 1 y parámetros
-          this.emailService.sendWelcomeEmail(email, name, 1, { name }).subscribe({
+          // In RegisterComponent:
+          this.emailService.sendWelcomeEmail(
+            email,
+            name,
+            1,
+            { name, email }
+          ).subscribe({
+            next: () => console.log('Welcome email sent successfully'),
+            error: (err) => console.error('Error sending welcome email:', err)
+          });
+          this.emailService.sendWelcomeEmail(email, name, 1, { name, email }).subscribe({
             next: () => {
               this.showSuccessAndLogin(email, password, true);
             },
@@ -208,7 +218,7 @@ export class RegisterComponent {
   private showSuccessAndLogin(email: string, password: string, emailSent: boolean) {
     const htmlMessage = emailSent 
       ? '¡Registro exitoso! Se iniciará sesión automáticamente...'
-      : `¡Registro exitoso!<br><small>El correo no pudo enviarse, pero puedes acceder normalmente.</small>`;
+      : `¡Registro exitoso!`;
   
     Swal.fire({
       icon: 'success',

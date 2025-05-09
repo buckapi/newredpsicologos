@@ -1,41 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { environment } from '../../environments/environment';
+
+export interface EmailParams {
+  name: string;
+  email: string;
+  message?: string;
+  date?: string;
+  [key: string]: any;
+  status?: string;
+}
+
+export interface EmailRequest {
+  toEmail: string;
+  toName: string;
+  templateId: number;
+  params: EmailParams;
+  type: 'welcome' | 'status' | 'subscribe' | 'adminNewRegister';
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmailService {
-/*   private apiUrl = 'https://db.redpsicologos.cl:5542/welcome';
- */
-/* private apiUrl = '/email-api/welcome';  // Usa la ruta del proxy
-  constructor(public http: HttpClient) {} */
-  private apiUrl: string;
-  constructor(public http: HttpClient) {
-    // Si está en producción, usa la URL del entorno
-    // Si está en desarrollo, usa la ruta del proxy
-    this.apiUrl = environment.production 
-      ? environment.emailServiceUrl 
-      : '/email-api/welcome';
-    console.log('Email Service URL:', this.apiUrl);
-  }
+  private baseUrl = window.location.hostname === 'localhost' 
+    ? '/email-api' 
+    : 'https://db.redpsicologos.cl:5542';
 
-  /* sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: any): Observable<any> {
+  constructor(private http: HttpClient) {}
+
+  sendEmail(request: EmailRequest): Observable<any> {
     const body = {
-      toEmail,
-      toName,
-      templateId,
-      params
-    };
-    return this.http.post(this.apiUrl, body);
-  } */
-  /* sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: any): Observable<any> {
-    const body = {
-      toEmail,
-      toName,
-      templateId,
-      params
+      toEmail: request.toEmail,
+      toName: request.toName,
+      templateId: request.templateId,
+      params: request.params
     };
 
     const headers = new HttpHeaders({
@@ -43,37 +42,58 @@ export class EmailService {
       'Accept': 'application/json'
     });
 
-    return this.http.post(this.apiUrl, body, { headers }).pipe(
+    const endpoint = `/${request.type}`;
+
+    return this.http.post(`${this.baseUrl}${endpoint}`, body, { headers }).pipe(
       catchError(error => {
         console.error('Error en el servicio de email:', error);
-        return throwError(() => new Error('Error al enviar el correo de bienvenida'));
+        return throwError(() => new Error(`Error al enviar el correo de tipo ${request.type}`));
       })
     );
-  } */
+  }
 
-    sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: any): Observable<any> {
-      const body = {
-        toEmail,
-        toName,
-        templateId,
-        params: {
-          name: params.name,
-          email: toEmail,
-          message: 'Bienvenido a RedPsicologos.cl',
-          date: new Date().toLocaleDateString('es-CL')
-        }
-      };
-    
-      const headers = new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      });
-    
-      return this.http.post(this.apiUrl, body, { headers }).pipe(
-        catchError(error => {
-          console.error('Error en el servicio de email:', error);
-          return throwError(() => new Error('Error al enviar el correo de bienvenida'));
-        })
-      );
-    }
+  // Convenience methods for specific email types
+  sendWelcomeEmail(toEmail: string, toName: string, templateId: number, params: EmailParams): Observable<any> {
+    return this.sendEmail({
+      toEmail,
+      toName,
+      templateId,
+      params: {
+        ...params,
+        message: 'Bienvenido a RedPsicologos.cl',
+        date: new Date().toLocaleDateString('es-CL')
+      },
+      type: 'welcome'
+    });
+  }
+
+  sendStatusEmail(toEmail: string, toName: string, templateId: number, params: EmailParams): Observable<any> {
+    return this.sendEmail({
+      toEmail,
+      toName,
+      templateId,
+      params,
+      type: 'status'
+    });
+  }
+
+  sendSubscribeEmail(toEmail: string, toName: string, templateId: number, params: EmailParams): Observable<any> {
+    return this.sendEmail({
+      toEmail,
+      toName,
+      templateId,
+      params,
+      type: 'subscribe'
+    });
+  }
+
+  sendAdminNewRegisterEmail(toEmail: string, toName: string, templateId: number, params: EmailParams): Observable<any> {
+    return this.sendEmail({
+      toEmail,
+      toName,
+      templateId,
+      params,
+      type: 'adminNewRegister'
+    });
+  }
 }
