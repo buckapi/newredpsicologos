@@ -44,7 +44,12 @@ reviewForm: FormGroup;
   ratings: any[] = [];
   isSubmitting = false;
   recaptchaLoaded = false;
-  
+  public retryCount = 0;
+  public maxRetries = 3;
+  public retryDelay = 2000; // 2 segundos entre reintentos
+  public recaptchaLoadTimeout = 10000; // 10 segundos máximo de espera
+  recaptchaError: string | null = null;
+
 constructor(
   public global: GlobalService,
   public fb: FormBuilder,
@@ -59,11 +64,128 @@ constructor(
   });
 
 }
-ngOnInit() {
+/* ngOnInit() {
   this.profesional = this.global.previewProfesionals;
   this.resetForm();  
   this.loadRatings();
+  
+  // Cargar reCAPTCHA al inicializar el componente
+  this.loadRecaptchaV3().catch(error => {
+    console.error('Error al cargar reCAPTCHA:', error);
+    // Puedes mostrar un mensaje al usuario si falla la carga
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo cargar el sistema de seguridad. Por favor recarga la página.'
+    });
+  });
+} */
+async ngOnInit() {
+  this.profesional = this.global.previewProfesionals;
+  this.resetForm();  
+  this.loadRatings();
+  
+  try {
+    await this.loadRecaptchaWithRetry();
+  } catch (error) {
+    this.showRecaptchaError('No se pudo cargar el sistema de seguridad después de varios intentos. Por favor recarga la página.');
+  }
 }
+
+private showRecaptchaError(message: string) {
+  this.recaptchaError = message;
+  this.isRecaptchaLoaded = false;
+  
+  // Opcional: enviar error a un servicio de monitoreo
+  console.error('Error reCAPTCHA:', message);
+}
+
+async retryRecaptcha() {
+  this.recaptchaError = null;
+  this.retryCount = 0;
+  
+  try {
+    await this.loadRecaptchaWithRetry();
+  } catch (error) {
+    this.showRecaptchaError('Seguimos teniendo problemas para cargar el sistema de seguridad. Por favor recarga la página completamente.');
+  }
+}
+private async loadRecaptchaV3(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Tiempo de espera agotado para cargar reCAPTCHA'));
+    }, this.recaptchaLoadTimeout);
+
+    if (window.grecaptcha) {
+      clearTimeout(timeout);
+      this.isRecaptchaLoaded = true;
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
+    script.async = true;
+    script.defer = true;
+    script.id = 'recaptcha-v3-script';
+
+    script.onload = () => {
+      clearTimeout(timeout);
+      this.isRecaptchaLoaded = true;
+      console.log('reCAPTCHA cargado correctamente');
+      resolve();
+    };
+
+    script.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error('Error al cargar el script de reCAPTCHA'));
+    };
+
+    const oldScript = document.getElementById('recaptcha-v3-script');
+    if (oldScript) document.head.removeChild(oldScript);
+    
+    document.head.appendChild(script);
+  });
+}
+/* private loadRecaptchaV3(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Si ya está cargado
+    if (window.grecaptcha) {
+      this.isRecaptchaLoaded = true;
+      resolve();
+      return;
+    }
+
+    // 1. Crea el script
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
+    script.async = true;
+    script.defer = true;
+    script.id = 'recaptcha-v3-script';
+
+    // 2. Define callbacks
+    script.onload = () => {
+      this.isRecaptchaLoaded = true;
+      console.log('reCAPTCHA cargado correctamente');
+      resolve();
+    };
+
+    script.onerror = () => {
+      console.error('Error al cargar el script de reCAPTCHA');
+      this.isRecaptchaLoaded = false;
+      reject(new Error('Error al cargar reCAPTCHA'));
+    };
+
+    // 3. Elimina scripts anteriores si existen
+    const oldScript = document.getElementById('recaptcha-v3-script');
+    if (oldScript) {
+      document.head.removeChild(oldScript);
+    }
+
+    // 4. Añade el nuevo script
+    document.head.appendChild(script);
+  });
+} */
 
 public cleanPhoneNumber(phone: string): string {
   return phone.replace(/[^0-9]/g, '');
@@ -190,7 +312,7 @@ ngAfterViewInit() {
   this.loadRecaptchaV3();
 }
 
-private loadRecaptchaV3(): Promise<void> {
+/* private loadRecaptchaV3(): Promise<void> {
   return new Promise((resolve, reject) => {
     // Si ya está cargado
     if (window.grecaptcha) {
@@ -224,7 +346,7 @@ private loadRecaptchaV3(): Promise<void> {
     // 4. Añade el nuevo script
     document.head.appendChild(script);
   });
-}
+} */
 
 async executeRecaptchaV3(): Promise<string> {
   try {
@@ -334,4 +456,23 @@ async testRecaptcha() {
     alert('Error: ' + (error as Error).message);
   }
 }
+
+
+private async loadRecaptchaWithRetry(): Promise<void> {
+  try {
+    await this.loadRecaptchaV3();
+  } catch (error) {
+    this.retryCount++;
+    
+    if (this.retryCount < this.maxRetries) {
+      console.warn(`Intento ${this.retryCount} fallido. Reintentando en ${this.retryDelay/1000} segundos...`);
+      await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+      return this.loadRecaptchaWithRetry();
+    } else {
+      console.error('Número máximo de reintentos alcanzado');
+      throw error;
+    }
+  }
+}
+
 }

@@ -98,8 +98,8 @@ interface corriente {
   providedIn: 'root'
 })
 export class GlobalService {
-   /* private professionalInfoSubject = new BehaviorSubject<any>({});
-  professionalInfo$ = this.professionalInfoSubject.asObservable(); */ 
+  public professionalInfoSubject = new BehaviorSubject<any>({});
+  professionalInfo$ = this.professionalInfoSubject.asObservable(); 
   storedRegiones: any[] = [];
   imageUrl: string = '';
   isLoading = false;
@@ -180,12 +180,15 @@ export class GlobalService {
   searchTerm: string = '';
   constructor(
     private realtimeRegiones: RealtimeRegionesService,
-    public realtimeProfesionales: RealtimeProfessionalsService
-
-  ) 
+    public realtimeProfesionales: RealtimeProfessionalsService  ) 
   { 
     this.pb = new PocketBase('https://db.redpsicologos.cl:8090');
     this.loadProfessionalInfo();
+    const storedInfo = localStorage.getItem('professionalInfo');
+    if (storedInfo) {
+      this.professionalInfo = JSON.parse(storedInfo);
+      this.professionalInfoSubject.next(this.professionalInfo);
+    }
   }
   setRoute(route: string) {
     this.activeRoute = route;
@@ -278,6 +281,51 @@ getPreviewProfesional(): Profesionals {
       top: 0,
       behavior: 'smooth'
     });
+  }
+  /* updateProfessionalInfo(info: any) {
+    this.professionalInfo = info;
+    this.professionalInfoSubject.next(info);
+  } */
+  
+   // Method to fetch and update professional info
+  async fetchProfessionalInfo() {
+    try {
+      const info = await this.getProfessionalInfo();
+      if (info) {
+        this.setProfessionalInfo(info);
+      }
+    } catch (error) {
+      console.error('Error fetching professional info:', error);
+    }
+  }
+
+  // Method to set professional info
+  setProfessionalInfo(info: any) {
+    this.professionalInfo = info;
+    this.professionalInfoSubject.next(info);
+    localStorage.setItem('professionalInfo', JSON.stringify(info));
+  }
+
+  // Method to get current professional info
+  getProfessionalInfo() {
+    return this.professionalInfo;
+  }
+
+  // Method to update specific fields
+  updateProfessionalInfo(fields: Partial<any>) {
+    if (!this.professionalInfo) {
+      this.professionalInfo = {};
+    }
+    this.professionalInfo = { ...this.professionalInfo, ...fields };
+    this.professionalInfoSubject.next(this.professionalInfo);
+    localStorage.setItem('professionalInfo', JSON.stringify(this.professionalInfo));
+  }
+
+  // Clear professional info
+  clearProfessionalInfo() {
+    this.professionalInfo = null;
+    this.professionalInfoSubject.next(null);
+    localStorage.removeItem('professionalInfo');
   }
   
 }

@@ -30,7 +30,9 @@ export class AuthPocketbaseService {
       return password;
     }
  
-
+    getProfessionalInfo() {
+      return this.global.professionalInfo;
+    }
 
     private isLocalStorageAvailable(): boolean {
       return typeof localStorage !== 'undefined';

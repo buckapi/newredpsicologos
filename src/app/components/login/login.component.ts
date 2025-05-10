@@ -4,22 +4,24 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Observable } from 'rxjs';
 import { GlobalService } from '../../service/global.service';
 import { AuthPocketbaseService } from '../../service/auth-pocketbase.service';
+import { TermsComponent } from '../terms/terms.component';
+import { PrivacyComponent } from '../privacy/privacy.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,ReactiveFormsModule],
+  imports: [CommonModule, FormsModule,ReactiveFormsModule, TermsComponent, PrivacyComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
   loading: boolean = false;
-
-
+  modalTitle: string = '';
+  modalContent: string = '';
   loginForm: FormGroup;
   passwordVisible: boolean = false; // Variable para mostrar/ocultar la contraseña
   errorMessage: string | null = null;
-  
+  showModal: boolean = false;
   constructor(
   public global: GlobalService,
   public fb: FormBuilder,
@@ -28,7 +30,8 @@ export class LoginComponent {
 {// Inicializa el formulario de inicio de sesión con validación básica
   this.loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    terms: [false, Validators.required]
   });
 }
 togglePasswordVisibility() {
@@ -70,5 +73,16 @@ togglePasswordVisibility() {
   get password() {
     return this.loginForm.get('password');
   }
+  get terms() {
+    return this.loginForm.get('terms');
+  }
+  openTermsModal(type: 'terms' | 'privacy') {
+    this.modalTitle = type === 'terms' ? 'Términos y Condiciones' : 'Política de Privacidad';
+    this.modalContent = type;
+    this.showModal = true;
+  }
 
+  closeModal() {
+    this.showModal = false;
+  }
 }

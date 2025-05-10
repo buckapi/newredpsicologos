@@ -6,11 +6,13 @@ import { GlobalService } from '../../service/global.service';
 import { AuthPocketbaseService } from '../../service/auth-pocketbase.service';
 import { EmailService } from '../../service/email.service';
 import axios from 'axios';
+import { TermsComponent } from '../../components/terms/terms.component';
+import { PrivacyComponent } from '../../components/privacy/privacy.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TermsComponent, PrivacyComponent ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -26,7 +28,9 @@ export class RegisterComponent {
   passwordVisible: boolean = false; // Variable para mostrar/ocultar la contraseña
   errorMessage: string | null = null;
   loading=false;
-
+  showModal: boolean = false;
+  modalTitle: string = '';
+  modalContent: string = '';
   constructor(
     public global:GlobalService,
     public auth:AuthPocketbaseService,
@@ -254,5 +258,14 @@ export class RegisterComponent {
 
   ngOnDestroy() {
     this.resetForm();
+  }
+  openTermsModal(type: 'terms' | 'privacy') {
+    this.modalTitle = type === 'terms' ? 'Términos y Condiciones' : 'Política de Privacidad';
+    this.modalContent = type;
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 }

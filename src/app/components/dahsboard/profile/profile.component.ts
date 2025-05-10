@@ -78,7 +78,7 @@ export class ProfileComponent implements AfterViewInit {
   target: TargetsArray = [];
   days: DaysArray = [];
   attentionTypes: AttentionTypeArray = [];
-  profileForm: FormGroup;
+  profileForm!: FormGroup;
   storedRegiones: any[] = []; 
   storedTerapias: any[] = []; 
   storedTratamientos: any[] = []; 
@@ -144,132 +144,80 @@ constructor(
 {
 this.initializeData();
 this.typeAttentionSelected = [];
-  // Initialize form with default values
+this.initializeForm();
+// Subscribe to professionalInfo changes
+this.global.professionalInfo$.subscribe((info) => {
+  if (info) {
+    this.updateFormWithProfessionalInfo();
+  }
+});
+// Update form when professionalInfo is available
+if (this.global.professionalInfo) {
+  this.updateFormWithProfessionalInfo();
+}
+}
+
+ private initializeForm() {
   this.profileForm = this.fb.group({
     name: ['', Validators.required],
     rut: ['', Validators.required],
     biography: ['', [Validators.required]],
     biography2: ['', [Validators.required]],
     phone: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
-    website: [''],
-    birthday: ['', [Validators.required]],
-    consultationAddress: ['', [Validators.required]],
-    region: ['', null],
-    comuna: ['', null],
-    gender: ['', null],
-    languages: this.fb.group({
-      es: [false],
-      en: [false],
-      fr: [false],
-      de: [false]
-    }),
-    targets: this.fb.group({
-      'niños y niñas': [false],
-      adultos: [false],
-      'jóvenes y adolecentes': [false],
-      'adultos mayores': [false],
-      todos: [false]
-    }),
-    payments: this.fb.group({
-      efectivo: [false],
-      transferencia: [false],
-      tarjetas: [false],
-      webpay: [false]
-    }),
-    days: this.fb.group({
-      Lunes: [false],
-      Martes: [false],
-      Miercoles: [false],
-      Jueves: [false],
-      Viernes: [false],
-      Sabado: [false],
-      Domingo: [false]
-    }),
-    typeAttention: this.fb.group({
-      Online: [false],
-      Presencial: [false],
-      'A domicilio': [false]
-    }),    
-    priceSession: ['', [Validators.required]],
-    titleUniversity: ['', null],
-    typeTherapy: ['', [Validators.required]],
-    typeTreatment: ['', [Validators.required]],
-    typeEspeciality: ['', [Validators.required]],
-    corriente: ['', [Validators.required]],
-    openingHours: ['', null],
-    registrationNumber: ['', null],
-    academicTitles: this.fb.array([]),
-    certificates: this.fb.array([]),
-   
-  });
-
-  // Update form when professionalInfo is available
-  if (this.global.professionalInfo) {
-    this.updateFormWithProfessionalInfo();
-  }
-  this.initializeFormWithDefaults();
-
- }
- private initializeFormWithDefaults() {
-  this.profileForm = this.fb.group({
-    name: ['', [Validators.required]],
-    rut: ['', [Validators.required]],
-    biography: ['', null],
-    biography2: ['', null],
-    phone: ['', [Validators.required]],
-    email: ['', [Validators.required]],
-    website: ['', null],
-    birthday: ['', null],
-    consultationAddress: ['', null],
-    region: ['', [Validators.required]],
-    comuna: ['', [Validators.required]],
-    gender: ['', [Validators.required]],
-    priceSession: ['', [Validators.required]],
-    titleUniversity: ['', null],
-    typeTherapy: ['', [Validators.required]],
-    typeTreatment: ['', [Validators.required]],
-    typeEspeciality: ['', [Validators.required]],
-    corriente: ['', [Validators.required]],
-    openingHours: ['', null],
-    registrationNumber: ['', null],
-    academicTitles: this.fb.array([]),
-    certificates: this.fb.array([]),
-    targets: this.fb.group({
-      'niños y niñas': [false],
-      adultos: [false],
-      'jóvenes y adolecentes': [false],
-      'adultos mayores': [false],
-      todos: [false]
-    }),
-    payments: this.fb.group({
-      efectivo: [false],
-      transferencia: [false],
-      tarjetas: [false],
-      webpay: [false]
-    }),
-    days: this.fb.group({
-      Lunes: [false],
-      Martes: [false],
-      Miercoles: [false],
-      Jueves: [false],
-      Viernes: [false],
-      Sabado: [false],
-      Domingo: [false]
-    }),
-    typeAttention: this.fb.group({
-      Online: [false],
-      Presencial: [false],
-      'A domicilio': [false]
-    }),
-    languages: this.fb.group({
-      es: [false],
-      en: [false],
-      fr: [false],
-      de: [false]
-    })
-  });
+  email: ['', [Validators.required, Validators.email]],
+  website: [''],
+  birthday: ['', [Validators.required]],
+  consultationAddress: ['', [Validators.required]],
+  region: ['', null],
+  comuna: ['', null],
+  gender: ['', null],
+  languages: this.fb.group({
+    es: [false],
+    en: [false],
+    fr: [false],
+    de: [false]
+  }),
+  targets: this.fb.group({
+    'niños y niñas': [false],
+    adultos: [false],
+    'jóvenes y adolecentes': [false],
+    'adultos mayores': [false],
+    todos: [false]
+  }),
+  payments: this.fb.group({
+    efectivo: [false],
+    transferencia: [false],
+    tarjetas: [false],
+    webpay: [false]
+  }),
+  days: this.fb.group({
+    Lunes: [false],
+    Martes: [false],
+    Miercoles: [false],
+    Jueves: [false],
+    Viernes: [false],
+    Sabado: [false],
+    Domingo: [false]
+  }),
+  typeAttention: this.fb.group({
+    Online: [false],
+    Presencial: [false],
+    'A domicilio': [false]
+  }),    
+  priceSession: ['', [Validators.required]],
+  titleUniversity: ['', null],
+  typeTherapy: ['', [Validators.required]],
+  typeTreatment: ['', [Validators.required]],
+  typeEspeciality: ['', [Validators.required]],
+  corriente: ['', [Validators.required]],
+  openingHours: ['', null],
+  registrationNumber: ['', null],
+  academicTitles: this.fb.array([]),
+  certificates: this.fb.array([]),
+ 
+});
 }
+
  async initializeData() {
   this.regionesList = await this.regionesService.getAllRegiones();
   this.comunasList = await this.comunasService.getAllComunas();
@@ -279,113 +227,18 @@ this.typeAttentionSelected = [];
   this.loadCorrientes();
 }
 
-ngAfterViewInit() {
-  
-  this.initForms();
-  if (this.global.professionalInfo) {
-    // Inicializar valores para checkboxes y grupos
-    const languages = this.global.professionalInfo.languages || {};
-    const targets = this.global.professionalInfo.targets || {};
-    const payments = this.global.professionalInfo.payments || {};
-    const days = this.global.professionalInfo.days || {};
-    const typeAttention = this.global.professionalInfo.typeAttention || {};
-
-    // Patch values para el formulario
-    this.profileForm.patchValue({
-      name: this.global.professionalInfo.name,
-      rut: this.global.professionalInfo.rut,
-      biography: this.global.professionalInfo.biography,
-      biography2: this.global.professionalInfo.biography2,
-      phone: this.global.professionalInfo.phone,
-      email: this.global.professionalInfo.email,
-      website: this.global.professionalInfo.website,
-      birthday: this.global.professionalInfo.birthday,
-      consultationAddress: this.global.professionalInfo.consultationAddress,
-      region: this.global.professionalInfo.region,
-      comuna: this.global.professionalInfo.comuna,
-      gender: this.global.professionalInfo.gender || '',
-      priceSession: this.global.professionalInfo.priceSession,
-      titleUniversity: this.global.professionalInfo.titleUniversity,
-      typeTherapy: this.global.professionalInfo.typeTherapy,
-      typeTreatment: this.global.professionalInfo.typeTreatment,
-      typeEspeciality: this.global.professionalInfo.typeEspeciality,
-      corriente: this.global.professionalInfo.corriente,
-      openingHours: this.global.professionalInfo.openingHours,
-      registrationNumber: this.global.professionalInfo.registrationNumber,
-      certificates: this.global.professionalInfo.certificates,
-      
-      // Grupos de checkboxes
-      languages: {
-        es: !!languages.es,
-        en: !!languages.en,
-        fr: !!languages.fr,
-        de: !!languages.de
-      },
-      targets: {
-        'niños y niñas': !!targets['niños y niñas'],
-        adultos: !!targets.adultos,
-        'jóvenes y adolecentes': !!targets['jóvenes y adolecentes'],
-        'adultos mayores': !!targets['adultos mayores'],
-        todos: !!targets.todos
-      },
-      payments: {
-        efectivo: !!payments.efectivo,
-        transferencia: !!payments.transferencia,
-        tarjetas: !!payments.tarjetas,
-        webpay: !!payments.webpay
-      },
-      days: {
-        Lunes: !!days.Lunes,
-        Martes: !!days.Martes,
-        Miercoles: !!days.Miercoles, // Asegurar coincidencia de nombres
-        Jueves: !!days.Jueves,
-        Viernes: !!days.Viernes,
-        Sabado: !!days.Sabado, // Asegurar coincidencia de nombres
-        Domingo: !!days.Domingo
-      },
-      
-      typeAttention: {
-        Online: !!typeAttention.Online,
-        Presencial: !!typeAttention.Presencial,
-        'A domicilio': !!typeAttention['A domicilio']
-      }
-    });
-    if (this.global.professionalInfo) {
-    // Cargar formación académica si existe
-    if (this.global.professionalInfo.academicTitles && this.global.professionalInfo.academicTitles.length > 0) {
-      // Limpiar el FormArray antes de agregar nuevos grupos
-      while (this.academicTitles.length !== 0) {
-        this.academicTitles.removeAt(0);
-      }
-
-      // Agregar cada título académico al FormArray
-      this.global.professionalInfo.academicTitles.forEach((title: { institution: string; specialization: string; year: string }) => {
-        this.academicTitles.push(this.fb.group({
-          institution: [title.institution, Validators.required],
-          specialization: [title.specialization, Validators.required],
-          year: [title.year, Validators.required]
-        }));
-      });
-    } else {
-      // Si no hay datos, agregar un grupo vacío
-      this.addTitle();
-    }
+async ngAfterViewInit() {
+  // Primero asegurarse que los datos básicos están cargados
+  if (!this.isDataLoaded) {
+    await this.initializeData();
   }
 
-    if (this.global.professionalInfo.gender) {
-      this.profileForm.get('gender')?.setValidators(null);
-      this.profileForm.get('gender')?.updateValueAndValidity();
-    }
-  
-    // Filtrar comunas basadas en la región seleccionada
-    if (this.global.professionalInfo.region) {
-      this.comunasFiltered = this.comunasList.filter(
-        comuna => comuna.idFather === this.global.professionalInfo.region.id
-      );
-    }
-
-    // Establecer imagen si existe
-    if (this.global.professionalInfo.images && this.global.professionalInfo.images.length > 0) {
+  // Luego actualizar el formulario
+  if (this.global.professionalInfo) {
+    this.updateFormWithProfessionalInfo();
+    
+    // Cargar imagen si existe
+    if (this.global.professionalInfo.images?.length > 0) {
       this.imageUrl = this.global.professionalInfo.images[0];
     }
   }
@@ -759,99 +612,112 @@ onFileSelected(event: any) {
     this.uploadImage(); // Llama a la función para cargar la imagen inmediatamente después de seleccionar
   }
 }
- async sendToUpdate() {
-      // 1. Validación general del formulario (sin validar género)
-      if (this.profileForm.valid) {
-        try {
-          this.isLoading = true;
-          this.global.isLoading = true;
-          const formValue = this.profileForm.value;
-          
-          // Preparar datos para enviar
-          const updatedData = {
-            ...formValue,
-            id: this.global.professionalInfo.id,
-            // Formación académica (convertir FormArray a array de objetos)
-            academicTitles: this.academicTitles.value,
-/*             certificates: this.global.professionalInfo.certificates || [],
- */            // Convertir los grupos de checkboxes
-            languages: this.prepareLanguagesData(formValue.languages),
-            targets: this.prepareTargetData(formValue.targets),
-            payments: this.preparePaymentsData(formValue.payments),
-            days: this.prepareDaysData(formValue.days),
-            typeAttention: this.prepareTypeAttentionData(formValue.typeAttention),
-            // Mantener datos existentes si no hay nuevos
-            region: this.regionSelected || this.global.professionalInfo.region,
-            comuna: this.comunaSelected || this.global.professionalInfo.comuna,
-            gender: formValue.gender || this.global.professionalInfo.gender || null, // Asegurar género (puede ser null)
-            typeTherapy: this.terapiaSelected || this.global.professionalInfo.typeTherapy,
-            typeTreatment: this.tratamientoSelected || this.global.professionalInfo.typeTreatment,
-            typeEspeciality: this.especialidadSelected || this.global.professionalInfo.typeEspeciality,
-            corriente: this.corrienteSelected || this.global.professionalInfo.corriente,
-            images: this.imageUrl ? [this.imageUrl] : this.global.professionalInfo.images,
-            // Otros campos importantes
-            biography: formValue.biography,
-            biography2: formValue.biography2,
-            priceSession: formValue.priceSession,
-            registrationNumber: formValue.registrationNumber
-          };
-    
-          // Limpiar datos nulos/undefined (excepto gender que puede ser null)
-          const cleanData = this.removeEmptyFields(updatedData);    
-          // Actualizar localStorage
-          localStorage.setItem('professionalInfo', JSON.stringify(cleanData));
-    
-          // Enviar datos al backend
-          const response = await this.authService.updateProfessionalInfo(cleanData);
-    
-          // Actualizar la vista con los nuevos datos
-          this.global.setPreviewProfesional(response);
-          
-          // Mostrar confirmación
-          await Swal.fire({
-            title: '¡Éxito!',
-            text: 'Datos actualizados correctamente',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false,
-            allowOutsideClick: true
-          });
-    
-          // Recargar datos del profesional
-          await this.getProfessionlINfo(); 
-    
-        } catch (error: unknown) {
-          console.error('Error al actualizar:', error);
-          const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-          await Swal.fire({
-            title: 'Error',
-            text: 'No se pudo actualizar la información: ' + errorMessage,
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-          });
-        } finally {
-          this.isLoading = false;
-          this.global.isLoading = false;
-          this.isDataLoaded = true;
-          clearTimeout(this.loadingTimeout);
-        }
-      } else {
-        // Mostrar errores de validación detallados (excluyendo género)
-        const invalidFields = this.getInvalidFields().filter(field => field !== 'Género');
+async sendToUpdate() {
+  if (this.profileForm.valid) {
+    try {
+      this.isLoading = true;
+      this.global.isLoading = true;
+      const formValue = this.profileForm.value;
+      
+      // Get existing data
+      const existingData = this.global.professionalInfo;
+      
+      // Prepare updated data, only including fields that have changed
+      const updatedData = {
+        id: existingData.id,
+        // Only include fields that have changed
+        ...(formValue.name !== existingData.name && { name: formValue.name }),
+        ...(formValue.rut !== existingData.rut && { rut: formValue.rut }),
+        ...(formValue.biography !== existingData.biography && { biography: formValue.biography }),
+        ...(formValue.biography2 !== existingData.biography2 && { biography2: formValue.biography2 }),
+        ...(formValue.phone !== existingData.phone && { phone: formValue.phone }),
+        ...(formValue.email !== existingData.email && { email: formValue.email }),
+        ...(formValue.website !== existingData.website && { website: formValue.website }),
+        ...(formValue.birthday !== existingData.birthday && { birthday: formValue.birthday }),
+        ...(formValue.consultationAddress !== existingData.consultationAddress && { consultationAddress: formValue.consultationAddress }),
+        ...(this.regionSelected && { region: this.regionSelected }),
+        ...(this.comunaSelected && { comuna: this.comunaSelected }),
+        ...(formValue.gender !== existingData.gender && { gender: formValue.gender }),
+        ...(formValue.priceSession !== existingData.priceSession && { priceSession: formValue.priceSession }),
+        ...(formValue.registrationNumber !== existingData.registrationNumber && { registrationNumber: formValue.registrationNumber }),
+        ...(formValue.openingHours !== existingData.openingHours && { openingHours: formValue.openingHours }),
         
-        if (invalidFields.length > 0) {
-          await Swal.fire({
-            title: 'Formulario incompleto',
-            html: `Por favor completa correctamente los siguientes campos:<br><br>${invalidFields.join('<br>')}`,
-            icon: 'warning',
-            confirmButtonText: 'Entendido'
-          });
-        } else {
-          // Si el único campo inválido es el género, permitir guardar igual
-          await this.sendToUpdate();
-        }
-      }
+        // Only update arrays if they have changed
+        ...(JSON.stringify(this.academicTitles.value) !== JSON.stringify(existingData.academicTitles) && { academicTitles: this.academicTitles.value }),
+        ...(JSON.stringify(this.terapiaSelected) !== JSON.stringify(existingData.typeTherapy) && { typeTherapy: this.terapiaSelected }),
+        ...(JSON.stringify(this.tratamientoSelected) !== JSON.stringify(existingData.typeTreatment) && { typeTreatment: this.tratamientoSelected }),
+        ...(JSON.stringify(this.especialidadSelected) !== JSON.stringify(existingData.typeEspeciality) && { typeEspeciality: this.especialidadSelected }),
+        ...(JSON.stringify(this.corrienteSelected) !== JSON.stringify(existingData.corriente) && { corriente: this.corrienteSelected }),
+        
+        // Only update checkboxes if they have changed
+        ...(JSON.stringify(this.prepareLanguagesData(formValue.languages)) !== JSON.stringify(existingData.languages) && { languages: this.prepareLanguagesData(formValue.languages) }),
+        ...(JSON.stringify(this.prepareTargetData(formValue.targets)) !== JSON.stringify(existingData.targets) && { targets: this.prepareTargetData(formValue.targets) }),
+        ...(JSON.stringify(this.preparePaymentsData(formValue.payments)) !== JSON.stringify(existingData.payments) && { payments: this.preparePaymentsData(formValue.payments) }),
+        ...(JSON.stringify(this.prepareDaysData(formValue.days)) !== JSON.stringify(existingData.days) && { days: this.prepareDaysData(formValue.days) }),
+        ...(JSON.stringify(this.prepareTypeAttentionData(formValue.typeAttention)) !== JSON.stringify(existingData.typeAttention) && { typeAttention: this.prepareTypeAttentionData(formValue.typeAttention) }),
+        
+        // Only update image if it has changed
+        ...(this.imageUrl && this.imageUrl !== existingData.images?.[0] && { images: [this.imageUrl] })
+      };
+
+      // Remove any undefined values
+      const cleanData = Object.fromEntries(
+        Object.entries(updatedData).filter(([_, value]) => value !== undefined)
+      );
+
+      // Update localStorage
+      localStorage.setItem('professionalInfo', JSON.stringify({
+        ...existingData,
+        ...cleanData
+      }));
+
+      // Enviar datos al backend
+      const response = await this.authService.updateProfessionalInfo(cleanData);
+
+      // Actualizar la vista con los nuevos datos
+      this.global.setPreviewProfesional(this.global.professionalInfo);
+      
+      // Mostrar mensaje de éxito con botón OK
+      await Swal.fire({
+        title: '¡Éxito!',
+        text: 'Datos actualizados correctamente',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
+
+      // Redirigir después de confirmar
+      this.global.activeRoute = 'homeprofessional';
+      this.global.scrollToTop();
+
+    } catch (error: unknown) {
+      console.error('Error al actualizar:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      await Swal.fire({
+        title: 'Error',
+        text: 'No se pudo actualizar la información: ' + errorMessage,
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    } finally {
+      this.isLoading = false;
+      this.global.isLoading = false;
+      this.isDataLoaded = true;
+      clearTimeout(this.loadingTimeout);
     }
+  } else {
+    // Mostrar errores de validación detallados (excluyendo género)
+    const invalidFields = this.getInvalidFields().filter(field => field !== 'Género');
+    
+    if (invalidFields.length > 0) {
+      await Swal.fire({
+        title: 'Formulario incompleto',
+        html: `Por favor completa correctamente los siguientes campos:<br><br>${invalidFields.join('<br>')}`,
+        icon: 'warning',
+        confirmButtonText: 'Entendido'
+      });
+    }
+  }
+}
     
     public isDataReady(): boolean {
       return this.isDataLoaded && 
@@ -1067,40 +933,25 @@ async updateCertificate(certificateUrl: string) {
   }
 }
 
-  async ngOnInit() {
-    this.initializeFormWithDefaults();
-    
-    // Cargar datos adicionales
-    this.loadRegiones();
-    this.loadTerapias();
-    this.loadTratamientos();
-    this.loadEspecialidades();
-    this.loadCorrientes();
-    this.loadComunas();
+async ngOnInit() {
+  this.initializeForm();
+  
+  // Cargar datos de referencia primero
+  await Promise.all([
+    this.loadRegiones(),
+    this.loadTerapias(),
+    this.loadTratamientos(),
+    this.loadEspecialidades(),
+    this.loadCorrientes(),
+    this.loadComunas()
+  ]);
 
-    // Esperar a que las regiones se carguen antes de filtrar comunas
-    this.regionesService.regiones$.subscribe(() => {
-      this.filterComunas();
-    });
+  // Luego cargar datos del profesional
+  await this.loadProfessionalData();
 
-    // Intentar cargar datos desde localStorage primero
-    const storedInfo = localStorage.getItem('professionalInfo');
-    if (storedInfo) {
-      try {
-        const professionalInfo = JSON.parse(storedInfo);
-        this.global.professionalInfo = professionalInfo;
-        this.updateFormWithProfessionalInfo();
-        this.isDataLoaded = true;
-      } catch (error) {
-        console.error('Error parsing stored info:', error);
-      }
-    }
-
-    // Si no hay datos en localStorage, cargar desde el servidor
-    if (!this.isDataLoaded) {
-      await this.getProfessionlINfo();
-    }
-  }
+  // Finalmente actualizar el formulario
+  this.updateFormWithProfessionalInfo();
+}
 
   
 
