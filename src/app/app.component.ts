@@ -21,6 +21,7 @@ import { HostListener } from '@angular/core';
 import { filter } from 'rxjs';
 import { PrivacyComponent } from './components/privacy/privacy.component';
 import { TermsComponent } from './components/terms/terms.component';
+import { PlanningComponent } from './components/dahsboard/planning/planning.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -39,7 +40,8 @@ import { TermsComponent } from './components/terms/terms.component';
     SettingsComponent,
     ReviewsComponent,
     PrivacyComponent,
-    TermsComponent
+    TermsComponent,
+    PlanningComponent
   ],  
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

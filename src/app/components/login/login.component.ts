@@ -38,10 +38,8 @@ togglePasswordVisibility() {
   this.passwordVisible = !this.passwordVisible;
 }
   onLogin() {
-
-    this.global.loading = true; // Start loading
+    this.global.loading = true;
     
-
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
       this.auth.loginUser(email, password).subscribe({
@@ -54,15 +52,19 @@ togglePasswordVisibility() {
           this.global.loadProfessionalInfo();
         },
         error: (error) => {
-          this.global.loading = false; // Stop loading
-
+          this.global.loading = false;
           console.error('Error en el inicio de sesión:', error);
           this.errorMessage = 'Credenciales incorrectas, intenta de nuevo.';
         }
       });
     } else {
-      this.errorMessage = 'Por favor, completa los campos correctamente.';
+      if (this.terms?.invalid) {
+        this.errorMessage = 'Debes aceptar los términos y condiciones para continuar.';
+      } else {
+        this.errorMessage = 'Por favor, completa los campos correctamente.';
+      }
     }
+    this.global.loading = false;
   }
 
   // Métodos de acceso a los controles para mostrar los mensajes de error
