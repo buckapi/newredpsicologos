@@ -21,7 +21,8 @@ export class ReviewsComponent {
   ratings: any[] = [];
   professionals: any[] = [];
   professionalMap: { [key: string]: string } = {};
-
+  filteredRatings: any[] = [];
+  filterBy: string = 'idSpecialist';
   constructor(
     public global: GlobalService,
     public authService: AuthPocketbaseService,
@@ -38,6 +39,7 @@ export class ReviewsComponent {
     // Suscribirse a las calificaciones
     this.realtimeRatings.ratings$.subscribe(ratings => {
       this.ratings = ratings;
+      this.updateFilteredRatings();
     });
    }
 
@@ -52,6 +54,10 @@ export class ReviewsComponent {
     const professional = this.professionals.find(p => p.id === id);
     return professional ? professional.name : 'Profesional no encontrado';
   }
+  /* getProfessionalNameById(id: string): string {
+    const professional = this.professionals.find(p => p.id === id);
+    return professional ? `${professional.name} ${professional.lastName}` : 'Usuario Anónimo';
+  } */
   getStatusText(rating: any): string {
     if (!rating.status) return 'Pendiente';
     return rating.status.charAt(0).toUpperCase() + rating.status.slice(1);
@@ -68,6 +74,7 @@ export class ReviewsComponent {
     if (!score) return 0;
     return Math.min(Math.max(0, score), 5); // Limitar entre 0 y 5
   }
+
 
   // Método para obtener el número de estrellas completas
   getFilledStars(score: number): number {
@@ -153,5 +160,15 @@ export class ReviewsComponent {
             'error'
         );
     }
+}
+getStars(rating: number): number[] {
+  return Array(rating).fill(0);
+}
+updateFilteredRatings() {
+  if (this.global.professionalInfo?.id) {
+    this.filteredRatings = this.ratings.filter(rating => 
+      rating.idSpecialist === this.global.professionalInfo.id
+    );
+  }
 }
 }
