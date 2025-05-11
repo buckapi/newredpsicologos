@@ -22,7 +22,6 @@ export class ReviewsComponent {
   professionals: any[] = [];
   professionalMap: { [key: string]: string } = {};
   filteredRatings: any[] = [];
-  filterBy: string = 'idSpecialist';
   constructor(
     public global: GlobalService,
     public authService: AuthPocketbaseService,

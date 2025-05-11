@@ -104,4 +104,5 @@ getSelectedItems(obj: any): string[] {
   if (!obj) return [];
   return Object.keys(obj).filter(key => obj[key]);
 }
+
 }

@@ -7,6 +7,10 @@ import { AuthPocketbaseService } from '../../service/auth-pocketbase.service';
 import { ElementRef } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import Swal from 'sweetalert2';
+import { RealtimeRatingsService } from '../../service/realtime-ratings.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 declare var grecaptcha: any; 
 declare global {
@@ -49,13 +53,24 @@ reviewForm: FormGroup;
   public retryDelay = 2000; // 2 segundos entre reintentos
   public recaptchaLoadTimeout = 10000; // 10 segundos máximo de espera
   recaptchaError: string | null = null;
-
+  filteredRatings: any[] = [];
+  filteredRatings$: Observable<any[]>;
+    
 constructor(
   public global: GlobalService,
   public fb: FormBuilder,
   public ratingService: PsychologistRatingService,
-  public authService: AuthPocketbaseService
+  public authService: AuthPocketbaseService,
+  public realtimeRatings: RealtimeRatingsService,
+  private cdRef: ChangeDetectorRef
 ){
+  this.filteredRatings$ = this.realtimeRatings.ratings$.pipe(
+    map(ratings => ratings.filter(rating => 
+      rating.idSpecialist === this.global.previewProfesionals?.id &&
+      rating.status?.toLowerCase() === 'approved'
+    ))
+  );
+
   this.reviewForm = this.fb.group({
     title: [''],
     comment: [''],
@@ -63,34 +78,114 @@ constructor(
     terms: [false]
   });
 
-}
-/* ngOnInit() {
-  this.profesional = this.global.previewProfesionals;
-  this.resetForm();  
-  this.loadRatings();
-  
-  // Cargar reCAPTCHA al inicializar el componente
-  this.loadRecaptchaV3().catch(error => {
-    console.error('Error al cargar reCAPTCHA:', error);
-    // Puedes mostrar un mensaje al usuario si falla la carga
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo cargar el sistema de seguridad. Por favor recarga la página.'
-    });
+  this.realtimeRatings.ratings$.subscribe(ratings => {
+    console.log('Ratings recibidos en tiempo real:', ratings);
+    this.ratings = ratings;
+    this.updateFilteredRatings();
   });
-} */
+}
+updateFilteredRatings() {
+  if (!this.global.previewProfesionals?.id) {
+    console.log('No hay profesional seleccionado o no tiene ID');
+    this.filteredRatings = [];
+    return;
+  }
+
+  const professionalId = this.global.previewProfesionals.id;
+  
+  // Filtrar ratings por profesional y estado approved (case insensitive)
+  this.filteredRatings = this.ratings.filter(rating => {
+    const matchesProfessional = rating.idSpecialist === professionalId;
+    const isApproved = rating.status?.toLowerCase() === 'approved';
+    
+    console.log(`Filtro: ${rating.id} | Prof: ${rating.idSpecialist} | Status: ${rating.status} | Match: ${matchesProfessional} | Approved: ${isApproved}`);
+    
+    return matchesProfessional && isApproved;
+  });
+
+  console.log('Ratings filtrados:', this.filteredRatings);
+  this.calculateAverageRating();
+}
+
+calculateAverageRating() {
+  if (this.filteredRatings.length > 0) {
+    const totalScore = this.filteredRatings.reduce((sum, rating) => sum + rating.score, 0);
+    this.averageRating = Math.round((totalScore / this.filteredRatings.length) * 10) / 10;
+  } else {
+    this.averageRating = 0;
+  }
+}
+
+getApprovedRatings(): any[] {
+  return this.filteredRatings.filter(rating => rating.status === 'approved');
+}
+
+  calculateRatingDistribution(): number[] {
+    const distribution = [0, 0, 0, 0, 0]; // Array para 5, 4, 3, 2, 1 estrellas
+    
+    this.filteredRatings.forEach(rating => {
+      const score = Math.min(Math.max(1, rating.score), 5); // Limitar entre 1 y 5
+      distribution[score - 1]++;
+    });
+    
+    return distribution;
+  }
+  getRatingDistribution(): number[] {
+    return this.calculateRatingDistribution();
+  }
+  
+
 async ngOnInit() {
   this.profesional = this.global.previewProfesionals;
-  this.resetForm();  
-  this.loadRatings();
+  this.resetForm();
+  
+  // Cargar ratings iniciales
+  await this.loadRatings();
   
   try {
     await this.loadRecaptchaWithRetry();
   } catch (error) {
     this.showRecaptchaError('No se pudo cargar el sistema de seguridad después de varios intentos. Por favor recarga la página.');
   }
+  // En el ngOnInit, después de cargar los datos reales:
+if (this.filteredRatings.length === 0) {
+  // Datos de prueba
+  this.filteredRatings = [{
+    title: "Paciente de prueba",
+    score: 5,
+    comment: "Excelente profesional, muy recomendable",
+    tags: "Profesional, Buen trato",
+    created: new Date(),
+    status: "approved"
+  }];
+  this.calculateAverageRating();
 }
+}
+
+async loadRatings() {
+  try {
+    // Limpiar ratings existentes
+    this.ratings = [];
+    this.filteredRatings = [];
+    
+    // Obtener todos los ratings
+    const allRatings = await this.ratingService.getAllRatings();
+    console.log('Datos crudos de ratings:', allRatings);
+    
+    // Asignar y asegurar que items existe
+    this.ratings = allRatings || [];
+    console.log('Ratings asignados:', this.ratings);
+    
+    // Forzar detección de cambios
+    this.cdRef.detectChanges();
+    
+    this.updateFilteredRatings();
+  } catch (error) {
+    console.error('Error loading ratings:', error);
+    this.filteredRatings = [];
+  }
+}
+
 
 private showRecaptchaError(message: string) {
   this.recaptchaError = message;
@@ -265,18 +360,6 @@ initForm() {
     recaptcha: ['', Validators.required],
     terms: [false, Validators.requiredTrue]
   });
-}
-
-async loadRatings() {
-  try {
-    const specialistId = this.global.previewProfesionals?.id;
-    if (specialistId) {
-      this.ratings = await this.ratingService.getRatingsBySpecialist(specialistId);
-      this.calculateRatingStats();
-    }
-  } catch (error) {
-    console.error('Error loading ratings:', error);
-  }
 }
 
 calculateRatingStats() {
@@ -473,6 +556,9 @@ private async loadRecaptchaWithRetry(): Promise<void> {
       throw error;
     }
   }
+}
+getStars(rating: number): number[] {
+  return Array(rating).fill(0);
 }
 
 }

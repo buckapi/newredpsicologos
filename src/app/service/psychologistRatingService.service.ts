@@ -154,4 +154,25 @@ export class PsychologistRatingService {
       throw new Error('No se pudo actualizar el estado de la valoración.');
     }
   }
+  async getAllApprovedRatings(): Promise<any[]> {
+    try {
+      // Ajusta esta línea según tu implementación de PocketBase
+      const records = await this.pb.collection('ratings').getFullList({
+        filter: 'status = "approved"'
+      });
+      return records;
+    } catch (error) {
+      console.error('Error fetching approved ratings:', error);
+      return [];
+    }
+  }
+  async getAllRatings(): Promise<any[]> {
+    try {
+      const records = await this.pb.collection('ratings').getFullList();
+      return records;
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+      return [];
+    }
+  }
 }
