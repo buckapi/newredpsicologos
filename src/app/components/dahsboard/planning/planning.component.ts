@@ -17,7 +17,7 @@ import { lastValueFrom } from 'rxjs';
   styleUrl: './planning.component.css'
 })
 export class PlanningComponent {
-  imageUrl: string = 'assets/images/resource/profile-3.png'; 
+  imageUrl: string = 'assets/images/user.png'; 
   private pb = new PocketBase('https://db.redpsicologos.cl:8090');
   paymentStatus: string = '';
   user: any = {};

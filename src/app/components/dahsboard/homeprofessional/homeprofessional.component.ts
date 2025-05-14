@@ -23,7 +23,7 @@ import { RealtimeCorrientesService } from '../../../service/realtime-corrientes.
 })
 export class HomeprofessionalComponent implements OnInit {
   rutError: boolean = false;
-  imageUrl: string = 'assets/images/resource/profile-3.png'; 
+  imageUrl: string = 'assets/images/resource/.png'; 
   private pb = new PocketBase('https://db.redpsicologos.cl:8090');
   isLoading: boolean = false;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;

@@ -84,7 +84,7 @@ export class ProfileComponent implements AfterViewInit {
   storedTratamientos: any[] = []; 
   storedEspecialidades: any[] = []; 
   selectedFile: File | null = null;
-  imageUrl: string = 'assets/images/resource/profile-3.png'; 
+  imageUrl: string = 'assets/images/user.png'; 
   private pb = new PocketBase('https://db.redpsicologos.cl:8090');
   isLoading: boolean = false;
   isDataLoaded: boolean = false;
