@@ -173,3 +173,26 @@
   color: #666;
   margin-top: 10px;
 }
+.rating-box {
+  margin: 15px 0;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+.rating {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 5px 0;
+  display: inline-block;
+}
+
+.rating li {
+  display: inline-block;
+  color: #ffc107; /* Color amarillo para estrellas */
+}
+
+.no-ratings {
+  color: #6c757d;
+  font-style: italic;
+}

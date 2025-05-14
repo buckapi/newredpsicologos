@@ -11,6 +11,7 @@ import { RealtimeRatingsService } from '../../service/realtime-ratings.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
 
 declare var grecaptcha: any; 
 declare global {
@@ -22,7 +23,7 @@ declare global {
 @Component({
   selector: 'app-professional-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatCardModule],
   templateUrl: './professional-detail.component.html',
   styleUrl: './professional-detail.component.css'
 })
@@ -55,7 +56,7 @@ reviewForm: FormGroup;
   recaptchaError: string | null = null;
   filteredRatings: any[] = [];
   filteredRatings$: Observable<any[]>;
-    
+  idSpecialist: string | null = null;
 constructor(
   public global: GlobalService,
   public fb: FormBuilder,
@@ -84,30 +85,11 @@ constructor(
     this.updateFilteredRatings();
   });
 }
-updateFilteredRatings() {
-  if (!this.global.previewProfesionals?.id) {
-    console.log('No hay profesional seleccionado o no tiene ID');
-    this.filteredRatings = [];
-    return;
-  }
 
-  const professionalId = this.global.previewProfesionals.id;
-  
-  // Filtrar ratings por profesional y estado approved (case insensitive)
-  this.filteredRatings = this.ratings.filter(rating => {
-    const matchesProfessional = rating.idSpecialist === professionalId;
-    const isApproved = rating.status?.toLowerCase() === 'approved';
-    
-    console.log(`Filtro: ${rating.id} | Prof: ${rating.idSpecialist} | Status: ${rating.status} | Match: ${matchesProfessional} | Approved: ${isApproved}`);
-    
-    return matchesProfessional && isApproved;
-  });
 
-  console.log('Ratings filtrados:', this.filteredRatings);
-  this.calculateAverageRating();
-}
 
 calculateAverageRating() {
+  // Usamos filteredRatings que ya contiene solo los aprobados del profesional actual
   if (this.filteredRatings.length > 0) {
     const totalScore = this.filteredRatings.reduce((sum, rating) => sum + rating.score, 0);
     this.averageRating = Math.round((totalScore / this.filteredRatings.length) * 10) / 10;
@@ -115,11 +97,34 @@ calculateAverageRating() {
     this.averageRating = 0;
   }
 }
-
+calculateRatingProgress(): number {
+  // Convert average rating to a percentage (0-100)
+  return (this.averageRating / 5) * 100;
+}
 getApprovedRatings(): any[] {
   return this.filteredRatings.filter(rating => rating.status === 'approved');
 }
+updateFilteredRatings() {
+  this.filteredRatings = this.ratings.filter(rating => 
+    rating.idSpecialist === this.global.previewProfesionals?.id &&
+    rating.idSpecialist === this.global.previewProfesionals?.id &&
+    rating.status?.toLowerCase() === 'approved'
+  );
+  this.calculateAverageRating();
+}
+getStars(rating: number): number[] {
+  return Array(Math.floor(rating)).fill(0);
+}
+/* getStars(rating: number): number[] {
+  return Array(rating).fill(0);
+} */
 
+getEmptyStars(rating: number): number[] {
+  // Calcula cuántas estrellas vacías mostrar (5 - estrellas llenas - media estrella)
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  return Array(5 - fullStars - (hasHalfStar ? 1 : 0)).fill(0);
+}
   calculateRatingDistribution(): number[] {
     const distribution = [0, 0, 0, 0, 0]; // Array para 5, 4, 3, 2, 1 estrellas
     
@@ -159,6 +164,11 @@ if (this.filteredRatings.length === 0) {
     status: "approved"
   }];
   this.calculateAverageRating();
+   // Scroll to top when component loads
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
 }
 }
 
@@ -179,7 +189,6 @@ async loadRatings() {
     // Forzar detección de cambios
     this.cdRef.detectChanges();
     
-    this.updateFilteredRatings();
   } catch (error) {
     console.error('Error loading ratings:', error);
     this.filteredRatings = [];
@@ -242,45 +251,6 @@ private async loadRecaptchaV3(): Promise<void> {
     document.head.appendChild(script);
   });
 }
-/* private loadRecaptchaV3(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // Si ya está cargado
-    if (window.grecaptcha) {
-      this.isRecaptchaLoaded = true;
-      resolve();
-      return;
-    }
-
-    // 1. Crea el script
-    const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
-    script.async = true;
-    script.defer = true;
-    script.id = 'recaptcha-v3-script';
-
-    // 2. Define callbacks
-    script.onload = () => {
-      this.isRecaptchaLoaded = true;
-      console.log('reCAPTCHA cargado correctamente');
-      resolve();
-    };
-
-    script.onerror = () => {
-      console.error('Error al cargar el script de reCAPTCHA');
-      this.isRecaptchaLoaded = false;
-      reject(new Error('Error al cargar reCAPTCHA'));
-    };
-
-    // 3. Elimina scripts anteriores si existen
-    const oldScript = document.getElementById('recaptcha-v3-script');
-    if (oldScript) {
-      document.head.removeChild(oldScript);
-    }
-
-    // 4. Añade el nuevo script
-    document.head.appendChild(script);
-  });
-} */
 
 public cleanPhoneNumber(phone: string): string {
   return phone.replace(/[^0-9]/g, '');
@@ -343,7 +313,9 @@ getLanguagesDisplay(): string {
   if (!langs || !Object.values(langs).length) return 'No especificado';
   return Object.keys(langs).filter(lang => langs[lang as keyof typeof langs]).join(', ');
 }
-
+floorRating(rating: number): number {
+  return Math.floor(rating);
+}
 getRegionDisplay(): string {
   const regionId = this.global.previewProfesionals?.region;
   const region = this.global.storedRegiones?.find(r => r.id === regionId);
@@ -395,41 +367,6 @@ ngAfterViewInit() {
   this.loadRecaptchaV3();
 }
 
-/* private loadRecaptchaV3(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // Si ya está cargado
-    if (window.grecaptcha) {
-      resolve();
-      return;
-    }
-
-    // 1. Crea el script
-    const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/api.js?render=${environment.recaptchaSiteKey}`;
-    script.async = true;
-    script.defer = true;
-    script.id = 'recaptcha-v3-script';
-
-    // 2. Define callbacks
-    script.onload = () => {
-      this.isRecaptchaLoaded = true;
-      resolve();
-    };
-
-    script.onerror = () => {
-      reject(new Error('Error al cargar reCAPTCHA'));
-    };
-
-    // 3. Elimina scripts anteriores si existen
-    const oldScript = document.getElementById('recaptcha-v3-script');
-    if (oldScript) {
-      document.head.removeChild(oldScript);
-    }
-
-    // 4. Añade el nuevo script
-    document.head.appendChild(script);
-  });
-} */
 
 async executeRecaptchaV3(): Promise<string> {
   try {
@@ -557,8 +494,6 @@ private async loadRecaptchaWithRetry(): Promise<void> {
     }
   }
 }
-getStars(rating: number): number[] {
-  return Array(rating).fill(0);
-}
+
 
 }

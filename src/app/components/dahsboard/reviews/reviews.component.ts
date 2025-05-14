@@ -22,6 +22,7 @@ export class ReviewsComponent {
   professionals: any[] = [];
   professionalMap: { [key: string]: string } = {};
   filteredRatings: any[] = [];
+  userId: string = '';
   constructor(
     public global: GlobalService,
     public authService: AuthPocketbaseService,
@@ -40,6 +41,8 @@ export class ReviewsComponent {
       this.ratings = ratings;
       this.updateFilteredRatings();
     });
+    this.userId = this.authService.getUserId();
+
    }
 
    ngOnInit(): void {
@@ -48,6 +51,7 @@ export class ReviewsComponent {
     
     // Actualizar la lista de calificaciones
     this.realtimeRatings.updateRatingsList();
+    
   }
   getProfessionalNameById(id: string): string {
     const professional = this.professionals.find(p => p.id === id);

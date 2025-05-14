@@ -23,12 +23,12 @@
                                 </ul>
                                 <p>Numero de registro: <span>{{ global.previewProfesionals.registrationNumber }}</span></p>
                                 <p>Rut: <span>{{ global.previewProfesionals.rut }}</span></p>
-                                <div class="rating-box clearfix">
+                                <!-- <div class="rating-box clearfix">
                                   <ul class="rating clearfix">
                                     <li *ngFor="let star of getStars(averageRating)"><i class="icon-Star"></i></li>
                                   </ul>
                                   <span>Calificación promedio: {{ averageRating }} / 5</span>
-                                </div>
+                                </div> -->
                                 <span class="designation" >Especialista en: <span style="color: #808080;">{{ global.previewProfesionals.typeEspeciality && global.previewProfesionals.typeEspeciality.length ? global.previewProfesionals.typeEspeciality[0].name : 'No especificado' }}</span></span>
                                 <div class="lower-box clearfix">
                                     <ul class="info clearfix">
@@ -104,53 +104,47 @@
                             <div class="tab" id="tab-4">
                               <div class="review-box">
                                 <h3>{{global.previewProfesionals.name}} </h3>
-                                <div class="rating-inner">
+                                
+                               <!--  <div class="rating-inner">
                                     <div class="rating-box">
-                                        <h2>4.5</h2>
-                                        <ul class="clearfix">
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                        </ul>
-                                        <span>Based on 5 review</span>
+                                        <h2>{{averageRating}}</h2>
+                                        <ul class="rating clearfix">
+                                          <span class="">{{ averageRating }}</span>
+                                          <li *ngFor="let star of getStars(averageRating)"><i class="icon-Star"></i></li>
+                                      </ul>
+                                        <span>Basado en {{ratings.length}} reseñas</span>
                                     </div>
                                     <div class="rating-pregress">
                                         <div class="single-progress">
                                             <span class="porgress-bar"></span>
-                                            <div class="text"><p><i class="icon-Star"></i>5 Stars</p></div>
+                                            <div class="text"><p><i class="icon-Star"></i>5 Estrellas</p></div>
                                         </div>
                                         <div class="single-progress">
                                             <span class="porgress-bar"></span>
-                                            <div class="text"><p><i class="icon-Star"></i>4 Stars</p></div>
+                                            <div class="text"><p><i class="icon-Star"></i></p></div>
                                         </div>
                                         <div class="single-progress">
                                             <span class="porgress-bar"></span>
-                                            <div class="text"><p><i class="icon-Star"></i>3 Stars</p></div>
+                                            <div class="text"><p><i class="icon-Star"></i></p></div>
                                         </div>
                                         <div class="single-progress">
                                             <span class="porgress-bar"></span>
-                                            <div class="text"><p><i class="icon-Star"></i>2 Stars</p></div>
+                                            <div class="text"><p><i class="icon-Star"></i></p></div>
                                         </div>
                                         <div class="single-progress">
                                             <span class="porgress-bar"></span>
-                                            <div class="text"><p><i class="icon-Star"></i>1 Stars</p></div>
+                                            <div class="text"><p><i class="icon-Star"></i></p></div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 {{global.previewProfesionals.id}}
-                                <div class="review-inner" *ngFor="let rating of realtimeRatings.ratings$ | async" class="rating-item" [hidden]="rating.idSpecialist !== global.previewProfesionals.id && rating.status !== 'approved'"
-                                >
+                                <div class="review-inner" *ngFor="let rating of realtimeRatings.ratings$ | async" class="rating-item" [hidden]="rating.idSpecialist !== global.previewProfesionals.id || rating.status !== 'approved'">
                               
                                     <div class="single-review-box">
-                                        <ul class="rating clearfix">
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                            <li><i class="icon-Star"></i></li>
-                                            <li class="light"><i class="icon-Star"></i></li>
-                                        </ul>
+                                      <ul class="rating clearfix">
+                                        <span class="">{{ rating.score }}</span>
+                                        <li *ngFor="let star of getStars(rating.score)"><i class="icon-Star"></i></li>
+                                    </ul>
                                         <h6>{{rating.title}} <span>- {{rating.created | date: 'dd/MM/yyyy'}}</span></h6>
                                         <p>{{rating.comment}}</p>
                                     </div>

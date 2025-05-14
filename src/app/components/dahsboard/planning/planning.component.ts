@@ -51,18 +51,7 @@ constructor(
   
 }
 
-/* async startPayment() {
-  try {
-    const response = await lastValueFrom(
-      this.paymentService.createSubscription('premium', this.user)
-    );
-    window.location.href = response.processUrl;
-  } catch (err) {
-    Swal.fire('Error', 'No se pudo iniciar el pago.', 'error');
-  }
-} */
-
-startSubscription(planId: string) { // ⚠️ Recibir el ID del plan
+/* startSubscription(planId: string) { // ⚠️ Recibir el ID del plan
   if (!this.global.professionalInfo?.rut) {
     Swal.fire('Error', 'Actualiza tu RUT en el perfil para continuar.', 'error');
     return;
@@ -83,8 +72,34 @@ startSubscription(planId: string) { // ⚠️ Recibir el ID del plan
       Swal.fire('Error', 'Error al contactar con Getnet: ' + err.error.details, 'error');
     }
   });
-}
-
+} */
+  startSubscription(planId: string) {
+    if (!this.global.professionalInfo?.rut) {
+      Swal.fire('Error', 'Please update your RUT in your profile to continue', 'error');
+      return;
+    }
+  
+    this.isProcessing = true;
+  
+    this.paymentService.createSubscription(planId, {
+      name: this.global.professionalInfo.name,
+      email: this.global.professionalInfo.email,
+      document: this.global.professionalInfo.rut
+    }).subscribe({
+      next: (response) => {
+        window.location.href = response.processUrl;
+      },
+      error: (err) => {
+        this.isProcessing = false;
+        Swal.fire({
+          title: 'Payment Error',
+          text: err.message || 'Unable to process payment',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
 // Método para verificar estado de pago
 checkPaymentStatus(requestId: string) {
   this.paymentService.checkPaymentStatus(requestId).subscribe({

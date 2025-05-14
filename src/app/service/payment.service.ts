@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 
 // Interface para tipado seguro (opcional pero recomendado)
 export interface User {
@@ -29,7 +29,7 @@ export class PaymentService {
   constructor(private http: HttpClient) { }
 
   // Crear sesión de pago
-  createSubscription(planId: string, user: User): Observable<PaymentSessionResponse> {
+   createSubscription(planId: string, user: User): Observable<PaymentSessionResponse> {
     return this.http.post<PaymentSessionResponse>(
       `${this.apiUrl}/create-session`,
       {
@@ -41,8 +41,51 @@ export class PaymentService {
         }
       }
     );
+  } 
+/* // payment.service.ts
+createSubscription(planId: string, user: User): Observable<PaymentSessionResponse> {
+  // Validación frontend
+  if (!user.document || !planId) {
+    return throwError(() => new Error('Documento y plan son requeridos'));
   }
 
+  return this.http.post<PaymentSessionResponse>(
+    `${this.apiUrl}/create-session`,
+    {
+      planId,
+      userData: {
+        name: user.name,
+        email: user.email,
+        document: user.document
+      }
+    }
+  ).pipe(
+    catchError(error => {
+      console.error('Error completo:', error);
+      
+      let userMessage = 'Error en el sistema de pagos';
+      let technicalMessage = error.message;
+      
+      if (error.error) {
+        technicalMessage = `${error.error.error} (Código ${error.error.code})`;
+        switch (error.error.code) {
+          case 401:
+            userMessage = 'Error de autenticación con el procesador de pagos';
+            break;
+          case 400:
+            userMessage = 'Datos de pago inválidos';
+            break;
+        }
+      }
+      
+      return throwError(() => ({
+        userMessage,
+        technicalMessage,
+        details: error.error?.details
+      }));
+    })
+  );
+} */
   // Consultar estado del pago
   checkPaymentStatus(requestId: string): Observable<PaymentStatusResponse> {
     return this.http.get<PaymentStatusResponse>(

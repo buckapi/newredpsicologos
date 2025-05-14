@@ -1303,7 +1303,7 @@ getTypeEspecialityText(): string {
   return selectedEspecialities.length > 0 ? selectedEspecialities.map(e => e.name).join(', ') : 'No especificado';
 }
 // En tu servicio de autenticación o profesional
-async loadProfessionalData(): Promise<RecordModel> {
+/* async loadProfessionalData(): Promise<RecordModel> {
   try {
     const userId = this.authService.getUserId();
     const professionalData = await this.pb.collection('professionals').getOne(userId);
@@ -1316,8 +1316,48 @@ async loadProfessionalData(): Promise<RecordModel> {
     console.error('Error loading professional data:', error);
     throw error;
   }
-}
-
+} */
+  async loadProfessionalData(): Promise<RecordModel> {
+    try {
+      const userId = this.authService.getUserId();
+      if (!userId) {
+        throw new Error('No user ID found');
+      }
+  
+      const professionalData = await this.pb.collection('professionals').getOne(userId);
+      
+      if (!professionalData) {
+        throw new Error('Professional data not found');
+      }
+  
+      // Guardar en localStorage
+      localStorage.setItem('professionalData', JSON.stringify(professionalData));
+      
+      return professionalData;
+    } catch (error: any) {
+      console.error('Error loading professional data:', error);
+      if (error.code === 404) {
+        console.log('Professional data not found. Creating new record...');
+        // Create new professional record if not found
+        try {
+          const userId = this.authService.getUserId();
+          if (!userId) {
+            throw new Error('No user ID found');
+          }
+          const newRecord = await this.pb.collection('professionals').create({
+            userId,
+            status: 'active'
+          });
+          localStorage.setItem('professionalData', JSON.stringify(newRecord));
+          return newRecord;
+        } catch (createError) {
+          console.error('Error creating new professional record:', createError);
+          throw createError;
+        }
+      }
+      throw error;
+    }
+  }
 // Al iniciar la aplicación
 async initializeApp() {
   const savedData = localStorage.getItem('professionalData');
