@@ -53,10 +53,7 @@ export class ReviewsComponent {
     const professional = this.professionals.find(p => p.id === id);
     return professional ? professional.name : 'Profesional no encontrado';
   }
-  /* getProfessionalNameById(id: string): string {
-    const professional = this.professionals.find(p => p.id === id);
-    return professional ? `${professional.name} ${professional.lastName}` : 'Usuario Anónimo';
-  } */
+  
   getStatusText(rating: any): string {
     if (!rating.status) return 'Pendiente';
     return rating.status.charAt(0).toUpperCase() + rating.status.slice(1);

@@ -9,6 +9,7 @@
                     <div class="inner">
                         <h3> {{ global.professionalInfo?.name }}</h3>
                         <p>Usuario: <span>{{ global.professionalInfo?.username }}</span></p>
+                        <p>Rut: <span>{{ global.professionalInfo?.rut }}</span></p>
                         <p>Numero de registro: <span>{{ global.professionalInfo?.registrationNumber }}</span></p>
                         <p>Genero: <span>{{ global.professionalInfo?.gender }}</span></p>
                         <p>Idiomas: <span>{{ global.professionalInfo?.languages &&
@@ -42,7 +43,7 @@
         </div>
     </div>
     <div class="right-panel">
-        <div class="content-container" id="dashboard" >
+        <div class="content-container" id="dashboard">
             <div class="outer-container">
                 <section class="pricing-section bg-color-3 sec-pad">
                     <div class="auto-container">
@@ -51,16 +52,12 @@
                             <h2>Elige el plan que mejor se ajuste a tus necesidades</h2>
                         </div>
                         <div class="tabs-box">
-                            <!-- <div class="tab-btn-box centred">
-                                <ul class="tab-btns tab-buttons clearfix">
-                                    <li class="tab-btn active-btn" data-tab="#tab-1">Mensual</li>
-                                    <li class="tab-btn" data-tab="#tab-2">Yearly</li>
-                                </ul>
-                            </div> -->
+
                             <div class="tabs-content">
                                 <div class="tab active-tab" id="tab-1">
                                     <div class="row clearfix">
-                                        <div class="col-lg-4 col-md-6 col-sm-12 pricing-block" *ngFor="let plan of realtimePlanes.planes$ | async">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 pricing-block"
+                                            *ngFor="let plan of realtimePlanes.planes$ | async">
                                             <div class="pricing-block-one">
                                                 <div class="pricing-table">
                                                     <div class="pattern">
@@ -78,183 +75,35 @@
                                                     <div class="table-content">
                                                         <ul class="list clearfix">
                                                             <li>{{ plan.description }}</li>
-                                                            
+
                                                         </ul>
                                                     </div>
                                                     <div class="table-footer">
-                                                        <div class="link"><a ><i
-                                                                    class="icon-Arrow-Right"></i></a></div>
-                                                        <div class="btn-box"><a  class="theme-btn-one"> Suscribirme<i class="icon-Arrow-Right"></i></a></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <!-- <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                                            <div class="pricing-block-one">
-                                                <div class="pricing-table active">
-                                                    <div class="pattern">
-                                                        <div class="pattern-1"
-                                                            style="background-image: url(assets/images/shape/shape-75.png);">
+                                                        <div class="link"><a><i class="icon-Arrow-Right"></i></a></div>
+                                                        <div class="btn-box">
+                                                            <!-- Mensaje si falta RUT -->
+                                                            <div *ngIf="!global.professionalInfo?.rut"
+                                                                class="alert alert-danger">
+                                                                ❌ Completa tu RUT en la sección de perfil para
+                                                                suscribirte.
+                                                            </div>
+
+                                                            <!-- Botón deshabilitado si falta RUT -->
+                                                            <button (click)="startSubscription(plan.id)"
+                                                                [disabled]="isProcessing ||
+                                                                !global.professionalInfo?.rut"
+                                                                class="theme-btn-one"
+                                                                >
+                                                                <span *ngIf="!isProcessing">Suscribirse</span>
+                                                                <span *ngIf="isProcessing">Procesando...</span>
+                                                                <i class="icon-Arrow-Right"></i>
+                                                            </button>
+
+                                                            <!-- Estado del pago -->
+                                                            <div *ngIf="paymentStatus" class="mt-2">
+                                                                Estado: {{ paymentStatus }}
+                                                            </div>
                                                         </div>
-                                                        <div class="pattern-2"
-                                                            style="background-image: url(assets/images/shape/shape-76.png);">
-                                                        </div>
-                                                        <div class="pattern-3"
-                                                            style="background-image: url(assets/images/shape/shape-77.png);">
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <h2>Popular Pack</h2>
-                                                        <h3>$50 USD</h3>
-                                                    </div>
-                                                    <div class="table-content">
-                                                        <ul class="list clearfix">
-                                                            <li>1 Bathroom Cleaning</li>
-                                                            <li>Up to 3 Bedrooms Cleaning</li>
-                                                            <li>1 Livingroom Cleaning</li>
-                                                            <li class="light">Kitchen Cleaning</li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="table-footer">
-                                                        <div class="link"><a href="pricing.html"><i
-                                                                    class="icon-Arrow-Right"></i></a></div>
-                                                        <div class="btn-box"><a href="pricing.html" class="theme-btn-one">Buy
-                                                                Package<i class="icon-Arrow-Right"></i></a></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                                            <div class="pricing-block-one">
-                                                <div class="pricing-table">
-                                                    <div class="pattern">
-                                                        <div class="pattern-1"
-                                                            style="background-image: url(assets/images/shape/shape-75.png);">
-                                                        </div>
-                                                        <div class="pattern-2"
-                                                            style="background-image: url(assets/images/shape/shape-76.png);">
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <h2>Premium Pack</h2>
-                                                        <h3>$60 USD</h3>
-                                                    </div>
-                                                    <div class="table-content">
-                                                        <ul class="list clearfix">
-                                                            <li>1 Bathroom Cleaning</li>
-                                                            <li>Up to 3 Bedrooms Cleaning</li>
-                                                            <li>1 Livingroom Cleaning</li>
-                                                            <li>Kitchen Cleaning</li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="table-footer">
-                                                        <div class="link"><a href="pricing.html"><i
-                                                                    class="icon-Arrow-Right"></i></a></div>
-                                                        <div class="btn-box"><a href="pricing.html" class="theme-btn-one">Buy
-                                                                Package<i class="icon-Arrow-Right"></i></a></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
-                                    </div>
-                                </div>
-                                <div class="tab" id="tab-2">
-                                    <div class="row clearfix">
-                                        <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                                            <div class="pricing-block-one">
-                                                <div class="pricing-table">
-                                                    <div class="pattern">
-                                                        <div class="pattern-1"
-                                                            style="background-image: url(assets/images/shape/shape-75.png);">
-                                                        </div>
-                                                        <div class="pattern-2"
-                                                            style="background-image: url(assets/images/shape/shape-76.png);">
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <h2>Basic Pack</h2>
-                                                        <h3>$50 USD</h3>
-                                                    </div>
-                                                    <div class="table-content">
-                                                        <ul class="list clearfix">
-                                                            <li>1 Bathroom Cleaning</li>
-                                                            <li>Up to 3 Bedrooms Cleaning</li>
-                                                            <li class="light">1 Livingroom Cleaning</li>
-                                                            <li class="light">Kitchen Cleaning</li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="table-footer">
-                                                        <div class="link"><a href="pricing.html"><i
-                                                                    class="icon-Arrow-Right"></i></a></div>
-                                                        <div class="btn-box"><a href="pricing.html" class="theme-btn-one">Buy
-                                                                Package<i class="icon-Arrow-Right"></i></a></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                                            <div class="pricing-block-one">
-                                                <div class="pricing-table active">
-                                                    <div class="pattern">
-                                                        <div class="pattern-1"
-                                                            style="background-image: url(assets/images/shape/shape-75.png);">
-                                                        </div>
-                                                        <div class="pattern-2"
-                                                            style="background-image: url(assets/images/shape/shape-76.png);">
-                                                        </div>
-                                                        <div class="pattern-3"
-                                                            style="background-image: url(assets/images/shape/shape-77.png);">
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <h2>Popular Pack</h2>
-                                                        <h3>$60 USD</h3>
-                                                    </div>
-                                                    <div class="table-content">
-                                                        <ul class="list clearfix">
-                                                            <li>1 Bathroom Cleaning</li>
-                                                            <li>Up to 3 Bedrooms Cleaning</li>
-                                                            <li>1 Livingroom Cleaning</li>
-                                                            <li class="light">Kitchen Cleaning</li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="table-footer">
-                                                        <div class="link"><a href="pricing.html"><i
-                                                                    class="icon-Arrow-Right"></i></a></div>
-                                                        <div class="btn-box"><a href="pricing.html" class="theme-btn-one">Buy
-                                                                Package<i class="icon-Arrow-Right"></i></a></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                                            <div class="pricing-block-one">
-                                                <div class="pricing-table">
-                                                    <div class="pattern">
-                                                        <div class="pattern-1"
-                                                            style="background-image: url(assets/images/shape/shape-75.png);">
-                                                        </div>
-                                                        <div class="pattern-2"
-                                                            style="background-image: url(assets/images/shape/shape-76.png);">
-                                                        </div>
-                                                    </div>
-                                                    <div class="table-header">
-                                                        <h2>Premium Pack</h2>
-                                                        <h3>$70 USD</h3>
-                                                    </div>
-                                                    <div class="table-content">
-                                                        <ul class="list clearfix">
-                                                            <li>1 Bathroom Cleaning</li>
-                                                            <li>Up to 3 Bedrooms Cleaning</li>
-                                                            <li>1 Livingroom Cleaning</li>
-                                                            <li>Kitchen Cleaning</li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="table-footer">
-                                                        <div class="link"><a href="pricing.html"><i
-                                                                    class="icon-Arrow-Right"></i></a></div>
-                                                        <div class="btn-box"><a href="pricing.html" class="theme-btn-one">Buy
-                                                                Package<i class="icon-Arrow-Right"></i></a></div>
                                                     </div>
                                                 </div>
                                             </div>

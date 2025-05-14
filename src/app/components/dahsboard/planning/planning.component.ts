@@ -6,7 +6,9 @@ import { AuthPocketbaseService } from '../../../service/auth-pocketbase.service'
 import { RealtimeProfessionalsService } from '../../../service/realtime-professionals';
 import { RealtimePlanesService } from '../../../service/realtime-planes.service';
 import PocketBase from 'pocketbase';
-
+import { PaymentService } from '../../../service/payment.service';
+import { ActivatedRoute } from '@angular/router';
+import { lastValueFrom } from 'rxjs';
 @Component({
   selector: 'app-planning',
   standalone: true,
@@ -17,12 +19,16 @@ import PocketBase from 'pocketbase';
 export class PlanningComponent {
   imageUrl: string = 'assets/images/resource/profile-3.png'; 
   private pb = new PocketBase('https://db.redpsicologos.cl:8090');
-
+  paymentStatus: string = '';
+  user: any = {};
+  isProcessing: boolean = false; // Propiedad nueva
 constructor(
  public global: GlobalService,
  public authService: AuthPocketbaseService,
  public realtimeProfesionales: RealtimeProfessionalsService,
- public realtimePlanes: RealtimePlanesService
+ public realtimePlanes: RealtimePlanesService,
+ public paymentService: PaymentService,
+ private route: ActivatedRoute
 ) { }
 
  ngOnInit() {
@@ -38,7 +44,65 @@ constructor(
     this.global.loadProfessionalInfo();
     this.getProfessionlInfo();
   }
+  const requestId = this.route.snapshot.queryParams['requestId'];
+  if (requestId) {
+    this.checkPaymentStatus(requestId);
+  }
+  
 }
+
+/* async startPayment() {
+  try {
+    const response = await lastValueFrom(
+      this.paymentService.createSubscription('premium', this.user)
+    );
+    window.location.href = response.processUrl;
+  } catch (err) {
+    Swal.fire('Error', 'No se pudo iniciar el pago.', 'error');
+  }
+} */
+
+startSubscription(planId: string) { // ⚠️ Recibir el ID del plan
+  if (!this.global.professionalInfo?.rut) {
+    Swal.fire('Error', 'Actualiza tu RUT en el perfil para continuar.', 'error');
+    return;
+  }
+
+  this.isProcessing = true;
+
+  this.paymentService.createSubscription(planId, { // ⚠️ Usar planId recibido
+    name: this.global.professionalInfo.name,
+    email: this.global.professionalInfo.email,
+    document: this.global.professionalInfo.rut
+  }).subscribe({
+    next: (response) => {
+      window.location.href = response.processUrl;
+    },
+    error: (err) => {
+      this.isProcessing = false;
+      Swal.fire('Error', 'Error al contactar con Getnet: ' + err.error.details, 'error');
+    }
+  });
+}
+
+// Método para verificar estado de pago
+checkPaymentStatus(requestId: string) {
+  this.paymentService.checkPaymentStatus(requestId).subscribe({
+    next: (statusResponse) => {
+      this.paymentStatus = statusResponse.status;
+      if (this.paymentStatus === 'APPROVED') {
+        Swal.fire('¡Pago exitoso!', 'Tu suscripción está activa.', 'success');
+      } else if (this.paymentStatus === 'REJECTED') {
+        Swal.fire('Pago rechazado', 'Por favor intenta nuevamente.', 'error');
+      }
+    },
+    error: (err) => {
+      console.error('Error:', err);
+      Swal.fire('Error', 'No se pudo verificar el estado del pago.', 'error');
+    }
+  });
+}
+
 confirmLogout() {
   Swal.fire({
     title: '¿Quieres cerrar sesión?',
@@ -75,7 +139,12 @@ async getProfessionlInfo() {
       profesional.payments = profesional.payments || {};
       profesional.days = profesional.days || {};
       profesional.typeAttention = profesional.typeAttention || {};
-      
+      this.user = {
+        id: profesional.id,
+        name: profesional.name,
+        email: profesional.email,
+        rut: this.global.professionalInfo?.rut || profesional.rut
+      };
       // Guardar en el servicio global
       this.global.setPreviewProfesional(profesional);
       
