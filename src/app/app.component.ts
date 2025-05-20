@@ -246,4 +246,9 @@ toggleMobileMenu() {
       toggler?.classList.toggle('active');
   }
 }
+
+openTerms(event: Event) {
+  event.preventDefault();
+  // Lógica para mostrar términos y condiciones
+}
 }

@@ -5,12 +5,12 @@ import Swal from 'sweetalert2';
 import { AuthPocketbaseService } from '../../../service/auth-pocketbase.service';
 import { RealtimeProfessionalsService } from '../../../service/realtime-professionals';
 import { RealtimePlanesService } from '../../../service/realtime-planes.service';
-import PocketBase from 'pocketbase';
 import { PaymentService } from '../../../service/payment.service';
 import { ActivatedRoute } from '@angular/router';
-import { lastValueFrom } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
 @Component({
-  selector: 'app-planning',
+  selector: 'app-planning', 
   standalone: true,
   imports: [CommonModule],
   templateUrl: './planning.component.html',
@@ -18,10 +18,10 @@ import { lastValueFrom } from 'rxjs';
 })
 export class PlanningComponent {
   imageUrl: string = 'assets/images/user.png'; 
-  private pb = new PocketBase('https://db.redpsicologos.cl:8090');
-  paymentStatus: string = '';
+  paymentStatus: any;
   user: any = {};
   isProcessing: boolean = false; // Propiedad nueva
+  public processUrl: string = '';
 constructor(
  public global: GlobalService,
  public authService: AuthPocketbaseService,
@@ -29,6 +29,7 @@ constructor(
  public realtimePlanes: RealtimePlanesService,
  public paymentService: PaymentService,
  private route: ActivatedRoute
+
 ) { }
 
  ngOnInit() {
@@ -44,78 +45,121 @@ constructor(
     this.global.loadProfessionalInfo();
     this.getProfessionlInfo();
   }
-  const requestId = this.route.snapshot.queryParams['requestId'];
+ /*  const requestId = this.route.snapshot.queryParams['requestId'];
   if (requestId) {
     this.checkPaymentStatus(requestId);
-  }
+  } */
   
 }
-
-/* startSubscription(planId: string) { // ⚠️ Recibir el ID del plan
-  if (!this.global.professionalInfo?.rut) {
-    Swal.fire('Error', 'Actualiza tu RUT en el perfil para continuar.', 'error');
-    return;
-  }
-
+startSubscription(planId: string) {
+  if (this.isProcessing) return;
+  
   this.isProcessing = true;
+  this.paymentStatus = null;
 
-  this.paymentService.createSubscription(planId, { // ⚠️ Usar planId recibido
-    name: this.global.professionalInfo.name,
-    email: this.global.professionalInfo.email,
-    document: this.global.professionalInfo.rut
-  }).subscribe({
-    next: (response) => {
-      window.location.href = response.processUrl;
-    },
-    error: (err) => {
-      this.isProcessing = false;
-      Swal.fire('Error', 'Error al contactar con Getnet: ' + err.error.details, 'error');
-    }
-  });
-} */
-  startSubscription(planId: string) {
-    if (!this.global.professionalInfo?.rut) {
-      Swal.fire('Error', 'Please update your RUT in your profile to continue', 'error');
+  this.realtimePlanes.planes$.subscribe(plans => {
+    const selectedPlan = plans.find(p => p.id === planId);
+    if (!selectedPlan) {
+      this.handleError('Plan no encontrado');
       return;
     }
-  
-    this.isProcessing = true;
-  
-    this.paymentService.createSubscription(planId, {
-      name: this.global.professionalInfo.name,
-      email: this.global.professionalInfo.email,
-      document: this.global.professionalInfo.rut
-    }).subscribe({
-      next: (response) => {
-        window.location.href = response.processUrl;
+
+    // Validar que el RUT esté correctamente formateado
+    const rut = this.global.professionalInfo?.rut;
+    if (!this.validateRUT(rut)) {
+      this.handleError('El RUT no es válido');
+      return;
+    }
+
+    const paymentRequest = {
+      locale: 'es_CL',
+      buyer: {
+        name: this.global.professionalInfo?.name || 'Cliente',
+        surname: this.global.professionalInfo?.lastName || 'Anónimo',
+        email: this.global.professionalInfo?.email || 'cliente@example.com',
+        document: rut,
+        documentType: 'CLRUT',
+        mobile: this.formatPhoneNumber(this.global.professionalInfo?.phone)
+      },
+      payment: {
+        reference: `SUB_${planId}_${Date.now()}`,
+        description: `Suscripción a ${selectedPlan.name}`,
+        amount: {
+          currency: 'CLP',
+          total: selectedPlan.price
+        },
+        recurring: {
+          periodicity: 'monthly',
+          interval: 1,
+          maxPayments: 12,
+          dueDate: this.getNextDueDate()
+        }
+      },
+      expiration: new Date(Date.now() + 3600000).toISOString(),
+      returnUrl: `${environment.returnUrl}?type=subscription&planId=${planId}`,
+      cancelUrl: environment.cancelUrl,
+      ipAddress: this.getUserIP(), // Método para obtener IP real en producción
+      userAgent: navigator.userAgent
+    };
+
+    this.paymentService.createPaymentSession(paymentRequest, true).subscribe({
+      next: (response: any) => {
+        if (response.status?.status === 'OK') {
+          // Redirigir al checkout de GetNet
+          window.location.href = response.processUrl;
+        } else {
+          this.handleError(response.status?.message || 'Error al crear sesión de pago');
+        }
       },
       error: (err) => {
-        this.isProcessing = false;
-        Swal.fire({
-          title: 'Payment Error',
-          text: err.message || 'Unable to process payment',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
+        this.handleError(this.parseGetnetError(err));
       }
     });
-  }
-// Método para verificar estado de pago
-checkPaymentStatus(requestId: string) {
-  this.paymentService.checkPaymentStatus(requestId).subscribe({
-    next: (statusResponse) => {
-      this.paymentStatus = statusResponse.status;
-      if (this.paymentStatus === 'APPROVED') {
-        Swal.fire('¡Pago exitoso!', 'Tu suscripción está activa.', 'success');
-      } else if (this.paymentStatus === 'REJECTED') {
-        Swal.fire('Pago rechazado', 'Por favor intenta nuevamente.', 'error');
-      }
-    },
-    error: (err) => {
-      console.error('Error:', err);
-      Swal.fire('Error', 'No se pudo verificar el estado del pago.', 'error');
-    }
   });
+}
+
+private getUserIP(): string {
+  return navigator.userAgent;
+}
+
+// Métodos auxiliares
+private validateRUT(rut: string): boolean {
+  if (!rut) return false;
+  // Implementar validación de RUT chileno
+  return true;
+}
+
+private formatPhoneNumber(phone: string): string {
+  if (!phone) return '+56912345678';
+  // Formatear número chileno
+  return phone.startsWith('+56') ? phone : `+56${phone}`;
+}
+
+private getNextDueDate(): string {
+  const nextMonth = new Date();
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  return nextMonth.toISOString().split('T')[0];
+}
+
+private parseGetnetError(error: any): string {
+  if (!error.error) return 'Error desconocido';
+  
+  const getnetErrorCodes = {
+    '100': 'Autenticación mal formada',
+    '101': 'Credenciales incorrectas',
+    '102': 'TranKey inválido',
+    '103': 'Diferencia de tiempo mayor a 5 minutos',
+    '104': 'Cuenta inactiva'
+  };
+  
+  return getnetErrorCodes[error.error.status?.reason as keyof typeof getnetErrorCodes] || 
+         error.error.status?.message || 
+         'Error en el procesamiento del pago';
+}
+
+private handleError(message: string) {
+  Swal.fire('Error', message, 'error');
+  this.isProcessing = false;
 }
 
 confirmLogout() {

@@ -4,4 +4,5 @@ export const environment = {
   recaptchaSecretKey: '6Leeui0rAAAAAFPGCAomijcMLh0ewkApJvXxcB5d',
   emailServiceUrl: 'https://db.redpsicologos.cl:5542/welcome'
 
+  
 };

@@ -89,7 +89,7 @@
                                                             </div>
 
                                                             <!-- Botón deshabilitado si falta RUT -->
-                                                            <button (click)="startSubscription(plan.id)"
+                                                             <button (click)="startSubscription(plan.id)"
                                                                 [disabled]="isProcessing ||
                                                                 !global.professionalInfo?.rut"
                                                                 class="theme-btn-one"
@@ -97,8 +97,8 @@
                                                                 <span *ngIf="!isProcessing">Suscribirse</span>
                                                                 <span *ngIf="isProcessing">Procesando...</span>
                                                                 <i class="icon-Arrow-Right"></i>
-                                                            </button>
-
+                                                            </button> 
+                                                            
                                                             <!-- Estado del pago -->
                                                             <div *ngIf="paymentStatus" class="mt-2">
                                                                 Estado: {{ paymentStatus }}

@@ -29,7 +29,10 @@ export class AuthPocketbaseService {
       }
       return password;
     }
- 
+
+    getToken(): string {
+      return this.pb.authStore.token;
+    }
     getProfessionalInfo() {
       return this.global.professionalInfo;
     }
@@ -162,6 +165,8 @@ export class AuthPocketbaseService {
         })
     );
     }
+    // En tu auth.service.ts
+
   loginUser(email: string, password: string): Observable<any> {
     return from(this.pb.collection('users').authWithPassword(email, password))
       .pipe(
@@ -184,6 +189,7 @@ export class AuthPocketbaseService {
             biography: pbUser['biography'],
           };
           return { ...authData, user };
+          
         }),
         tap((authData) => {
           this.setUser(authData.user);
@@ -191,6 +197,10 @@ export class AuthPocketbaseService {
           localStorage.setItem('isLoggedin', 'true');
           this.global.islogged = true;
           localStorage.setItem('userId', authData.user.id);
+            console.log('Token generado:', authData.token); 
+          localStorage.setItem('pb_auth_token', authData.token);
+          this.pb.authStore.save(authData.token);
+          console.log('Token actualizado:', this.pb.authStore.token);
         })
       );
   }

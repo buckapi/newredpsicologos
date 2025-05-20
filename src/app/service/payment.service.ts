@@ -1,95 +1,57 @@
+// getnet.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
-
-// Interface para tipado seguro (opcional pero recomendado)
-export interface User {
-  id?: string;
-  name: string;
-  email: string;
-  document: string;
-}
-
-interface PaymentSessionResponse {
-  processUrl: string;
-  requestId: string;
-}
-
-interface PaymentStatusResponse {
-  status: 'APPROVED' | 'REJECTED' | 'PENDING';
-  amount?: number;
-  planId?: string;
-}
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import * as CryptoJS from 'crypto-js';
 
 @Injectable({
-  providedIn: 'root' // Disponible en toda la app
+  providedIn: 'root'
 })
 export class PaymentService {
-  private apiUrl = 'https://db.redpsicologos.cl:3000/api/payments'; // URL completa
+  private apiUrl = environment.getnetApiUrl; // Debería estar en environment.ts
+  private login = environment.getnetLogin; // clientId
+  private secretKey = environment.getnetTranKey; // clientSecret
+  
   constructor(private http: HttpClient) { }
 
-  // Crear sesión de pago
-   createSubscription(planId: string, user: User): Observable<PaymentSessionResponse> {
-    return this.http.post<PaymentSessionResponse>(
-      `${this.apiUrl}/create-session`,
-      {
-        planId,
-        userData: {
-          name: user.name,
-          email: user.email,
-          document: user.document
-        }
-      }
-    );
-  } 
-/* // payment.service.ts
-createSubscription(planId: string, user: User): Observable<PaymentSessionResponse> {
-  // Validación frontend
-  if (!user.document || !planId) {
-    return throwError(() => new Error('Documento y plan son requeridos'));
+  private generateAuthHeaders() {
+    // 1. Generar nonce (valor aleatorio)
+    const nonce = CryptoJS.lib.WordArray.random(16).toString();
+    
+    // 2. Generar seed (fecha actual en ISO 8601)
+    const seed = new Date().toISOString();
+    
+    // 3. Calcular tranKey (SHA-256 de nonce + seed + secretKey, luego Base64)
+    const tranKey = CryptoJS.SHA256(nonce + seed + this.secretKey).toString(CryptoJS.enc.Base64);
+    
+    // 4. Codificar nonce en Base64 para enviarlo
+    const encodedNonce = CryptoJS.enc.Utf8.parse(nonce).toString(CryptoJS.enc.Base64);
+    
+    // 5. Crear objeto de autenticación
+    const auth = {
+      login: this.login,
+      tranKey,
+      nonce: encodedNonce,
+      seed
+    };
+    
+    // 6. Crear headers
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${btoa(JSON.stringify(auth))}`
+    });
   }
 
-  return this.http.post<PaymentSessionResponse>(
-    `${this.apiUrl}/create-session`,
-    {
-      planId,
-      userData: {
-        name: user.name,
-        email: user.email,
-        document: user.document
-      }
-    }
-  ).pipe(
-    catchError(error => {
-      console.error('Error completo:', error);
-      
-      let userMessage = 'Error en el sistema de pagos';
-      let technicalMessage = error.message;
-      
-      if (error.error) {
-        technicalMessage = `${error.error.error} (Código ${error.error.code})`;
-        switch (error.error.code) {
-          case 401:
-            userMessage = 'Error de autenticación con el procesador de pagos';
-            break;
-          case 400:
-            userMessage = 'Datos de pago inválidos';
-            break;
-        }
-      }
-      
-      return throwError(() => ({
-        userMessage,
-        technicalMessage,
-        details: error.error?.details
-      }));
-    })
-  );
-} */
-  // Consultar estado del pago
-  checkPaymentStatus(requestId: string): Observable<PaymentStatusResponse> {
-    return this.http.get<PaymentStatusResponse>(
-      `${this.apiUrl}/check-status/${requestId}`
-    );
+  createPaymentSession(paymentData: any, isSubscription: boolean = false) {
+    const endpoint = isSubscription ? '/subscription' : '/session';
+    return this.http.post(`${this.apiUrl}${endpoint}`, paymentData, {
+      headers: this.generateAuthHeaders()
+    });
+  }
+
+  getPaymentStatus(requestId: string) {
+    return this.http.post(`${this.apiUrl}/session/${requestId}`, {}, {
+      headers: this.generateAuthHeaders()
+    });
   }
 }
