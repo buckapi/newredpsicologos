@@ -14,6 +14,7 @@ export interface Planes {
   price: string;
   description: string;
   services?: Service[];
+  duration: number;
 }
 
 @Injectable({

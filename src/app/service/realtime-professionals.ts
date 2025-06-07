@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import PocketBase from 'pocketbase';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, from, map } from 'rxjs';
 
 export interface Profesionals {
   id: string;
@@ -81,7 +81,8 @@ export class RealtimeProfessionalsService implements OnDestroy {
       map(profesionales => profesionales.find(profesional => profesional.id === userId))
     );
   }
-
+  
+  
   private async subscribeToProfesionales() {
     try {
       await this.pb.collection('users').authWithPassword('admin@email.com', 'admin1234');
@@ -97,7 +98,9 @@ export class RealtimeProfessionalsService implements OnDestroy {
   private handleRealtimeEvent(event: any) {
     this.updateProfesionalesList();
   }
-
+  updateProfesional(id: string, data: any) {
+    return from(this.pb.collection('psychologistsProfessionals').update(id, data));
+  }
   private async updateProfesionalesList() {
     try {
       const records = await this.pb.collection('psychologistsProfessionals').getFullList<Profesionals>(200, {

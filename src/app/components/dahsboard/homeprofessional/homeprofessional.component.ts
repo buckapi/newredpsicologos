@@ -12,6 +12,8 @@ import { AuthPocketbaseService } from '../../../service/auth-pocketbase.service'
 import { RealtimeProfessionalsService } from '../../../service/realtime-professionals';
 import { CommonModule } from '@angular/common';
 import { RealtimeCorrientesService } from '../../../service/realtime-corrientes.service';
+import { ActivatedRoute } from '@angular/router';
+import { RealtimePlanesService } from '../../../service/realtime-planes.service';
 
 
 @Component({
@@ -26,6 +28,7 @@ export class HomeprofessionalComponent implements OnInit {
   imageUrl: string = 'assets/images/resource/.png'; 
   private pb = new PocketBase('https://db.redpsicologos.cl:8090');
   isLoading: boolean = false;
+  plan: any = {};
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
 constructor(  
   public global: GlobalService,
@@ -33,6 +36,8 @@ constructor(
   public fb: FormBuilder,
   public realtimeProfesionales: RealtimeProfessionalsService,
   public realtimeCorrientes: RealtimeCorrientesService,
+  public route: ActivatedRoute,
+  public realtimePlanes: RealtimePlanesService
   
 )
 {
@@ -52,6 +57,24 @@ constructor(
     this.global.loadProfessionalInfo();
     this.getProfessionlInfo();
   }
+  this.route.queryParams.subscribe(params => {
+    const redirectType = params['type'];
+    if (redirectType === 'subscription') {
+      this.global.activeRoute = 'planning';
+    }
+  });
+  this.route.queryParams.subscribe(params => {
+    const type = params['type'];
+    const planId = params['planId'];
+
+    if (type === 'subscription') {
+      this.global.activeRoute = 'planning'; // Activa la vista "Suscripción"
+    }
+
+    if (params['status'] === 'cancel') {
+      Swal.fire('Pago cancelado', 'No completaste el proceso de pago.', 'info');
+    }
+  });
 }
 confirmLogout() {
   Swal.fire({

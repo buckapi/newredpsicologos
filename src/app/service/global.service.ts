@@ -178,6 +178,7 @@ export class GlobalService {
     
   };
   searchTerm: string = '';
+  activePlanId: string = '';
   constructor(
     private realtimeRegiones: RealtimeRegionesService,
     public realtimeProfesionales: RealtimeProfessionalsService  ) 
@@ -218,6 +219,9 @@ export class GlobalService {
     });
     this.professionalInfo = JSON.parse(localStorage.getItem('professionalInfo') || '{}');
     this.menuSelected = option;
+  }
+  setActivePlanId(planId: string) {
+    this.activePlanId = planId;
   }
   setProfesional(route: string,profesional  : Profesionals) {
     this.activeRoute = route;

@@ -51,8 +51,12 @@
                             <p>Planes de suscripción</p>
                             <h2>Elige el plan que mejor se ajuste a tus necesidades</h2>
                         </div>
-                        <div class="tabs-box">
 
+                        <div class="tabs-box">
+                            <div class="badge badge-success" *ngIf="global.professionalInfo?.planId === plan.id">
+                                Plan actual
+                              </div>
+                              
                             <div class="tabs-content">
                                 <div class="tab active-tab" id="tab-1">
                                     <div class="row clearfix">
@@ -89,15 +93,18 @@
                                                             </div>
 
                                                             <!-- Botón deshabilitado si falta RUT -->
-                                                             <button (click)="startSubscription(plan.id)"
-                                                                [disabled]="isProcessing ||
-                                                                !global.professionalInfo?.rut"
-                                                                class="theme-btn-one"
-                                                                >
-                                                                <span *ngIf="!isProcessing">Suscribirse</span>
-                                                                <span *ngIf="isProcessing">Procesando...</span>
-                                                                <i class="icon-Arrow-Right"></i>
-                                                            </button> 
+                                                            
+                                                            <button 
+                                                            (click)="startSubscription(plan.id)"
+                                                            [disabled]="isProcessing || !global.professionalInfo?.rut || 
+                                                                        (global.professionalInfo?.planId === plan.id && suscripcionActiva)"
+                                                            class="theme-btn-one"
+                                                          >
+                                                            <span *ngIf="!isProcessing">Suscribirse</span>
+                                                            <span *ngIf="isProcessing">Procesando...</span>
+                                                            <i class="icon-Arrow-Right"></i>
+                                                          </button>
+                                                          
                                                             
                                                             <!-- Estado del pago -->
                                                             <div *ngIf="paymentStatus" class="mt-2">
