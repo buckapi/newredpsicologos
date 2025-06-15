@@ -77,7 +77,7 @@ export class PaymentService {
 
     createPaymentSession(paymentData: any) {
       // No usar encabezados personalizados
-      return this.http.post('http://localhost:3000/api/getnet/create-payment-session', paymentData);
+      return this.http.post('https://db.redpsicologos.cl:3000/api/getnet/create-payment-session', paymentData);
     }
 
   getPaymentStatus(requestId: string) {

@@ -22,6 +22,7 @@ import { filter } from 'rxjs';
 import { PrivacyComponent } from './components/privacy/privacy.component';
 import { TermsComponent } from './components/terms/terms.component';
 import { PlanningComponent } from './components/dahsboard/planning/planning.component';
+import { ChangePasswordComponent } from './components/dahsboard/change-password/change-password.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -41,7 +42,8 @@ import { PlanningComponent } from './components/dahsboard/planning/planning.comp
     ReviewsComponent,
     PrivacyComponent,
     TermsComponent,
-    PlanningComponent
+    PlanningComponent,
+    ChangePasswordComponent
   ],  
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -55,8 +57,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   menuItems = [
     { label: 'Inicio', route: 'home', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
     { label: 'Profesionales', route: 'professionals', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
-    { label: 'Contacto', route: 'contact', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() }
-  ]; 
+    { label: 'Contacto', route: 'contact', visible: () => !this.auth.isLogin(), scrollToTop: () => this.globalService.scrollToTop() },
+/*     {label: 'Foro', rute: 'win' visible:()=> !this.auth.isLogin(), scrollToTop: () => this.globalservice.scrollToTop()}
+ */  ]; 
 
   constructor(
     public globalService: GlobalService,

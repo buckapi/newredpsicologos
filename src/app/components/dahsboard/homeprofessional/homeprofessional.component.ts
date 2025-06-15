@@ -14,6 +14,8 @@ import { CommonModule } from '@angular/common';
 import { RealtimeCorrientesService } from '../../../service/realtime-corrientes.service';
 import { ActivatedRoute } from '@angular/router';
 import { RealtimePlanesService } from '../../../service/realtime-planes.service';
+import { HttpClient } from '@angular/common/http';
+
 
 
 @Component({
@@ -37,7 +39,8 @@ constructor(
   public realtimeProfesionales: RealtimeProfessionalsService,
   public realtimeCorrientes: RealtimeCorrientesService,
   public route: ActivatedRoute,
-  public realtimePlanes: RealtimePlanesService
+  public realtimePlanes: RealtimePlanesService,
+  private http: HttpClient // <-- importante
   
 )
 {
@@ -152,6 +155,33 @@ confirmLogout() {
       console.error('Error fetching record:', error);
     }
   }
+
+  goToForum() {
+    const user = this.authService.getCurrentUser();
+  
+    if (!user) {
+      console.error('Usuario no autenticado');
+      return;
+    }
+  
+    const body = {
+      userId: user.id,
+      username: user.username,
+      type: user.type
+    };
+  
+    this.http.post<{ code: string }>('http://localhost:4000/api/issue-code', body)
+      .subscribe({
+        next: ({ code }) => {
+          window.location.href = `https://foro.redpsicologos.cl/login?code=${code}`;
+        },
+        error: (err) => {
+          console.error('Error al generar código para el foro:', err);
+          alert('No se pudo acceder al foro en este momento.');
+        }
+      });
+  }
+  
 
 
       

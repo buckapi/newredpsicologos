@@ -129,7 +129,8 @@ constructor(
   public realtimeTratamientos: RealtimeTratamientosService,
   public realtimeEspecialidades: RealtimeEspecialidadesService,
   public realtimeCorrientes: RealtimeCorrientesService,
-  public router: Router
+  public router: Router,
+ 
 ){
    // Cargar datos iniciales
      this.realtimeRegiones.regiones$.subscribe(regiones => this.regiones = regiones);
@@ -356,20 +357,6 @@ toggleFilters(): void {
 isMobile(): boolean {
   return window.innerWidth <= 768; // Cambia este valor según tus necesidades
 }
-// En el componente
-/* getFormattedTargets(targets: any): string {
-  const activeTargets = [];
-  
-  if (targets?.['niños y niñas']) activeTargets.push('Niños y niñas');
-  if (targets?.adultos) activeTargets.push('Adultos');
-  if (targets?.['jóvenes y adolecentes']) activeTargets.push('Jóvenes y adolescentes');
-  if (targets?.['adultos mayores']) activeTargets.push('Adultos mayores');
-  if (targets?.todos) activeTargets.push('Todos los públicos');
-  
-  return activeTargets.join(', ') || 'No especificado';
-} */
-
-
   searchProfessionals(term: string) {
     if (term.trim()) {
         // Guarda el término de búsqueda en el servicio global
