@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { GlobalService } from './service/global.service';
 import { ScriptLoaderService } from './service/loader.service';
 import { HomeComponent } from './components/home/home.component';
@@ -66,7 +66,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     private scriptLoader: ScriptLoaderService,
     public auth: AuthPocketbaseService,
     public realtimeProfesionales: RealtimeProfessionalsService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute, 
   
   )
     {
@@ -123,7 +124,13 @@ export class AppComponent implements OnInit, AfterViewInit {
           behavior: 'smooth'
         });
       });
+      this.route.queryParams.subscribe(params => {
+        if (params['logout'] === 'true') {
+          this.logout();
+        }
+      });
     }
+   
     ngAfterViewInit() {
       this.adjustBodyPadding();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -193,9 +200,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Función para cerrar sesión
     logout(): void {
       this.auth.logoutUser().subscribe(() => {
-        this.checkLoginStatus();  // Actualizamos el estado después de cerrar sesión
+        this.checkLoginStatus();
+        this.router.navigate(['home']);
       });
+      localStorage.clear();
     }
+    
+   
     
     // Función para redirigir a las rutas de login y register
     navigateTo(route: string): void {

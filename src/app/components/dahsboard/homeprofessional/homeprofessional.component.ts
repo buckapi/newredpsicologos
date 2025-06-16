@@ -173,7 +173,7 @@ confirmLogout() {
     this.http.post<{ code: string }>('http://localhost:4000/api/issue-code', body)
       .subscribe({
         next: ({ code }) => {
-          window.location.href = `https://foro.redpsicologos.cl/login?code=${code}`;
+          window.location.href = `http://localhost:3000/?code=${code}`;
         },
         error: (err) => {
           console.error('Error al generar código para el foro:', err);

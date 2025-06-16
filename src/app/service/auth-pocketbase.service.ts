@@ -221,12 +221,16 @@ export class AuthPocketbaseService {
     this.global.loading = false;
     this.pb.authStore.clear();
     this.global.activeRoute = 'home';
+    this.pb.authStore.clear();
+    localStorage.clear();
+    this.userTypeSubject.next(null); // si usas BehaviorSubject
     // this.virtualRouter.routerActive = "home";
     return new Observable<any>((observer) => {
       observer.next(''); // Indicar que la operación de cierre de sesión ha completado
       observer.complete();
     });
   }
+ 
   
 
   setUser(user: UserInterface): void {
